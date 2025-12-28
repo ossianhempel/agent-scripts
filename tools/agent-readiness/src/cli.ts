@@ -43,7 +43,12 @@ runner().catch((error) => {
 async function runReport(): Promise<void> {
   const rootInput = resolveRoot(options.root);
   const repoRoot = detectRepoRoot(rootInput);
-  const report = await buildReport(repoRoot, pkg.version);
+  const report = await buildReport(repoRoot, pkg.version, {
+    telemetryScan: options.telemetryScan ?? false,
+    runIntegration: options.runIntegration ?? false,
+    ciProvider: options.ciProvider,
+    signals: options.signals,
+  });
 
   if (options.out) {
     const outPath = path.resolve(repoRoot, options.out);
@@ -87,6 +92,10 @@ function parseArgs(rest: string[]): {
   pretty?: boolean;
   help?: boolean;
   version?: boolean;
+  telemetryScan?: boolean;
+  runIntegration?: boolean;
+  ciProvider?: "github";
+  signals?: "github";
 } {
   const result: {
     format: "json" | "markdown";
@@ -96,6 +105,10 @@ function parseArgs(rest: string[]): {
     pretty?: boolean;
     help?: boolean;
     version?: boolean;
+    telemetryScan?: boolean;
+    runIntegration?: boolean;
+    ciProvider?: "github";
+    signals?: "github";
   } = {
     format: "markdown",
   };
@@ -148,6 +161,44 @@ function parseArgs(rest: string[]): {
       result.pretty = true;
       continue;
     }
+    if (arg === "--telemetry-scan") {
+      result.telemetryScan = true;
+      continue;
+    }
+    if (arg === "--run-integration") {
+      result.runIntegration = true;
+      continue;
+    }
+    if (arg === "--ci-provider") {
+      const value = rest[i + 1];
+      if (value === "github") {
+        result.ciProvider = value;
+      }
+      i += 1;
+      continue;
+    }
+    if (arg.startsWith("--ci-provider=")) {
+      const value = arg.split("=")[1];
+      if (value === "github") {
+        result.ciProvider = value;
+      }
+      continue;
+    }
+    if (arg === "--signals") {
+      const value = rest[i + 1];
+      if (value === "github") {
+        result.signals = value;
+      }
+      i += 1;
+      continue;
+    }
+    if (arg.startsWith("--signals=")) {
+      const value = arg.split("=")[1];
+      if (value === "github") {
+        result.signals = value;
+      }
+      continue;
+    }
     if (arg === "--help" || arg === "-h") {
       result.help = true;
       continue;
@@ -161,6 +212,6 @@ function parseArgs(rest: string[]): {
 }
 
 function printHelp(): void {
-  const message = `Agent Readiness Framework\n\nUsage:\n  agent-readiness report [--format json|markdown] [--out path] [--root path] [--pretty]\n  agent-readiness validate [--in path] [--root path]\n\nOptions:\n  --format   Output format (default: markdown)\n  --out      Write JSON report to a file (relative to repo root)\n  --in       Input JSON report path (default: .agent-readiness/latest.json)\n  --root     Start path for repo discovery (default: cwd)\n  --pretty   Pretty-print JSON output\n  --version  Print CLI version\n  --help     Show help\n`;
+  const message = `Agent Readiness Framework\n\nUsage:\n  agent-readiness report [--format json|markdown] [--out path] [--root path] [--pretty]\n  agent-readiness validate [--in path] [--root path]\n\nOptions:\n  --format           Output format (default: markdown)\n  --out              Write JSON report to a file (relative to repo root)\n  --in               Input JSON report path (default: .agent-readiness/latest.json)\n  --root             Start path for repo discovery (default: cwd)\n  --pretty           Pretty-print JSON output\n  --telemetry-scan   Enable deeper tracing/metrics code scanning\n  --run-integration  Execute integration test commands (short timeout)\n  --ci-provider      CI provider for optional checks (github)\n  --signals          Enable signals-based checks (github)\n  --version          Print CLI version\n  --help             Show help\n`;
   process.stdout.write(message);
 }

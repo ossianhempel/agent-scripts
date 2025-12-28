@@ -1,7 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT_ARG="${1:-.}"
+ROOT_ARG="."
+EXTRA_ARGS=()
+if [[ $# -gt 0 && "${1:-}" != -* ]]; then
+  ROOT_ARG="$1"
+  shift
+fi
+EXTRA_ARGS=("$@")
 FORMAT="${FORMAT:-markdown}"
 OUT="${OUT:-.agent-readiness/latest.json}"
 
@@ -28,4 +34,4 @@ if [[ "$NEEDS_BUILD" -eq 1 ]]; then
   (cd tools/agent-readiness && npm install && npm run build)
 fi
 
-node "$CLI_PATH" report --format "$FORMAT" --out "$OUT"
+node "$CLI_PATH" report --format "$FORMAT" --out "$OUT" --root "$ROOT_ARG" "${EXTRA_ARGS[@]}"
