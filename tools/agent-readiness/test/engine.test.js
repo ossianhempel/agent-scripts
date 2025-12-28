@@ -42,11 +42,15 @@ test("buildReport scores Level 1 criteria and produces action items", async () =
 
     const report = await buildReport(root, "0.1.0-test");
 
-    assert.equal(report.levels.achievedLevel, 1);
-    assert.equal(report.levels.nextLevel, 2);
+    assert.equal(report.levelSummary.achievedLevel, 1);
+    assert.equal(report.levelSummary.nextLevel, 2);
+    assert.equal(report.levels["1"].passCount, 4);
+    assert.equal(report.levels["1"].evaluatedCount, 4);
     assert.equal(report.report.lint_config.numerator, 1);
     assert.equal(report.report.type_check.numerator, 1);
     assert.equal(report.report.unit_tests.numerator, 1);
+    assert.equal(report.criteriaMeta.readme.status, "pass");
+    assert.equal(report.criteriaMeta.integration_tests_runnable.status, "not_evaluated");
     assert.ok(report.actionItems.length > 0);
     const actionIds = report.actionItems.map((item) => item.criterionId);
     assert.ok(actionIds.includes("devcontainer") || actionIds.includes("precommit_hooks"));

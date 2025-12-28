@@ -10,7 +10,9 @@
     "repoRoot",
     "apps",
     "report",
-    "levels"
+    "criteriaMeta",
+    "levels",
+    "levelSummary"
   ],
   "properties": {
     "schemaVersion": { "type": "string" },
@@ -57,8 +59,12 @@
           "pillar": { "type": "string" },
           "scope": { "type": "string", "enum": ["repo", "app"] },
           "numerator": { "type": "integer", "minimum": 0 },
-          "denominator": { "type": "integer", "minimum": 1 },
+          "denominator": { "type": "integer", "minimum": 0 },
           "rationale": { "type": "string" },
+          "evidence": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
           "failingApps": {
             "type": "array",
             "items": { "type": "string" }
@@ -67,26 +73,67 @@
         "additionalProperties": false
       }
     },
+    "criteriaMeta": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["level", "scope", "pillar", "status"],
+        "properties": {
+          "level": { "type": "integer", "minimum": 1, "maximum": 5 },
+          "scope": { "type": "string", "enum": ["repo", "app"] },
+          "pillar": { "type": "string" },
+          "status": {
+            "type": "string",
+            "enum": ["pass", "fail", "not_applicable", "not_evaluated"]
+          }
+        },
+        "additionalProperties": false
+      }
+    },
     "levels": {
       "type": "object",
-      "required": ["achievedLevel", "nextLevel", "gate", "progress"],
+      "additionalProperties": {
+        "type": "object",
+        "required": ["completion", "evaluatedCount", "passCount", "unlocked"],
+        "properties": {
+          "completion": { "type": "number", "minimum": 0, "maximum": 1 },
+          "evaluatedCount": { "type": "integer", "minimum": 0 },
+          "passCount": { "type": "integer", "minimum": 0 },
+          "unlocked": { "type": "boolean" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "levelSummary": {
+      "type": "object",
+      "required": ["achievedLevel", "nextLevel", "gate", "levels"],
       "properties": {
         "achievedLevel": { "type": "integer", "minimum": 0, "maximum": 5 },
         "nextLevel": { "type": ["integer", "null"], "minimum": 1, "maximum": 5 },
         "gate": { "type": "number" },
-        "progress": {
+        "levels": {
           "type": "object",
           "additionalProperties": {
             "type": "object",
-            "required": ["numerator", "denominator", "completion"],
+            "required": ["completion", "evaluatedCount", "passCount", "unlocked"],
             "properties": {
-              "numerator": { "type": "integer", "minimum": 0 },
-              "denominator": { "type": "integer", "minimum": 0 },
-              "completion": { "type": "number", "minimum": 0, "maximum": 1 }
+              "completion": { "type": "number", "minimum": 0, "maximum": 1 },
+              "evaluatedCount": { "type": "integer", "minimum": 0 },
+              "passCount": { "type": "integer", "minimum": 0 },
+              "unlocked": { "type": "boolean" }
             },
             "additionalProperties": false
           }
         }
+      },
+      "additionalProperties": false
+    },
+    "signals": {
+      "type": "object",
+      "properties": {
+        "ciProvider": { "type": "string" },
+        "deploySource": { "type": "string" },
+        "notes": { "type": "string" }
       },
       "additionalProperties": false
     },

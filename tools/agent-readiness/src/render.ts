@@ -1,17 +1,16 @@
-import { CriterionResult, ReadinessReport } from "./types";
+import { CriterionResult, CriterionStatus, ReadinessReport } from "./types";
 
 export function renderMarkdown(report: ReadinessReport): string {
   const lines: string[] = [];
-  const achieved = report.levels.achievedLevel;
-  const nextLevel = report.levels.nextLevel;
-  const currentProgress = report.levels.progress[String(achieved)] || {
-    numerator: 0,
-    denominator: 0,
+  const achieved = report.levelSummary.achievedLevel;
+  const nextLevel = report.levelSummary.nextLevel;
+  const currentProgress = report.levels[String(achieved)] || {
+    passCount: 0,
+    evaluatedCount: 0,
     completion: 0,
+    unlocked: false,
   };
-  const nextProgress = nextLevel
-    ? report.levels.progress[String(nextLevel)]
-    : null;
+  const nextProgress = nextLevel ? report.levels[String(nextLevel)] : null;
 
   lines.push("# Agent Readiness Report");
   lines.push("");
@@ -24,7 +23,7 @@ export function renderMarkdown(report: ReadinessReport): string {
     lines.push(
       `- Next gate: Level ${nextLevel} (${formatPercent(
         nextProgress.completion
-      )} / ${Math.round(report.levels.gate * 100)}% required)`
+      )} / ${Math.round(report.levelSummary.gate * 100)}% required)`
     );
   } else {
     lines.push("- Next gate: none (all levels achieved)");
@@ -37,19 +36,26 @@ export function renderMarkdown(report: ReadinessReport): string {
   lines.push("## Criteria");
 
   const grouped = groupByLevel(report.report);
+  const maxVisibleLevel = Math.min(achieved + 1, 5);
   for (const level of Object.keys(grouped).sort((a, b) => Number(a) - Number(b))) {
+    if (Number(level) > maxVisibleLevel) continue;
     const results = grouped[level];
-    const progress = report.levels.progress[level];
+    const progress = report.levels[level];
+    const progressLabel =
+      progress.evaluatedCount === 0
+        ? "not evaluated"
+        : `${progress.passCount}/${progress.evaluatedCount} = ${formatPercent(
+            progress.completion
+          )}`;
     lines.push("");
-    lines.push(
-      `### Level ${level} (${progress.numerator}/${progress.denominator} = ${formatPercent(
-        progress.completion
-      )})`
-    );
+    lines.push(`### Level ${level} (${progressLabel})`);
     for (const result of results) {
-      const status = result.numerator === result.denominator ? "PASS" : "FAIL";
+      const meta = report.criteriaMeta[result.id];
+      const status = formatStatus(meta?.status);
+      const evidence =
+        result.evidence && result.evidence.length ? ` [${result.evidence.join(", ")}]` : "";
       lines.push(
-        `- [${status}] ${result.id} (${result.numerator}/${result.denominator}): ${result.rationale}`
+        `- [${status}] ${result.id} (${result.numerator}/${result.denominator}): ${result.rationale}${evidence}`
       );
     }
   }
@@ -77,4 +83,20 @@ function groupByLevel(report: Record<string, CriterionResult>): Record<string, C
 
 function formatPercent(value: number): string {
   return `${Math.round(value * 100)}%`;
+}
+
+function formatStatus(status?: CriterionStatus): string {
+  if (!status) return "UNKNOWN";
+  switch (status) {
+    case "pass":
+      return "PASS";
+    case "fail":
+      return "FAIL";
+    case "not_applicable":
+      return "N/A";
+    case "not_evaluated":
+      return "NOT EVALUATED";
+    default:
+      return "UNKNOWN";
+  }
 }

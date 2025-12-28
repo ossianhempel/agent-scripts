@@ -5,18 +5,24 @@ import { discoverApps } from "./discovery";
 import { getGitMetadata, getRepoUrl } from "./git";
 import {
   ActionItem,
+  CriterionCheck,
   CriterionDefinition,
   CriterionResult,
-  LevelProgress,
+  CriteriaMeta,
+  LevelDetail,
   LevelSummary,
   ReadinessReport,
   RepoContext,
 } from "./types";
 
-const SCHEMA_VERSION = "0.1.0";
+const SCHEMA_VERSION = "0.2.0";
 const GATE = 0.8;
 
-export async function buildReport(root: string, toolVersion: string): Promise<ReadinessReport> {
+export async function buildReport(
+  root: string,
+  toolVersion: string,
+  options?: RepoContext["options"]
+): Promise<ReadinessReport> {
   const apps = discoverApps(root);
   const repoUrl = getRepoUrl(root);
   const git = getGitMetadata(root);
@@ -26,11 +32,17 @@ export async function buildReport(root: string, toolVersion: string): Promise<Re
     apps,
     repoUrl,
     git,
+    options: {
+      telemetryScan: options?.telemetryScan ?? false,
+      runIntegration: options?.runIntegration ?? false,
+      ciProvider: options?.ciProvider,
+      signals: options?.signals,
+    },
   };
 
-  const results = await evaluateCriteria(ctx, CRITERIA);
-  const levels = scoreLevels(results);
-  const actionItems = getActionItems(ctx, results, levels);
+  const { results, criteriaMeta } = await evaluateCriteria(ctx, CRITERIA);
+  const levelSummary = scoreLevels(results);
+  const actionItems = getActionItems(ctx, results, levelSummary);
 
   const appsMap = Object.fromEntries(
     apps.map((app) => [
@@ -42,6 +54,15 @@ export async function buildReport(root: string, toolVersion: string): Promise<Re
       },
     ])
   );
+
+  const signals =
+    options?.ciProvider || options?.signals
+      ? {
+          ...(options?.ciProvider ? { ciProvider: options.ciProvider } : {}),
+          ...(options?.signals ? { deploySource: options.signals } : {}),
+          notes: "Signals derived from local heuristics; API signals not enabled.",
+        }
+      : undefined;
 
   return {
     schemaVersion: SCHEMA_VERSION,
@@ -56,7 +77,10 @@ export async function buildReport(root: string, toolVersion: string): Promise<Re
     hasNonRemoteCommits: git.hasNonRemoteCommits,
     apps: appsMap,
     report: results,
-    levels,
+    criteriaMeta,
+    levels: levelSummary.levels,
+    levelSummary,
+    ...(signals ? { signals } : {}),
     actionItems,
   };
 }
@@ -64,43 +88,85 @@ export async function buildReport(root: string, toolVersion: string): Promise<Re
 async function evaluateCriteria(
   ctx: RepoContext,
   criteria: CriterionDefinition[]
-): Promise<Record<string, CriterionResult>> {
+): Promise<{ results: Record<string, CriterionResult>; criteriaMeta: Record<string, CriteriaMeta> }> {
   const results: Record<string, CriterionResult> = {};
+  const criteriaMeta: Record<string, CriteriaMeta> = {};
 
   for (const criterion of criteria) {
     if (criterion.scope === "repo") {
-      const check = criterion.evaluateRepo
+      const check: CriterionCheck = criterion.evaluateRepo
         ? await criterion.evaluateRepo(ctx)
-        : { passed: false, rationale: "No evaluator provided." };
+        : { status: "not_evaluated", rationale: "No evaluator provided." };
+      const isScored = check.status === "pass" || check.status === "fail";
       results[criterion.id] = {
         id: criterion.id,
         title: criterion.title,
         level: criterion.level,
         pillar: criterion.pillar,
         scope: criterion.scope,
-        numerator: check.passed ? 1 : 0,
-        denominator: 1,
+        numerator: check.status === "pass" ? 1 : 0,
+        denominator: isScored ? 1 : 0,
         rationale: check.rationale,
+        ...(check.evidence ? { evidence: check.evidence } : {}),
+      };
+      criteriaMeta[criterion.id] = {
+        level: criterion.level,
+        scope: criterion.scope,
+        pillar: criterion.pillar,
+        status: check.status,
+      };
+      continue;
+    }
+
+    if (ctx.apps.length === 0) {
+      results[criterion.id] = {
+        id: criterion.id,
+        title: criterion.title,
+        level: criterion.level,
+        pillar: criterion.pillar,
+        scope: criterion.scope,
+        numerator: 0,
+        denominator: 0,
+        rationale: "No apps discovered.",
+      };
+      criteriaMeta[criterion.id] = {
+        level: criterion.level,
+        scope: criterion.scope,
+        pillar: criterion.pillar,
+        status: "not_applicable",
       };
       continue;
     }
 
     const failingApps: string[] = [];
     let numerator = 0;
+    let denominator = 0;
+    let sawNotEvaluated = false;
+    const evidence: string[] = [];
     for (const app of ctx.apps) {
-      const check = criterion.evaluateApp
+      const criterionCheck: CriterionCheck = criterion.evaluateApp
         ? await criterion.evaluateApp(ctx, app)
-        : { passed: false, rationale: "No evaluator provided." };
-      if (check.passed) {
+        : { status: "not_evaluated", rationale: "No evaluator provided." };
+      if (criterionCheck.status === "pass") {
         numerator += 1;
-      } else {
+        denominator += 1;
+      } else if (criterionCheck.status === "fail") {
+        denominator += 1;
         failingApps.push(app.path);
+      } else if (criterionCheck.status === "not_evaluated") {
+        sawNotEvaluated = true;
+      }
+      if (criterionCheck.evidence) {
+        evidence.push(...criterionCheck.evidence);
       }
     }
 
-    const denominator = Math.max(ctx.apps.length, 1);
     let rationale = "";
-    if (failingApps.length === 0) {
+    if (denominator === 0) {
+      rationale = sawNotEvaluated
+        ? "Not evaluated for apps (missing required signals)."
+        : "Not applicable for discovered apps.";
+    } else if (failingApps.length === 0) {
       rationale = "All apps satisfied this criterion.";
     } else if (failingApps.length === ctx.apps.length) {
       rationale = "No apps satisfied this criterion.";
@@ -108,6 +174,14 @@ async function evaluateCriteria(
       rationale = `Missing for: ${failingApps.join(", ")}.`;
     }
 
+    let status: CriteriaMeta["status"];
+    if (denominator === 0) {
+      status = sawNotEvaluated ? "not_evaluated" : "not_applicable";
+    } else {
+      status = numerator === denominator ? "pass" : "fail";
+    }
+
+    const uniqueEvidence = Array.from(new Set(evidence));
     results[criterion.id] = {
       id: criterion.id,
       title: criterion.title,
@@ -117,30 +191,43 @@ async function evaluateCriteria(
       numerator,
       denominator,
       rationale,
+      ...(uniqueEvidence.length ? { evidence: uniqueEvidence } : {}),
       failingApps: failingApps.length ? failingApps : undefined,
+    };
+    criteriaMeta[criterion.id] = {
+      level: criterion.level,
+      scope: criterion.scope,
+      pillar: criterion.pillar,
+      status,
     };
   }
 
-  return results;
+  return { results, criteriaMeta };
 }
 
 function scoreLevels(results: Record<string, CriterionResult>): LevelSummary {
-  const progress: Record<string, LevelProgress> = {};
+  const levels: Record<string, LevelDetail> = {};
   let achievedLevel = 0;
 
   for (let level = 1; level <= 5; level += 1) {
     const levelResults = Object.values(results).filter(
       (item): item is CriterionResult => Boolean(item) && item.level === level
     );
-    const numerator = levelResults.reduce((sum, item) => sum + item.numerator, 0);
-    const denominator = levelResults.reduce((sum, item) => sum + item.denominator, 0);
-    const completion = denominator > 0 ? numerator / denominator : 1;
-    progress[String(level)] = { numerator, denominator, completion };
+    const passCount = levelResults.reduce((sum, item) => sum + item.numerator, 0);
+    const evaluatedCount = levelResults.reduce((sum, item) => sum + item.denominator, 0);
+    const completion = evaluatedCount > 0 ? passCount / evaluatedCount : 0;
+    const unlocked = evaluatedCount > 0 && completion >= GATE;
+    levels[String(level)] = {
+      completion,
+      evaluatedCount,
+      passCount,
+      unlocked,
+    };
   }
 
   for (let level = 1; level <= 5; level += 1) {
-    const completion = progress[String(level)]?.completion ?? 0;
-    if (completion >= GATE) {
+    const unlocked = levels[String(level)]?.unlocked ?? false;
+    if (unlocked) {
       achievedLevel = level;
     } else {
       break;
@@ -153,7 +240,7 @@ function scoreLevels(results: Record<string, CriterionResult>): LevelSummary {
     achievedLevel,
     nextLevel,
     gate: GATE,
-    progress,
+    levels,
   };
 }
 
@@ -177,6 +264,7 @@ function getActionItems(
     .map((criterion): MissingEntry | null => {
       const result = results[criterion.id];
       if (!result) return null;
+      if (result.denominator === 0) return null;
       const missingCount = result.denominator - result.numerator;
       return {
         criterion,

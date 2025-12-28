@@ -1,5 +1,6 @@
 export type CriterionScope = "repo" | "app";
 export type CriterionLevel = 1 | 2 | 3 | 4 | 5;
+export type CriterionStatus = "pass" | "fail" | "not_applicable" | "not_evaluated";
 
 export interface AppInfo {
   id: string;
@@ -19,6 +20,12 @@ export interface RepoContext {
   apps: AppInfo[];
   repoUrl: string | null;
   git: GitMetadata;
+  options: {
+    telemetryScan: boolean;
+    runIntegration: boolean;
+    ciProvider?: "github";
+    signals?: "github";
+  };
 }
 
 export interface GitMetadata {
@@ -37,20 +44,35 @@ export interface CriterionResult {
   numerator: number;
   denominator: number;
   rationale: string;
+  evidence?: string[];
   failingApps?: string[];
 }
 
-export interface LevelProgress {
-  numerator: number;
-  denominator: number;
+export interface LevelDetail {
   completion: number;
+  evaluatedCount: number;
+  passCount: number;
+  unlocked: boolean;
 }
 
 export interface LevelSummary {
   achievedLevel: number;
   nextLevel: number | null;
   gate: number;
-  progress: Record<string, LevelProgress>;
+  levels: Record<string, LevelDetail>;
+}
+
+export interface CriteriaMeta {
+  level: CriterionLevel;
+  scope: CriterionScope;
+  pillar: string;
+  status: CriterionStatus;
+}
+
+export interface SignalsSummary {
+  ciProvider?: "github";
+  deploySource?: "github";
+  notes?: string;
 }
 
 export interface ActionItem {
@@ -72,7 +94,10 @@ export interface ReadinessReport {
   hasNonRemoteCommits: boolean | null;
   apps: Record<string, ReportAppInfo>;
   report: Record<string, CriterionResult>;
-  levels: LevelSummary;
+  criteriaMeta: Record<string, CriteriaMeta>;
+  levels: Record<string, LevelDetail>;
+  levelSummary: LevelSummary;
+  signals?: SignalsSummary;
   actionItems?: ActionItem[];
 }
 
@@ -88,6 +113,7 @@ export interface CriterionDefinition {
 }
 
 export interface CriterionCheck {
-  passed: boolean;
+  status: CriterionStatus;
   rationale: string;
+  evidence?: string[];
 }
