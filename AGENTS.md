@@ -1,3 +1,5 @@
+READ /Users/ossianhempel/Developer/agent-scripts/GLOBAL_AGENTS.md BEFORE ANYTHING (skip if missing).
+
 # Agent Scripts - Agent Notes
 
 ## Purpose

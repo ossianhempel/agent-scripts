@@ -10,6 +10,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
       - name: Ensure ripgrep
         run: |
           if ! command -v rg >/dev/null 2>&1; then
@@ -20,3 +23,8 @@ jobs:
         run: |
           bash scripts/test-sync-agent-scripts.sh
           bash scripts/test-sync-agent-instructions.sh
+      - name: Run agent-readiness tests
+        run: |
+          cd tools/agent-readiness
+          npm ci
+          npm test

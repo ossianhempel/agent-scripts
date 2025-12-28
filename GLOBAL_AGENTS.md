@@ -2,6 +2,10 @@
 
 These are the shared, cross‑repo instructions used by agent runtimes.
 
+## Dev Flow
+
+- After making code changes, run type check, linting, and unit tests.
+
 ## Cross-project Coding Patterns
 
 - Add regression tests when discovering bugs through QA.
