@@ -1,24 +1,5 @@
 # Agent Scripts
 
-```
-                    _______________________________________________
-                   /                                               \
-                  /    █████╗  ██████╗ ███████╗███╗   ██╗████████╗ \
-                 |    ██╔══██╗██╔════╝ ██╔════╝████╗  ██║╚══██╔══╝  |
-                 |    ███████║██║  ███╗█████╗  ██╔██╗ ██║   ██║     |
-                 |    ██╔══██║██║   ██║██╔══╝  ██║╚██╗██║   ██║     |
-                 |    ██║  ██║╚██████╔╝███████╗██║ ╚████║   ██║     |
-                 |    ╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚═╝  ╚═══╝   ╚═╝     |
-                 |                                                   |
-                 |    ███████╗ ██████╗██████╗ ██╗██████╗ ████████╗  |
-                 |    ██╔════╝██╔════╝██╔══██╗██║██╔══██╗╚══██╔══╝  |
-                 |    ███████╗██║     ██████╔╝██║██████╔╝   ██║     |
-                 |    ╚════██║██║     ██╔══██╗██║██╔═══╝    ██║     |
-                 |    ███████║╚██████╗██║  ██║██║██║        ██║     |
-                  \   ╚══════╝ ╚═════╝╚═╝  ╚═╝╚═╝╚═╝        ╚═╝    /
-                   \_______________________________________________ /
-```
-
 Portable, versioned collection of my personal agent skills and slash commands.
 
 This repo is a single source of truth that I can reuse across machines and plug
@@ -53,6 +34,7 @@ into whichever agent runtime I’m using (Codex CLI or others).
   a `SKILL.md` entry point plus optional `references/`, `assets/`, or `scripts/`.
 - `slash-commands/`: markdown files that define reusable agent commands.
 - `scripts/`: utilities for syncing and maintenance.
+- `tools/`: standalone CLIs and evaluators used by agents.
 - `docs/`: lightweight documentation.
 
 ## Getting Started
@@ -152,7 +134,11 @@ Skills
 Slash commands
 - `commit`
 - `draft-pr`
+- `agent-readiness`
 - `update-agent-scripts`
+
+Tools
+- `agent-readiness`
 
 ## Conventions
 - Use kebab-case for new skill and command names.

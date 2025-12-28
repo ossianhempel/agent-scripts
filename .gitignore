@@ -1,2 +1,4 @@
 .claude/settings.local.json
-
+/.agent-readiness/
+/tools/agent-readiness/node_modules/
+/tools/agent-readiness/dist/
