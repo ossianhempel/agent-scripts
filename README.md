@@ -67,6 +67,33 @@ Run `scripts/sync-agent-scripts.sh` to copy/update skills and slash commands int
 local/global agent runtimes.
 See `docs/syncing.md` for examples and provider details.
 
+Examples:
+```sh
+./scripts/sync-agent-scripts.sh --dry-run
+./scripts/sync-agent-scripts.sh
+./scripts/sync-agent-scripts.sh --providers codex,claude
+COPILOT_PROMPTS_DIR=~/my-repo/.github/prompts ./scripts/sync-agent-scripts.sh --provider copilot --copilot-scope workspace
+COPILOT_SKILLS_DIR=~/my-repo/.github/skills ./scripts/sync-agent-scripts.sh --provider copilot
+```
+
+## Sync Agent Instructions to Repos
+Use `scripts/sync-agent-instructions.sh` to insert the shared pointer line into
+instruction files across repos (preserving local rules below it).
+See `docs/instructions-syncing.md` for examples and supported filenames.
+
+By default it only updates files that already exist; use `--create-missing` to
+create instruction files.
+
+Examples:
+```sh
+./scripts/sync-agent-instructions.sh --root ~/Developer --dry-run
+./scripts/sync-agent-instructions.sh --root ~/Developer
+./scripts/sync-agent-instructions.sh --repo ~/Developer/my-repo --create-missing
+```
+
+Pointer target:
+- `GLOBAL_AGENTS.md` (shared cross-repo instructions)
+
 Defaults:
 - Codex: `~/.codex/skills` and `~/.codex/prompts`
 - Claude Code: `~/.claude/skills` and `~/.claude/commands`
@@ -93,8 +120,16 @@ Overrides:
 - Cursor skills: https://cursor.com/docs/context/skills
 - Copilot agent skills: https://docs.github.com/copilot/concepts/agents/about-agent-skills
 
+## Provider Instruction Docs
+- Codex AGENTS.md: https://developers.openai.com/codex/guides/agents-md
+- Claude Code CLAUDE.md: https://www.anthropic.com/news/claude-code
+- Cursor AGENTS.md: https://docs.cursor.com/en/context
+- Copilot instructions: https://docs.github.com/en/copilot/how-tos/custom-instructions/adding-repository-custom-instructions
+- Gemini CLI GEMINI.md: https://github.com/google-gemini/gemini-cli/blob/main/docs/cli/gemini.md
+
 ## Tests
 - `scripts/test-sync-agent-scripts.sh`
+- `scripts/test-sync-agent-instructions.sh`
 
 ## Linting
 This repo uses `pre-commit` with Markdown linting via `markdownlint-cli2`.
