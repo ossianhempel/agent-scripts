@@ -1,0 +1,20 @@
+{
+  "name": "agent-readiness",
+  "version": "0.1.0",
+  "private": true,
+  "bin": {
+    "agent-readiness": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/cli.js",
+    "test": "npm run build && node --test test/*.test.js"
+  },
+  "dependencies": {
+    "ajv": "^8.12.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.30",
+    "typescript": "^5.6.3"
+  }
+}
