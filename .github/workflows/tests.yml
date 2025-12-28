@@ -17,4 +17,6 @@ jobs:
             sudo apt-get install -y ripgrep
           fi
       - name: Run sync tests
-        run: bash scripts/test-sync-agent-scripts.sh
+        run: |
+          bash scripts/test-sync-agent-scripts.sh
+          bash scripts/test-sync-agent-instructions.sh
