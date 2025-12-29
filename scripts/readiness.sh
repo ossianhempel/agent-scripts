@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Determine the agent-scripts repo root (where this script lives)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+AGENT_SCRIPTS_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+
 ROOT_ARG="."
 EXTRA_ARGS=()
 if [[ $# -gt 0 && "${1:-}" != -* ]]; then
@@ -11,19 +15,11 @@ EXTRA_ARGS=("$@")
 FORMAT="${FORMAT:-markdown}"
 OUT="${OUT:-.agent-readiness/latest.json}"
 
-if command -v git >/dev/null 2>&1 && git rev-parse --show-toplevel >/dev/null 2>&1; then
-  REPO_ROOT="$(git rev-parse --show-toplevel)"
-else
-  REPO_ROOT="$ROOT_ARG"
-fi
-
-cd "$REPO_ROOT"
-
-CLI_PATH="tools/agent-readiness/dist/cli.js"
-SRC_DIR="tools/agent-readiness/src"
+CLI_PATH="$AGENT_SCRIPTS_ROOT/tools/agent-readiness/dist/cli.js"
+SRC_DIR="$AGENT_SCRIPTS_ROOT/tools/agent-readiness/src"
 NEEDS_BUILD=0
 
-if [[ ! -f "$CLI_PATH" || ! -d "tools/agent-readiness/node_modules" ]]; then
+if [[ ! -f "$CLI_PATH" || ! -d "$AGENT_SCRIPTS_ROOT/tools/agent-readiness/node_modules" ]]; then
   NEEDS_BUILD=1
 elif find "$SRC_DIR" -type f -newer "$CLI_PATH" -print -quit | grep -q .; then
   NEEDS_BUILD=1
@@ -31,7 +27,7 @@ fi
 
 if [[ "$NEEDS_BUILD" -eq 1 ]]; then
   echo "Building agent-readiness CLI..." >&2
-  (cd tools/agent-readiness && npm install && npm run build)
+  (cd "$AGENT_SCRIPTS_ROOT/tools/agent-readiness" && npm install && npm run build)
 fi
 
-node "$CLI_PATH" report --format "$FORMAT" --out "$OUT" --root "$ROOT_ARG" "${EXTRA_ARGS[@]}"
+node "$CLI_PATH" report --format "$FORMAT" --out "$OUT" --root "$ROOT_ARG" "${EXTRA_ARGS[@]+"${EXTRA_ARGS[@]}"}"
