@@ -125,6 +125,7 @@ Run manually:
 
 ## Contents
 Skills
+- `agent-readiness`
 - `create-cli`
 - `frontend-design`
 - `oracle`
