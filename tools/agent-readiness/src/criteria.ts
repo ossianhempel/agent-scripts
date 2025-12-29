@@ -89,7 +89,7 @@ export const CRITERIA: CriterionDefinition[] = [
     evaluateApp: (ctx, app) => checkLintConfig(ctx, app),
     recommendation: (_, failingApps) =>
       failingApps.length
-        ? `Add lint config or lint script for: ${failingApps.join(", ")}.`
+        ? `Add lint config or lint script for: ${formatAppList(failingApps)}.`
         : "Add lint configuration for each app.",
   },
   {
@@ -101,7 +101,7 @@ export const CRITERIA: CriterionDefinition[] = [
     evaluateApp: (ctx, app) => checkTypeCheck(ctx, app),
     recommendation: (_, failingApps) =>
       failingApps.length
-        ? `Add strict type checking configs for: ${failingApps.join(", ")}.`
+        ? `Add strict type checking configs for: ${formatAppList(failingApps)}.`
         : "Add type checking configuration for each app.",
   },
   {
@@ -113,7 +113,7 @@ export const CRITERIA: CriterionDefinition[] = [
     evaluateApp: (ctx, app) => checkUnitTests(ctx, app),
     recommendation: (_, failingApps) =>
       failingApps.length
-        ? `Add unit test configuration or command for: ${failingApps.join(", ")}.`
+        ? `Add unit test configuration or command for: ${formatAppList(failingApps)}.`
         : "Add unit tests or test command for each app.",
   },
   {
@@ -152,7 +152,7 @@ export const CRITERIA: CriterionDefinition[] = [
     evaluateApp: (ctx, app) => checkIntegrationTestsConfigured(ctx, app),
     recommendation: (_, failingApps) =>
       failingApps.length
-        ? `Add integration test scripts/configs for: ${failingApps.join(", ")}.`
+        ? `Add integration test scripts/configs for: ${formatAppList(failingApps)}.`
         : "Add integration test scripts/configs for each app.",
   },
   {
@@ -164,7 +164,7 @@ export const CRITERIA: CriterionDefinition[] = [
     evaluateApp: (ctx, app) => checkIntegrationTestsRunnable(ctx, app),
     recommendation: (_, failingApps) =>
       failingApps.length
-        ? `Ensure integration test commands run locally for: ${failingApps.join(", ")}.`
+        ? `Ensure integration test commands run locally for: ${formatAppList(failingApps)}.`
         : "Ensure integration test commands run locally for each app.",
   },
   {
@@ -203,7 +203,7 @@ export const CRITERIA: CriterionDefinition[] = [
     evaluateApp: (ctx, app) => checkTracing(ctx, app),
     recommendation: (_, failingApps) =>
       failingApps.length
-        ? `Add OpenTelemetry tracing instrumentation for: ${failingApps.join(", ")}.`
+        ? `Add OpenTelemetry tracing instrumentation for: ${formatAppList(failingApps)}.`
         : "Add OpenTelemetry tracing instrumentation for each app.",
   },
   {
@@ -215,7 +215,7 @@ export const CRITERIA: CriterionDefinition[] = [
     evaluateApp: (ctx, app) => checkMetrics(ctx, app),
     recommendation: (_, failingApps) =>
       failingApps.length
-        ? `Add metrics instrumentation and /metrics exposure for: ${failingApps.join(", ")}.`
+        ? `Add metrics instrumentation and /metrics exposure for: ${formatAppList(failingApps)}.`
         : "Add metrics instrumentation and /metrics exposure for each app.",
   },
   {
@@ -300,6 +300,10 @@ export const CRITERIA: CriterionDefinition[] = [
     recommendation: () => "Add monitoring/analytics configs that feed into automated follow-ups.",
   },
 ];
+
+function formatAppList(apps: string[]): string {
+  return apps.map((app) => (app === "." ? "(root)" : app)).join(", ");
+}
 
 function pass(rationale: string): CriterionCheck {
   return { status: "pass", rationale };
