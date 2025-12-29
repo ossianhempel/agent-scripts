@@ -3,33 +3,30 @@
 Inspired by https://github.com/steipete/agent-scripts
 
 Portable, versioned collection of my personal agent skills and slash commands.
-
-This repo is a single source of truth that I can reuse across machines and plug
-into whichever agent runtime I’m using (Codex CLI or others).
+Source of truth on this machine: `~/Developer/agent-scripts`.
 
 ## Syncing With Other Repos
-- Treat this repo as the canonical mirror for shared agent helpers. When you
-  update a skill or command in another repo, copy the change here and then back
-  out to every other repo that carries the same helper so they stay identical.
-- When someone says “sync agent scripts,” pull latest changes here, ensure
-  downstream repos have the pointer-style `AGENTS.md`, copy helper updates into
-  place, and reconcile differences before moving on.
-- Keep everything dependency-free and portable. Avoid project-specific imports
-  or config expectations so the helpers run in isolation across repos.
+- Canonical mirror for shared helpers. When a helper changes elsewhere, copy it
+  here and sync back out so files stay byte-identical.
+- When someone says """sync agent scripts,""" pull latest changes here, ensure
+  downstream repos have the pointer-style `AGENTS.md`, copy helper updates, and
+  reconcile differences before moving on.
+- Keep helpers dependency-free and portable; avoid project-specific imports or
+  config expectations.
 
 ## Pointer-Style AGENTS
 - Shared agent instructions live only inside this repo: `AGENTS.md`.
-- Every consuming repo’s `AGENTS.md` should be reduced to a single pointer line:
+- Every consuming repo""'s `AGENTS.md` should be reduced to a single pointer line:
   `READ ~/path/to/agent-scripts/AGENTS.md BEFORE ANYTHING (skip if missing).`
   Place any repo-specific rules **after** that line if truly needed.
 - When updating shared instructions, edit `agent-scripts/AGENTS.md`, mirror the
   change into your global agent location (if you keep one), and let downstream
   repos keep the pointer.
+- Do not copy shared blocks into other repos; keep the pointer and sync instead.
 
-## Goals
-- Keep skills and commands modular and easy to copy or symlink
-- Version changes so I can sync updates across computers
-- Make each skill/command self-contained and discoverable
+## Sync Expectations
+- This repo is the canonical mirror for guardrail helpers used across projects.
+  When a helper changes elsewhere, copy it back here immediately (and vice versa).
 
 ## Repository Layout
 - `skills/`: skill folders. Each skill lives in its own directory and includes
@@ -46,10 +43,14 @@ into whichever agent runtime I’m using (Codex CLI or others).
 3. Keep this repo up to date with `git pull` and commit changes as you add or
    refine skills/commands.
 
+## Core Helpers
+- `scripts/committer`: safe commit helper that stages only listed paths.
+- `scripts/docs-list.ts`: docs indexer enforcing `summary`/`read_when` front matter.
+- `scripts/browser-tools.ts`: Chrome DevTools helper (see `tools.md`).
+
 ## Sync to Global Agent Settings
 Run `scripts/sync-agent-scripts.sh` to copy/update skills and slash commands into
-local/global agent runtimes.
-See `docs/syncing.md` for examples and provider details.
+local/global agent runtimes. See `docs/syncing.md` for details.
 
 Examples:
 ```sh
@@ -76,7 +77,7 @@ Examples:
 ```
 
 Pointer target:
-- `GLOBAL_AGENTS.md` (shared cross-repo instructions)
+- `AGENTS.md` (shared cross-repo instructions)
 
 Defaults:
 - Codex: `~/.codex/skills` and `~/.codex/prompts`
@@ -112,24 +113,30 @@ Overrides:
 - Gemini CLI GEMINI.md: https://github.com/google-gemini/gemini-cli/blob/main/docs/cli/gemini.md
 
 ## Tests
-- `scripts/test-sync-agent-scripts.sh`
-- `scripts/test-sync-agent-instructions.sh`
+- `test/test-sync-agent-scripts.sh`
+- `test/test-sync-agent-instructions.sh`
+- `test/test-readiness.sh`
 
 ## Linting
 This repo uses `pre-commit` with Markdown linting via `markdownlint-cli2`.
+Run: `pre-commit run --all-files`
 
-Setup:
-1. Install pre-commit.
-2. Run `pre-commit install`.
-
-Run manually:
-`pre-commit run --all-files`
+## Conventions
+- Skills go in `skills/<name>/` and must include `SKILL.md`.
+- Slash commands go in `slash-commands/<name>.md`.
+- Keep names in kebab-case.
+- Keep instructions concise and scoped to the skill/command.
+- Avoid unnecessary dependencies; keep helpers portable.
+- Prefer small, modular changes over large refactors.
+- Preserve existing structure unless there is a clear reason to change it.
+- Update `README.md` when you add or remove items.
 
 ## Contents
 Skills
 - `agent-readiness`
 - `create-cli`
 - `frontend-design`
+- `markdown-converter`
 - `oracle`
 - `revenuecat`
 - `update-agent-scripts`
@@ -143,7 +150,5 @@ Slash commands
 Tools
 - `agent-readiness`
 
-## Conventions
-- Use kebab-case for new skill and command names.
-- Put the primary instructions for each skill in `SKILL.md`.
+## Contents Maintenance
 - Update the lists above when adding or removing items.

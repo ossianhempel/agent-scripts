@@ -1,3 +1,10 @@
+---
+summary: Guide for syncing agent instruction files across repositories
+read_when:
+  - Using sync-agent-instructions.sh to propagate AGENTS.md pointer
+  - Setting up agent instructions in multiple repos
+---
+
 # Syncing Agent Instructions
 
 Use `scripts/sync-agent-instructions.sh` to insert a shared pointer line into
@@ -6,7 +13,7 @@ repo instruction files while preserving local rules below it.
 The pointer line looks like:
 
 ```
-READ /path/to/agent-scripts/GLOBAL_AGENTS.md BEFORE ANYTHING (skip if missing).
+READ /path/to/agent-scripts/AGENTS.md BEFORE ANYTHING (skip if missing).
 ```
 
 ## Usage
@@ -37,7 +44,7 @@ Override the pointer path:
 ```sh
 /path/to/agent-scripts/scripts/sync-agent-instructions.sh \
   --root ~/code \
-  --pointer-path ~/agent-scripts/GLOBAL_AGENTS.md
+  --pointer-path ~/agent-scripts/AGENTS.md
 ```
 
 ## Supported filenames

@@ -7,7 +7,7 @@ DRY_RUN=0
 CREATE_MISSING=0
 INCLUDE_SELF=0
 ROOT_DIR=""
-POINTER_PATH="${POINTER_PATH:-$ROOT/GLOBAL_AGENTS.md}"
+POINTER_PATH="${POINTER_PATH:-$ROOT/AGENTS.md}"
 POINTER_LINE="READ $POINTER_PATH BEFORE ANYTHING (skip if missing)."
 
 INSTRUCTION_FILES_DEFAULT=(
@@ -106,7 +106,7 @@ ensure_pointer() {
     fi
   fi
 
-  filtered=$(printf '%s\n' "$content" | awk -v pointer="$POINTER_LINE" '$0 != pointer {print}')
+  filtered=$(printf '%s\n' "$content" | awk -v pointer="$POINTER_LINE" '$0 != pointer && $0 !~ /^READ .*GLOBAL_AGENTS\.md BEFORE ANYTHING \(skip if missing\)\.$/ {print}')
   filtered=$(printf '%s\n' "$filtered" | awk 'BEGIN{skip=1} {if (skip && $0=="") next; skip=0; print}')
 
   if [[ -n "$filtered" ]]; then
