@@ -1,5 +1,7 @@
 # Agent Scripts
 
+Inspired by https://github.com/steipete/agent-scripts
+
 Portable, versioned collection of my personal agent skills and slash commands.
 
 This repo is a single source of truth that I can reuse across machines and plug
