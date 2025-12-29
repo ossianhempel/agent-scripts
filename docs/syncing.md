@@ -1,7 +1,14 @@
+---
+summary: Guide for syncing skills and commands to agent runtime locations
+read_when:
+  - Using sync-agent-scripts.sh to deploy skills/commands
+  - Setting up agent skills across Codex, Claude Code, Gemini, Cursor, or Copilot
+---
+
 # Syncing Agent Scripts
 
 Use `scripts/sync-agent-scripts.sh` to copy the skills and slash commands in this
-repo into each agent runtime’s standard locations.
+repo into each agent runtime's standard locations.
 
 ## Quickstart
 
