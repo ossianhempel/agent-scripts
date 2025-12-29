@@ -13,7 +13,6 @@ POINTER_LINE="READ $POINTER_PATH BEFORE ANYTHING (skip if missing)."
 INSTRUCTION_FILES_DEFAULT=(
   "AGENTS.md"
   "CLAUDE.md"
-  "GEMINI.md"
   ".github/copilot-instructions.md"
 )
 INSTRUCTION_FILES=()

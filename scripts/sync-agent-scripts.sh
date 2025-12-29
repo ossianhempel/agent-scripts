@@ -127,6 +127,66 @@ run_sync_dir() {
   cp -a "$src" "$dest"
 }
 
+update_gemini_settings() {
+  local settings_path="$1"
+  local context_file="$2"
+  local verb=""
+  local current=""
+
+  if [[ -f "$settings_path" ]]; then
+    current=$(python3 - "$settings_path" <<'PY'
+import json
+import sys
+
+path = sys.argv[1]
+try:
+    with open(path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+except Exception:
+    data = {}
+value = data.get("contextFileName", "")
+print(value if isinstance(value, str) else "")
+PY
+)
+    if [[ "$current" == "$context_file" ]]; then
+      log_action "skip" "contextFileName" "$settings_path"
+      return 0
+    fi
+    verb="update"
+  else
+    verb="create"
+  fi
+
+  log_action "$verb" "contextFileName" "$settings_path"
+  if [[ "$DRY_RUN" -eq 1 ]]; then
+    return 0
+  fi
+
+  mkdir -p "$(dirname "$settings_path")"
+  python3 - "$settings_path" "$context_file" <<'PY'
+import json
+import os
+import sys
+
+path = sys.argv[1]
+context_file = sys.argv[2]
+
+data = {}
+if os.path.exists(path):
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+    except json.JSONDecodeError:
+        data = {}
+
+data["contextFileName"] = context_file
+
+with open(path, "w", encoding="utf-8") as f:
+    json.dump(data, f, indent=2, ensure_ascii=False)
+    f.write("\n")
+PY
+}
+
 sync_markdown_tree() {
   local src_root="$1"
   local dest_root="$2"
@@ -225,6 +285,7 @@ scope_has() {
 CODEX_HOME_DEFAULT="$HOME/.codex"
 CLAUDE_HOME_DEFAULT="$HOME/.claude"
 GEMINI_HOME_DEFAULT="$HOME/.gemini"
+GEMINI_CONTEXT_FILE_DEFAULT="AGENTS.md"
 
 CODEX_HOME="$CODEX_HOME_DEFAULT"
 CLAUDE_HOME="$CLAUDE_HOME_DEFAULT"
@@ -381,6 +442,8 @@ if want_provider "gemini"; then
     fi
     render_gemini_toml "$file" "$dest_dir/$base_name.toml" "$base_name"
   done < <(find "$ROOT/slash-commands" -type f -name '*.md' -print0)
+
+  update_gemini_settings "$GEMINI_HOME/settings.json" "$GEMINI_CONTEXT_FILE_DEFAULT"
 fi
 
 if want_provider "cursor"; then
