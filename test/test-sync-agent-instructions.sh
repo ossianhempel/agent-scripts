@@ -9,7 +9,7 @@ cleanup() {
 }
 trap cleanup EXIT
 
-POINTER="READ $ROOT/GLOBAL_AGENTS.md BEFORE ANYTHING (skip if missing)."
+POINTER="READ $ROOT/AGENTS.md BEFORE ANYTHING (skip if missing)."
 
 REPO_ONE="$TMP_DIR/repo-one"
 REPO_TWO="$TMP_DIR/repo-two"

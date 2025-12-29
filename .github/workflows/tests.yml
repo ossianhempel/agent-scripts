@@ -21,8 +21,11 @@ jobs:
           fi
       - name: Run sync tests
         run: |
-          bash scripts/test-sync-agent-scripts.sh
-          bash scripts/test-sync-agent-instructions.sh
+          bash test/test-sync-agent-scripts.sh
+          bash test/test-sync-agent-instructions.sh
+      - name: Run readiness script tests
+        run: |
+          bash test/test-readiness.sh
       - name: Run agent-readiness tests
         run: |
           cd tools/agent-readiness
