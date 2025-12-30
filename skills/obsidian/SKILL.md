@@ -58,9 +58,17 @@ views:
         - 'file.hasTag("tag_name")'
         - 'property == "value"'
     order:
+      - file.name      # Columns to display
       - file.mtime
+    sort:
+      - property: file.mtime   # How to sort rows
+        direction: DESC
     limit: 50
 ```
+
+**IMPORTANT:**
+- `order` defines which **columns** are displayed
+- `sort` defines how **rows** are sorted
 
 **Common filter functions:**
 - `file.hasTag("tag")` - Check for tag (without #)
@@ -71,11 +79,12 @@ views:
 **Converting Dataview to Bases:**
 
 | Dataview Pattern | Base Equivalent |
-|-----------------|-----------------|
-| `FROM #tag` | `file.hasTag("tag")` |
-| `WHERE contains(prop, [[Note]])` | `file.hasLink("Note")` |
-| `WHERE prop = "value"` | `prop == "value"` |
-| `SORT file.mtime DESC` | `order: [file.mtime]` |
+| ---------------- | --------------- |
+| `FROM #tag` | `file.hasTag("tag")` (in filters) |
+| `WHERE contains(prop, [[Note]])` | `file.hasLink("Note")` (in filters) |
+| `WHERE prop = "value"` | `prop == "value"` (in filters) |
+| `TABLE field1, field2` | `order: [field1, field2]` (columns to display) |
+| `SORT file.mtime DESC` | `sort: [{property: file.mtime, direction: DESC}]` (row sorting) |
 | `LIMIT 10` | `limit: 10` |
 
 **Workflow:**

@@ -15,7 +15,11 @@ views:
         - 'condition1'
         - 'condition2'
     order:
+      - file.name       # Columns to display (and their order)
       - property_name
+    sort:
+      - property: file.mtime   # How to sort rows
+        direction: DESC
     limit: 50
 
 formulas:
@@ -73,7 +77,7 @@ Duration formats: `y`/`year`, `M`/`month`, `w`/`week`, `d`/`day`, `h`/`hour`, `m
 Available for all files:
 
 | Property | Type | Description |
-|----------|------|-------------|
+| -------- | ---- | ----------- |
 | `file.ctime` | Date | Created time |
 | `file.mtime` | Date | Modified time |
 | `file.name` | String | File name |
@@ -142,8 +146,28 @@ views:
 - `type` - View type (currently only "table" is common)
 - `name` - Display name for the view
 - `filters` - View-specific filters (in addition to global filters)
-- `order` - Array of properties to sort by
+- **`order`** - Array of properties defining **which columns are displayed** and their sequence (left to right)
+- **`sort`** - Array of sort rules defining **how rows are sorted** (separate from column display)
 - `limit` - Maximum number of rows to display
+
+**CRITICAL: `order` vs `sort`**
+- **`order`** controls **COLUMN DISPLAY** - which properties appear as columns and in what sequence
+- **`sort`** controls **ROW SORTING** - how the data rows are ordered
+
+Example showing both:
+```yaml
+views:
+  - type: table
+    name: "My Table"
+    order:
+      - file.name      # Column 1: File name
+      - file.mtime     # Column 2: Modified time
+      - tags           # Column 3: Tags
+    sort:
+      - property: file.mtime
+        direction: DESC  # Sort rows by modification time (newest first)
+    limit: 100
+```
 
 ## Property Display Configuration
 
@@ -176,7 +200,11 @@ filters:
 filters:
   - 'file.mtime > now() - "7d"'
 order:
-  - file.mtime
+  - file.name        # Display file name column
+  - file.mtime       # Display modified time column
+sort:
+  - property: file.mtime
+    direction: DESC  # Sort by newest first
 ```
 
 ### Files Linking to Specific Note
@@ -211,12 +239,43 @@ views:
 Common Dataview patterns and their Base equivalents:
 
 | Dataview | Base |
-|----------|------|
-| `FROM #tag` | `file.hasTag("tag")` |
-| `WHERE contains(prop, [[Note]])` | `file.hasLink("Note")` |
-| `SORT file.mtime DESC` | `order: [file.mtime]` |
+| -------- | ---- |
+| `FROM #tag` | `file.hasTag("tag")` (in filters) |
+| `WHERE contains(prop, [[Note]])` | `file.hasLink("Note")` (in filters) |
+| `WHERE prop = "value"` | `prop == "value"` (in filters) |
+| `SORT file.mtime DESC` | `sort: [{property: file.mtime, direction: DESC}]` |
+| `TABLE field1, field2` | `order: [field1, field2]` (columns to display) |
 | `LIMIT 10` | `limit: 10` |
-| `WHERE prop = "value"` | `prop == "value"` |
+
+**Example Dataview to Base conversion:**
+
+Dataview:
+```dataview
+TABLE file.mtime, tags
+FROM #inbox
+WHERE status != "done"
+SORT file.mtime DESC
+LIMIT 50
+```
+
+Base equivalent:
+```yaml
+views:
+  - type: table
+    name: Inbox
+    filters:
+      and:
+        - 'file.hasTag("inbox")'
+        - 'status != "done"'
+    order:
+      - file.name
+      - file.mtime
+      - tags
+    sort:
+      - property: file.mtime
+        direction: DESC
+    limit: 50
+```
 
 ## Tips
 
