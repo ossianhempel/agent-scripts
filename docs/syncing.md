@@ -30,6 +30,24 @@ Limit providers:
 /path/to/agent-scripts/scripts/sync-agent-scripts.sh --providers codex,claude
 ```
 
+## Auto-sync via Git hooks (local only)
+
+If you want local auto-sync on pull/checkout/rebase:
+
+```sh
+./scripts/install-hooks.sh
+```
+
+This installs repo-local hooks (via `core.hooksPath`) that run
+`scripts/sync-agent-scripts.sh` when changes are detected under
+`skills/`, `slash-commands/`, or `scripts/`.
+
+To remove the hooks:
+
+```sh
+git config --unset core.hooksPath
+```
+
 ## Default destinations
 
 Global (user) locations:
