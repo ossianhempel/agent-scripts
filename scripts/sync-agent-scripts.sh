@@ -87,6 +87,24 @@ action_verb() {
   fi
 }
 
+files_identical() {
+  local src="$1"
+  local dest="$2"
+  if [[ ! -f "$dest" ]]; then
+    return 1
+  fi
+  cmp -s "$src" "$dest"
+}
+
+dirs_identical() {
+  local src="$1"
+  local dest="$2"
+  if [[ ! -d "$dest" ]]; then
+    return 1
+  fi
+  diff -qr "$src" "$dest" >/dev/null 2>&1
+}
+
 to_lower() {
   printf '%s' "$1" | tr '[:upper:]' '[:lower:]'
 }
@@ -95,6 +113,9 @@ run_copy_file() {
   local src="$1"
   local dest="$2"
   local verb
+  if files_identical "$src" "$dest"; then
+    return 0
+  fi
   verb=$(action_verb "$dest")
   log_action "$verb" "$src" "$dest"
   if [[ "$DRY_RUN" -eq 1 ]]; then
@@ -110,6 +131,10 @@ run_sync_dir() {
   local label="${3:-}"
   local count
   local verb
+
+  if dirs_identical "$src" "$dest"; then
+    return 0
+  fi
 
   count=$(find "$src" -type f | wc -l | tr -d ' ')
   verb=$(action_verb "$dest")
@@ -217,18 +242,28 @@ render_gemini_toml() {
   body=${body//\$ARGUMENTS/{{args}}}
   body=${body//\"\"\"/\\\"\\\"\\\"}
 
-  log_action "$(action_verb "$dest")" "$src" "$dest"
-  if [[ "$DRY_RUN" -eq 1 ]]; then
-    return 0
-  fi
-
-  mkdir -p "$(dirname "$dest")"
+  local tmp_file
+  tmp_file=$(mktemp)
   {
     printf 'description = "%s"\n\n' "$desc"
     printf 'prompt = """\n'
     printf '%s\n' "$body"
     printf '"""\n'
-  } > "$dest"
+  } > "$tmp_file"
+
+  if files_identical "$tmp_file" "$dest"; then
+    rm -f "$tmp_file"
+    return 0
+  fi
+
+  log_action "$(action_verb "$dest")" "$src" "$dest"
+  if [[ "$DRY_RUN" -eq 1 ]]; then
+    rm -f "$tmp_file"
+    return 0
+  fi
+
+  mkdir -p "$(dirname "$dest")"
+  mv "$tmp_file" "$dest"
 }
 
 render_copilot_prompt() {
@@ -248,19 +283,29 @@ render_copilot_prompt() {
     body=${body//\$ARGUMENTS/$args_placeholder}
   fi
 
+  local tmp_file
+  tmp_file=$(mktemp)
+  {
+    printf '%s\n' '---'
+    printf 'mode: agent\n'
+    printf 'description: "%s"\n' "$desc"
+    printf '%s\n\n' '---'
+    printf '%s\n' "$body"
+  } > "$tmp_file"
+
+  if files_identical "$tmp_file" "$dest"; then
+    rm -f "$tmp_file"
+    return 0
+  fi
+
   log_action "$(action_verb "$dest")" "$src" "$dest"
   if [[ "$DRY_RUN" -eq 1 ]]; then
+    rm -f "$tmp_file"
     return 0
   fi
 
   mkdir -p "$(dirname "$dest")"
-  {
-    printf '---\n'
-    printf 'mode: agent\n'
-    printf 'description: "%s"\n' "$desc"
-    printf '---\n\n'
-    printf '%s\n' "$body"
-  } > "$dest"
+  mv "$tmp_file" "$dest"
 }
 
 want_provider() {

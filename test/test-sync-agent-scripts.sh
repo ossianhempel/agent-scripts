@@ -94,4 +94,27 @@ assert_not_contains "Workspace prompts -> $ROOT/.github/prompts"
 assert_not_contains "-> $ROOT/.github/prompts/"
 assert_not_contains "-> $ROOT/.github/skills/"
 
+OUTPUT_FILE="$TMP_DIR/output-skip-identical.txt"
+
+(
+  cd "$WORKSPACE_DIR"
+  HOME="$HOME_DIR" \
+  "$ROOT/scripts/sync-agent-scripts.sh" --providers codex,claude,gemini,cursor
+) >/dev/null
+
+(
+  cd "$WORKSPACE_DIR"
+  HOME="$HOME_DIR" \
+  "$ROOT/scripts/sync-agent-scripts.sh" --dry-run --providers codex,claude,gemini,cursor
+) > "$OUTPUT_FILE"
+
+assert_not_contains "- create skill"
+assert_not_contains "- update skill"
+assert_not_contains "- create $ROOT/slash-commands/commit.md -> $HOME_DIR/.claude/commands/commit.md"
+assert_not_contains "- update $ROOT/slash-commands/commit.md -> $HOME_DIR/.claude/commands/commit.md"
+assert_not_contains "- create $ROOT/slash-commands/commit.md -> $HOME_DIR/.gemini/commands/commit.toml"
+assert_not_contains "- update $ROOT/slash-commands/commit.md -> $HOME_DIR/.gemini/commands/commit.toml"
+assert_not_contains "- create $ROOT/slash-commands/commit.md -> $HOME_DIR/.cursor/commands/commit.md"
+assert_not_contains "- update $ROOT/slash-commands/commit.md -> $HOME_DIR/.cursor/commands/commit.md"
+
 echo "ok"
