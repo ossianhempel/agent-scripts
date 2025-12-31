@@ -83,6 +83,9 @@ Ossian owns this. Start: say hi + 1 motivating line. Work style: telegraph; noun
 - GitHub CLI for PRs/CI/releases. Given issue/PR URL (or /pull/5): use gh, not web search.
 - Examples: `gh issue view <url> --comments -R owner/repo`, `gh pr view <url> --comments --files -R owner/repo`.
 
+### gog (gogcli)
+- Google Workspace CLI (Gmail/Calendar/Drive/Contacts). Install via `brew install steipete/tap/gogcli`.
+
 ### committer
 - Commit helper (PATH). Stages only listed paths; required here. Repo may also ship ./scripts/committer.
 

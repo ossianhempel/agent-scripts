@@ -149,6 +149,7 @@ Slash commands
 
 Tools
 - `agent-readiness`
+- `gog`
 
 ## Contents Maintenance
 - Update the lists above when adding or removing items.

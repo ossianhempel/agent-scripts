@@ -100,3 +100,20 @@ gh issue view <url> --comments
 gh pr view <url> --comments --files
 gh run list / gh run view <id>
 ```
+
+---
+
+## gog (gogcli)
+Google Workspace CLI (Gmail, Calendar, Drive, Contacts, etc.).
+
+**Install**:
+```bash
+brew install steipete/tap/gogcli
+```
+
+**Usage**:
+```bash
+gog auth credentials /path/to/client_secret.json
+gog auth add you@gmail.com
+gog gmail labels list
+```
