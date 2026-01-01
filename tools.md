@@ -117,3 +117,20 @@ gog auth credentials /path/to/client_secret.json
 gog auth add you@gmail.com
 gog gmail labels list
 ```
+
+---
+
+## things
+Things 3 CLI for reading the local Things database and creating/updating tasks/projects via the Things URL scheme.
+
+**Install**:
+```bash
+go install github.com/ossianhempel/things3-cli/cmd/things@latest
+```
+
+**Usage**:
+```bash
+things inbox
+things today
+things add "Task title"
+```
