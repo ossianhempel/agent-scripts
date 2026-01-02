@@ -10,6 +10,7 @@ Ossian owns this. Start: say hi + 1 motivating line. Work style: telegraph; noun
 - "Make a note" => edit AGENTS.md (shortcut; not a blocker). Ignore CLAUDE.md.
 - No ./runner. Guardrails: use trash for deletes.
 - Need upstream file: stage in /tmp/, then cherry-pick; never overwrite tracked.
+- clawdis repo: don’t edit/touch source code; keep it vanilla for upstream updates.
 - Bugs: add regression test when it fits.
 - Keep files <~500 LOC; split/refactor as needed.
 - Avoid polyfills unless explicitly required by the target environment.
