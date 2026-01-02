@@ -47,6 +47,7 @@ Source of truth on this machine: `~/Developer/agent-scripts`.
 - `scripts/committer`: safe commit helper that stages only listed paths.
 - `scripts/docs-list.ts`: docs indexer enforcing `summary`/`read_when` front matter.
 - `scripts/browser-tools.ts`: Chrome DevTools helper (see `tools.md`).
+- `scripts/update-clawdis.sh`: update + rebuild + restart Clawdis app (macOS).
 
 ## Sync to Global Agent Settings
 Run `scripts/sync-agent-scripts.sh` to copy/update skills and slash commands into
