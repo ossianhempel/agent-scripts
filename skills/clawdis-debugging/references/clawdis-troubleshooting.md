@@ -47,6 +47,7 @@ FAQ: https://github.com/steipete/clawdis/blob/main/docs/faq.md
 - If the gateway won’t start, check `/tmp/clawdis/clawdis-YYYY-MM-DD.log` for port conflicts, missing API keys, or JSON5 syntax issues.
 - If a process keeps restarting after you stop it, look for a supervisor (systemd/pm2) and disable that service.
 - If WhatsApp logs out, re-auth with `pnpm clawdis login`.
+- Node gateway may need a restart after rebuilds; stop the running process and rerun `pnpm clawdis gateway`, or restart your supervisor.
 
 ### Start fresh (explicit steps)
 

@@ -15,7 +15,8 @@ Use this skill to diagnose and fix Clawdis runtime, gateway, config, heartbeat, 
 2. Update from git and rebuild when code may be stale; run `pnpm clawdis doctor` after pulling latest to migrate config.
 3. Use `pnpm clawdis onboard` for first-time setup, or `pnpm clawdis configure` to change providers/models/integrations/heartbeat settings; avoid hand-editing JSON unless the user asks.
 4. If heartbeats or cron are not firing, confirm the gateway is running continuously, then check config and logs and list cron status.
-5. If skills/config changes are not reflected, use `/reset` to refresh the skills snapshot; no gateway restart needed.
+5. If running node gateway, restart it after rebuild if updates are not picked up.
+6. If skills/config changes are not reflected, use `/reset` to refresh the skills snapshot; no gateway restart needed.
 
 ## FAQ highlights
 
