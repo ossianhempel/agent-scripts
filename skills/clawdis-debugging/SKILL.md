@@ -28,6 +28,7 @@ Use this skill to diagnose and fix Clawdis runtime, gateway, config, heartbeat, 
 - Build errors on `main`: pull latest, `pnpm install`, run doctor, then check issues or temporarily pin an older commit.
 - If WhatsApp logs out, re-auth with `pnpm clawdis login`.
 - For auto-restart, run the gateway under a supervisor (pm2 or launchd); see references.
+- Port 18789 can be owned by the macOS app relay; don’t run the app relay and a dev gateway at the same time.
 
 ## References
 

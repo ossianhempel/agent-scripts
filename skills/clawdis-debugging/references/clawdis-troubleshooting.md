@@ -48,6 +48,7 @@ FAQ: https://github.com/steipete/clawdis/blob/main/docs/faq.md
 - If a process keeps restarting after you stop it, look for a supervisor (systemd/pm2) and disable that service.
 - If WhatsApp logs out, re-auth with `pnpm clawdis login`.
 - Node gateway may need a restart after rebuilds; stop the running process and rerun `pnpm clawdis gateway`, or restart your supervisor.
+- Port 18789 conflicts often mean the macOS app relay is running; pick one gateway (app relay or dev/pm2) at a time.
 
 ## Auto-restart options (macOS)
 
@@ -80,6 +81,13 @@ Create a LaunchAgent that runs `pnpm gateway:watch` in `/Users/ossianhempel/Deve
 - `RunAtLoad = true`
 - `KeepAlive = true`
 - `StandardOutPath` and `StandardErrorPath` to a log file
+
+## App relay vs dev gateway
+
+- **App relay** lives inside `Clawdis.app/Contents/Resources/Relay/clawdis` and owns port 18789.
+- **Dev gateway** is `pnpm gateway[:watch]` from the repo, often supervised by pm2/launchd.
+- If the dev gateway logs “attach failed” or health check errors, the app relay may be holding the port or be stuck.
+- Resolution: quit the app relay or stop pm2/launchd, then restart the chosen gateway.
 
 ### Start fresh (explicit steps)
 
