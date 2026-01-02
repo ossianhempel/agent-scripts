@@ -10,7 +10,6 @@ Ossian owns this. Start: say hi + 1 motivating line. Work style: telegraph; noun
 - "Make a note" => edit AGENTS.md (shortcut; not a blocker). Ignore CLAUDE.md.
 - No ./runner. Guardrails: use trash for deletes.
 - Need upstream file: stage in /tmp/, then cherry-pick; never overwrite tracked.
-- clawdis repo: don’t edit/touch source code; keep it vanilla for upstream updates.
 - Bugs: add regression test when it fits.
 - Keep files <~500 LOC; split/refactor as needed.
 - Avoid polyfills unless explicitly required by the target environment.
@@ -75,6 +74,12 @@ Ossian owns this. Start: say hi + 1 motivating line. Work style: telegraph; noun
 - Leave breadcrumb notes in thread.
 
 ## Tools
+
+### Clawdis
+- Don’t edit/touch source code; keep it vanilla for upstream updates.
+- Personal AI assistant running on my computer (Mac Mini).
+- Set up with `clawdis onboard` 
+- Configure with `clawdis configure`
 
 ### Oracle
 - Bundle prompt+files for 2nd model. Use when stuck/buggy/review.

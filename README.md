@@ -149,7 +149,15 @@ Slash commands
 
 Tools
 - `agent-readiness`
+- `sync-agent-scripts`
+- `sync-agent-instructions`
+- `committer`
+- `docs-list`
+- `browser-tools`
+- `oracle`
+- `gh`
 - `gog`
+- `things`
 
 ## Contents Maintenance
 - Update the lists above when adding or removing items.
