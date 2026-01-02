@@ -49,6 +49,38 @@ FAQ: https://github.com/steipete/clawdis/blob/main/docs/faq.md
 - If WhatsApp logs out, re-auth with `pnpm clawdis login`.
 - Node gateway may need a restart after rebuilds; stop the running process and rerun `pnpm clawdis gateway`, or restart your supervisor.
 
+## Auto-restart options (macOS)
+
+### pm2 (recommended for simplicity)
+
+```bash
+npm i -g pm2
+pm2 start /Users/ossianhempel/Library/pnpm/pnpm --name clawdis-gateway --cwd /Users/ossianhempel/Developer/clawdis --interpreter bash -- gateway:watch
+pm2 save
+```
+
+Auto-start on login/reboot (requires sudo):
+
+```bash
+sudo env PATH=$PATH:/Users/ossianhempel/.nvm/versions/node/v22.16.0/bin /Users/ossianhempel/.nvm/versions/node/v22.16.0/lib/node_modules/pm2/bin/pm2 startup launchd -u ossianhempel --hp /Users/ossianhempel
+```
+
+Useful:
+
+```bash
+pm2 status
+pm2 logs clawdis-gateway
+pm2 restart clawdis-gateway
+```
+
+### launchd (native)
+
+Create a LaunchAgent that runs `pnpm gateway:watch` in `/Users/ossianhempel/Developer/clawdis` with:
+
+- `RunAtLoad = true`
+- `KeepAlive = true`
+- `StandardOutPath` and `StandardErrorPath` to a log file
+
 ### Start fresh (explicit steps)
 
 1. Back up `~/.clawdis`.

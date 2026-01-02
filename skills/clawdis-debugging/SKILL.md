@@ -27,6 +27,7 @@ Use this skill to diagnose and fix Clawdis runtime, gateway, config, heartbeat, 
 - Start fresh: back up `~/.clawdis`, remove state, then rerun `pnpm clawdis onboard` and `pnpm clawdis login`.
 - Build errors on `main`: pull latest, `pnpm install`, run doctor, then check issues or temporarily pin an older commit.
 - If WhatsApp logs out, re-auth with `pnpm clawdis login`.
+- For auto-restart, run the gateway under a supervisor (pm2 or launchd); see references.
 
 ## References
 
