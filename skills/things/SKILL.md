@@ -5,7 +5,7 @@ description: Things 3 CLI for reading the local Things database and creating/upd
 
 # things
 
-Use `things` to read from the local Things 3 database and to create/update items via the Things URL scheme.
+Use `things` to read from the local Things 3 database and to create/update items via the Things URL scheme (areas use AppleScript).
 
 Quick start (read)
 - `things inbox`
@@ -19,6 +19,8 @@ Write (URL scheme)
 - `things add-project "Project title" --area "Area Name"`
 - `things update --id <uuid> --notes "Updated notes"`
 - `things update-project --id <uuid> "New project title"`
+- Move to Someday: `things update --id <uuid> --when=someday`
+- Move to This Evening (Later): `things update --id <uuid> --later` (alias for `--when=evening`)
 
 Filters + DB
 - Use `--db` or `THINGSDB` to point to a specific Things.sqlite.
@@ -33,3 +35,4 @@ Auth + permissions
 Notes
 - macOS only.
 - Use `things --help` and `things <command> --help` for the full flag list.
+- Install via Homebrew: `brew tap ossianhempel/tap` then `brew install things3-cli`.
