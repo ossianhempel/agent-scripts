@@ -125,8 +125,7 @@ Things 3 CLI for reading the local Things database and creating/updating tasks/p
 
 **Install**:
 ```bash
-brew tap ossianhempel/tap
-brew install things3-cli
+brew install ossianhempel/tap/things3-cli
 ```
 
 **Usage**:

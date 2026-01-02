@@ -35,4 +35,4 @@ Auth + permissions
 Notes
 - macOS only.
 - Use `things --help` and `things <command> --help` for the full flag list.
-- Install via Homebrew: `brew tap ossianhempel/tap` then `brew install things3-cli`.
+- Install via Homebrew: `brew install ossianhempel/tap/things3-cli`.
