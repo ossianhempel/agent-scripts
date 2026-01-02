@@ -28,7 +28,7 @@ Filters + DB
 - Use `--json` for machine output; `--recursive` includes checklist items in JSON.
 
 Auth + permissions
-- Updates require an auth token: set `THINGS_AUTH_TOKEN` or pass `--auth-token`.
+- Updates require an auth token: run `things auth` for setup/status, set `THINGS_AUTH_TOKEN`, or pass `--auth-token`.
 - DB reads may require Full Disk Access for your terminal.
 - URL scheme writes can open/foreground Things; use `--dry-run` to print URLs or `--foreground` to force focus.
 
