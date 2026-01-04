@@ -131,6 +131,69 @@ Create a LaunchAgent that runs `pnpm gateway:watch` in `/Users/ossianhempel/Deve
 
 No need to hand-edit JSON unless you want to.
 
+## Model switching errors (unknown model / wrong provider)
+
+Symptoms:
+- `Unknown model: anthropic/<model>`
+- `/model <name>` fails even though the model exists
+
+Root cause:
+- Provider omitted → Clawdis defaults to `anthropic/...`.
+- Model not in the catalog (`~/.clawdis/agent/models.json`) or blocked by
+  `agent.allowedModels`.
+
+Fix checklist:
+1. List available models from the running gateway:
+   ```bash
+   clawdis gateway call models.list
+   ```
+2. Use the full `provider/model` in `/model`:
+   ```text
+   /model google-antigravity/<exact-model-id>
+   ```
+3. Add an alias (and allowlist if set):
+   ```json5
+   {
+     agent: {
+       allowedModels: ["google-antigravity/<exact-model-id>"],
+       modelAliases: { geminiFlash: "google-antigravity/<exact-model-id>" }
+     }
+   }
+   ```
+
+Notes:
+- If you only provide a model name, Clawdis assumes `anthropic`.
+- If you set `agent.allowedModels`, the model must be listed there.
+
+## Gemini "Corrupted thought signature" (Cloud Code Assist / Antigravity)
+
+Symptoms:
+- `Cloud Code Assist API error (400): "Corrupted thought signature"`
+
+Likely cause:
+- Stale session state or a bad thought/think payload after a model switch.
+- Can happen on both Cloud Code Assist and Antigravity Gemini.
+
+Fixes:
+1. Reset the session: `/new`.
+2. Temporarily disable thinking: `/think off`.
+3. If needed, set default thinking off:
+   ```json5
+   { agent: { thinkingDefault: "off" } }
+   ```
+
+## Model swap compatibility tips (general)
+
+Symptoms:
+- Weird provider errors right after switching models.
+- Tool-call ordering or “thinking”/reasoning errors.
+
+Fixes:
+1. Reset the session: `/new`.
+2. Disable thinking for the session: `/think off`.
+3. If the model still fails, switch to a known-good model, then back.
+4. For persistent issues, set `thinkingDefault: "off"` in config and only enable per-session.
+
 ## Heartbeats
 
 - Gateway sends a `HEARTBEAT` message to the agent at the configured interval (example: every 15m).
