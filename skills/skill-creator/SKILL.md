@@ -1,7 +1,6 @@
 ---
 name: skill-creator
 description: Guide for creating effective skills. This skill should be used when users want to create a new skill (or update an existing skill) that extends Claude's capabilities with specialized knowledge, workflows, or tool integrations.
-license: Complete terms in LICENSE.txt
 ---
 
 # Skill Creator
@@ -203,6 +202,7 @@ Claude reads REDLINING.md or OOXML.md only when the user needs those features.
 
 Skill creation involves these steps:
 
+0. Triage the request (new)
 1. Understand the skill with concrete examples
 2. Plan reusable skill contents (scripts, references, assets)
 3. Initialize the skill (run init_skill.py)
@@ -211,6 +211,27 @@ Skill creation involves these steps:
 6. Iterate based on real usage
 
 Follow these steps in order, skipping only if there is a clear reason why they are not applicable.
+
+### Step 0: Triage the Request
+
+**Always start here.** Before creating any new skill, determine the appropriate action:
+
+| Situation | Action |
+|-----------|--------|
+| Existing skill handles this well | **USE_EXISTING** - Recommend the existing skill |
+| Existing skill partially covers this | **IMPROVE_EXISTING** - Enhance the existing skill |
+| No existing skill covers this | **CREATE_NEW** - Proceed to Step 1 |
+| Multiple skills needed together | **COMPOSE** - Create orchestration skill |
+
+**Triage steps:**
+
+1. List installed skills: `ls ~/.claude/skills/` or check user's skill directories
+2. Read skill descriptions for capability overlap
+3. Ask: "Does an existing skill already do 80%+ of what's needed?"
+4. If yes → recommend using or improving existing skill
+5. If no → proceed with creation
+
+This prevents skill proliferation and duplicated capabilities.
 
 ### Step 1: Understanding the Skill with Concrete Examples
 
@@ -226,6 +247,28 @@ For example, when building an image-editor skill, relevant questions include:
 - "What would a user say that should trigger this skill?"
 
 To avoid overwhelming users, avoid asking too many questions in a single message. Start with the most important questions and follow up as needed for better effectiveness.
+
+**Deep Analysis (for non-trivial skills):**
+
+For complex skills, apply thinking lenses to uncover hidden requirements. See `references/thinking-lenses.md` for the complete framework. Key lenses:
+
+- **First Principles**: What fundamental problem is being solved?
+- **User-Centric**: What does success look like from the user's perspective?
+- **Edge Cases**: What unusual inputs or scenarios could occur?
+- **Pre-Mortem**: If this skill fails in 6 months, why would that be?
+
+**Regression Questioning**: Continue self-questioning until three consecutive rounds produce no new insights:
+1. "What am I assuming that might not be true?"
+2. "What would an expert in this domain add?"
+3. "What's the simplest version that still provides value?"
+
+**Three-Layer Requirements**: Capture requirements at three levels:
+
+| Layer | Description | Example |
+|-------|-------------|---------|
+| **Explicit** | Stated directly | "Rotate PDFs" |
+| **Implicit** | Expected but unstated | Handle multi-page PDFs, preserve quality |
+| **Unknown Unknowns** | Discovered through analysis | Edge case: encrypted PDFs |
 
 Conclude this step when there is a clear sense of the functionality the skill should support.
 
@@ -305,13 +348,14 @@ Any example files and directories not needed for the skill should be deleted. Th
 
 Write the YAML frontmatter with `name` and `description`:
 
-- `name`: The skill name
+- `name`: The skill name (hyphen-case, ≤64 chars)
 - `description`: This is the primary triggering mechanism for your skill, and helps Claude understand when to use the skill.
   - Include both what the Skill does and specific triggers/contexts for when to use it.
   - Include all "when to use" information here - Not in the body. The body is only loaded after triggering, so "When to Use This Skill" sections in the body are not helpful to Claude.
-  - Example description for a `docx` skill: "Comprehensive document creation, editing, and analysis with support for tracked changes, comments, formatting preservation, and text extraction. Use when Claude needs to work with professional documents (.docx files) for: (1) Creating new documents, (2) Modifying or editing content, (3) Working with tracked changes, (4) Adding comments, or any other document tasks"
+  - **Include 3-5 natural trigger phrase variations** to improve discoverability.
+  - Example description for a `docx` skill: "Comprehensive document creation, editing, and analysis with support for tracked changes, comments, formatting preservation, and text extraction. Use when Claude needs to work with professional documents (.docx files) for: (1) Creating new documents, (2) Modifying or editing content, (3) Working with tracked changes, (4) Adding comments, or any other document tasks. Triggers: 'create a Word doc', 'edit this document', 'add tracked changes', 'convert to docx'"
 
-Do not include any other fields in YAML frontmatter.
+Do not include any other fields in YAML frontmatter unless specifically needed (allowed: `license`, `allowed-tools`, `metadata`).
 
 ##### Body
 
@@ -344,6 +388,33 @@ The packaging script will:
 
 If validation fails, the script will report the errors and exit without creating a package. Fix any validation errors and run the packaging command again.
 
+#### Quality Review Before Packaging
+
+Before packaging, evaluate the skill against these criteria:
+
+**Timelessness Score (aim for 7+/10):**
+
+| Score | Interpretation |
+|-------|----------------|
+| 1-3 | **Reject** - Too tied to specific tools/versions |
+| 4-6 | **Revise** - Tooling-dependent, needs abstraction |
+| 7-8 | **Good** - Principle-based, extensible |
+| 9-10 | **Excellent** - Addresses fundamental problem |
+
+**Timelessness checklist:**
+- [ ] Designed around principles, not hardcoded implementations
+- [ ] Documents the "why" not just the "what"
+- [ ] Includes extension points for future growth
+- [ ] Avoids version-specific APIs where possible
+
+**Validation checklist:**
+- [ ] Frontmatter uses only allowed properties
+- [ ] Name is hyphen-case, ≤64 characters
+- [ ] Description ≤1024 characters, no angle brackets
+- [ ] 3-5 trigger phrases documented in description
+- [ ] Scripts tested and working
+- [ ] `python scripts/quick_validate.py <skill-path>` passes
+
 ### Step 6: Iterate
 
 After testing the skill, users may request improvements. Often this happens right after using the skill, with fresh context of how the skill performed.
@@ -354,3 +425,12 @@ After testing the skill, users may request improvements. Often this happens righ
 2. Notice struggles or inefficiencies
 3. Identify how SKILL.md or bundled resources should be updated
 4. Implement changes and test again
+
+## Anti-Patterns to Avoid
+
+| Pattern | Problem | Alternative |
+|---------|---------|-------------|
+| Duplicate skills | Bloats registry, confuses routing | Always run Step 0 triage first |
+| Single trigger phrase | Hard to discover | Use 3-5 natural variations |
+| No verification method | Can't confirm success | Include measurable outcomes |
+| Missing rationale | Can't evolve intelligently | Document every decision's WHY |
