@@ -138,6 +138,7 @@ Skills
 - `create-cli`
 - `frontend-design`
 - `markdown-converter`
+- `notion`
 - `oracle`
 - `revenuecat`
 - `update-agent-scripts`
