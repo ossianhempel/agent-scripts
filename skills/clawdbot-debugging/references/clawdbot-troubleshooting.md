@@ -1,4 +1,4 @@
-# Clawdis Debugging Reference
+# Clawdbot Debugging Reference
 
 ## Update from git (cloned repo)
 
@@ -19,7 +19,7 @@ cd /app
 git pull origin main
 pnpm install
 pnpm build
-pnpm clawdis gateway
+pnpm clawdbot gateway
 ```
 
 ## Config migration after pulling latest
@@ -27,27 +27,27 @@ pnpm clawdis gateway
 If you `git pull` latest, run:
 
 ```bash
-pnpm clawdis doctor
+pnpm clawdbot doctor
 ```
 
 This migrates old config to the new format.
 
 ## Upstream FAQ
 
-FAQ: https://github.com/steipete/clawdis/blob/main/docs/faq.md
+FAQ: `https://github.com/clawdbot/clawdbot/blob/main/docs/faq.md`
 
 ## FAQ highlights (abridged)
 
-- Data lives in `~/.clawdis/` (config, credentials, sessions).
+- Data lives in `~/.clawdbot/` (config, credentials, sessions).
 - Workspace path is separate via `agent.workspace`.
-- “Unauthorized” health check errors usually mean no config; run `pnpm clawdis onboard`.
-- `pnpm clawdis doctor` validates config/skills and can restart the gateway.
-- Start fresh: back up, then move `~/.clawdis` to Trash; rerun onboarding + login.
+- “Unauthorized” health check errors usually mean no config; run `pnpm clawdbot onboard`.
+- `pnpm clawdbot doctor` validates config/skills and can restart the gateway.
+- Start fresh: back up, then move `~/.clawdbot` to Trash; rerun onboarding + login.
 - Build errors on `main`: pull latest, `pnpm install`, run doctor; check issues or temporarily pin an older commit if needed.
-- If the gateway won’t start, check `/tmp/clawdis/clawdis-YYYY-MM-DD.log` for port conflicts, missing API keys, or JSON5 syntax issues.
+- If the gateway won’t start, check `/tmp/clawdbot/clawdbot-YYYY-MM-DD.log` for port conflicts, missing API keys, or JSON5 syntax issues.
 - If a process keeps restarting after you stop it, look for a supervisor (systemd/pm2) and disable that service.
-- If WhatsApp logs out, re-auth with `pnpm clawdis login`.
-- Node gateway may need a restart after rebuilds; stop the running process and rerun `pnpm clawdis gateway`, or restart your supervisor.
+- If WhatsApp logs out, re-auth with `pnpm clawdbot login`.
+- Node gateway may need a restart after rebuilds; stop the running process and rerun `pnpm clawdbot gateway`, or restart your supervisor.
 - Port 18789 conflicts often mean the macOS app relay is running; pick one gateway (app relay or dev/pm2) at a time.
 
 ## Auto-restart options (macOS)
@@ -56,7 +56,7 @@ FAQ: https://github.com/steipete/clawdis/blob/main/docs/faq.md
 
 ```bash
 npm i -g pm2
-pm2 start /Users/ossianhempel/Library/pnpm/pnpm --name clawdis-gateway --cwd /Users/ossianhempel/Developer/clawdis --interpreter bash -- gateway:watch
+pm2 start /Users/ossianhempel/Library/pnpm/pnpm --name clawdbot-gateway --cwd /Users/ossianhempel/Developer/clawdbot --interpreter bash -- gateway:watch
 pm2 save
 ```
 
@@ -70,13 +70,13 @@ Useful:
 
 ```bash
 pm2 status
-pm2 logs clawdis-gateway
-pm2 restart clawdis-gateway
+pm2 logs clawdbot-gateway
+pm2 restart clawdbot-gateway
 ```
 
 ### launchd (native)
 
-Create a LaunchAgent that runs `pnpm gateway:watch` in `/Users/ossianhempel/Developer/clawdis` with:
+Create a LaunchAgent that runs `pnpm gateway:watch` in `/Users/ossianhempel/Developer/clawdbot` with:
 
 - `RunAtLoad = true`
 - `KeepAlive = true`
@@ -84,19 +84,19 @@ Create a LaunchAgent that runs `pnpm gateway:watch` in `/Users/ossianhempel/Deve
 
 ## App relay vs dev gateway
 
-- **App relay** lives inside `Clawdis.app/Contents/Resources/Relay/clawdis` and owns port 18789.
+- **App relay** lives inside `Clawdbot.app/Contents/Resources/Relay/clawdbot` and owns port 18789.
 - **Dev gateway** is `pnpm gateway[:watch]` from the repo, often supervised by pm2/launchd.
 - If the dev gateway logs “attach failed” or health check errors, the app relay may be holding the port or be stuck.
 - Resolution: quit the app relay or stop pm2/launchd, then restart the chosen gateway.
 
 ### Start fresh (explicit steps)
 
-1. Back up `~/.clawdis`.
-2. Remove state (prefer `trash ~/.clawdis`).
+1. Back up `~/.clawdbot`.
+2. Remove state (prefer `trash ~/.clawdbot`).
 3. Re-run setup:
    ```bash
-   pnpm clawdis onboard
-   pnpm clawdis login
+   pnpm clawdbot onboard
+   pnpm clawdbot login
    ```
 
 ### Build errors on main
@@ -108,7 +108,7 @@ Create a LaunchAgent that runs `pnpm gateway:watch` in `/Users/ossianhempel/Deve
    ```
 2. Run:
    ```bash
-   pnpm clawdis doctor
+   pnpm clawdbot doctor
    ```
 3. If still failing, check GitHub issues; optionally roll back to a known-good commit.
 
@@ -116,11 +116,11 @@ Create a LaunchAgent that runs `pnpm gateway:watch` in `/Users/ossianhempel/Deve
 
 - First-time guided setup:
   ```bash
-  pnpm clawdis onboard
+  pnpm clawdbot onboard
   ```
 - Already set up, need to change settings:
   ```bash
-  pnpm clawdis configure
+  pnpm clawdbot configure
   ```
 
 `configure` is best for:
@@ -138,14 +138,14 @@ Symptoms:
 - `/model <name>` fails even though the model exists
 
 Root cause:
-- Provider omitted → Clawdis defaults to `anthropic/...`.
-- Model not in the catalog (`~/.clawdis/agent/models.json`) or blocked by
+- Provider omitted → Clawdbot defaults to `anthropic/...`.
+- Model not in the catalog (`~/.clawdbot/agent/models.json`) or blocked by
   `agent.allowedModels`.
 
 Fix checklist:
 1. List available models from the running gateway:
    ```bash
-   clawdis gateway call models.list
+   clawdbot gateway call models.list
    ```
 2. Use the full `provider/model` in `/model`:
    ```text
@@ -162,7 +162,7 @@ Fix checklist:
    ```
 
 Notes:
-- If you only provide a model name, Clawdis assumes `anthropic`.
+- If you only provide a model name, Clawdbot assumes `anthropic`.
 - If you set `agent.allowedModels`, the model must be listed there.
 
 ## Gemini "Corrupted thought signature" (Cloud Code Assist / Antigravity)
@@ -207,11 +207,11 @@ Fixes:
 1. Confirm gateway is running continuously (heartbeats require the gateway to stay up).
 2. Check config:
    ```bash
-   cat ~/.clawdis/clawdis.json | grep -A5 heartbeat
+   cat ~/.clawdbot/clawdbot.json | grep -A5 heartbeat
    ```
 3. Check logs:
    ```bash
-   cat /tmp/clawdis/clawdis-$(date +%Y-%m-%d).log | grep -i heartbeat
+   cat /tmp/clawdbot/clawdbot-$(date +%Y-%m-%d).log | grep -i heartbeat
    ```
 
 ## Cron jobs
@@ -222,7 +222,7 @@ Fixes:
 Check status:
 
 ```bash
-pnpm clawdis cron list
+pnpm clawdbot cron list
 ```
 
 ### If cron jobs are not firing
@@ -230,11 +230,11 @@ pnpm clawdis cron list
 1. Confirm gateway is running continuously.
 2. Check config:
    ```bash
-   cat ~/.clawdis/clawdis.json | grep -A5 cron
+   cat ~/.clawdbot/clawdbot.json | grep -A5 cron
    ```
 3. Check logs:
    ```bash
-   cat /tmp/clawdis/clawdis-$(date +%Y-%m-%d).log | grep -i cron
+   cat /tmp/clawdbot/clawdbot-$(date +%Y-%m-%d).log | grep -i cron
    ```
 
 ## Skills snapshot refresh (no gateway restart)

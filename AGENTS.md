@@ -75,12 +75,12 @@ Ossian owns this. Start: say hi + 1 motivating line. Work style: telegraph; noun
 
 ## Tools
 
-### Clawdis
+### Clawdbot
 - Don’t edit/touch source code; keep it vanilla for upstream updates.
 - Personal AI assistant running on my computer (Mac Mini).
-- Set up with `clawdis onboard` 
-- Configure with `clawdis configure`
-- Update helper: `scripts/update-clawdis.sh` (pull + rebuild + restart app + embedded CLI).
+- Set up with `clawdbot onboard`
+- Configure with `clawdbot configure`
+- Update helper: `scripts/update-clawdbot.sh` (pull + rebuild + restart app + embedded CLI).
 
 ### Oracle
 - Bundle prompt+files for 2nd model. Use when stuck/buggy/review.
