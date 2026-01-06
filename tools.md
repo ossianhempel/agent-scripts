@@ -132,5 +132,11 @@ brew install ossianhempel/tap/things3-cli
 ```bash
 things inbox
 things today
+things repeating
 things add "Task title"
+things add "Daily standup" --repeat=day --repeat-mode=schedule
+things update --id <uuid> --repeat=week --repeat-every=2
+things update --id <uuid> --repeat=day --repeat-until=2026-01-18
 ```
+
+Repeating updates write directly to the Things database (Full Disk Access may be required).
