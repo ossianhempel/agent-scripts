@@ -37,6 +37,7 @@ Repeating (database writes)
 - Add repeating deadlines: `things update --id <uuid> --repeat=week --repeat-deadline=2`
 - Stop repeating after a date: `things update --id <uuid> --repeat=day --repeat-until=2026-01-18`
 - Clear repeating schedule: `things update --id <uuid> --repeat-clear`
+ - Repeating adds launch Things in the background first to ensure the item hits the database before the repeat rule is applied.
 
 Filters + DB
 - Use `--db` or `THINGSDB` to point to a specific Things.sqlite.
