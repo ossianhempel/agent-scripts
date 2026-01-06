@@ -1,13 +1,13 @@
 # Global Agent Instructions
 
-Ossian owns this. Start: say hi + 1 motivating line. Work style: telegraph; noun-phrases ok; drop grammar; min tokens.
+Ossian owns this. Start: greet user + 1 motivating line. Work style: telegraph; noun-phrases ok; drop grammar; min tokens.
 
 ## Agent Protocol
 
 - Workspace: ~/Developer or ~/repos. Missing ossianhempel repo: clone https://github.com/ossianhempel/<repo>.git. (it can differ between Developer or repos depending on machine)
 - Files: repo or ~/Developer/agent-scripts or ~/repos/agent-scripts.
 - PRs: use gh pr view/diff (no URLs).
-- "Make a note" => edit AGENTS.md (shortcut; not a blocker). Ignore CLAUDE.md.
+- "Make a note" or "remember something" => edit AGENTS.md (shortcut; not a blocker). Ignore CLAUDE.md.
 - No ./runner. Guardrails: use trash for deletes.
 - Need upstream file: stage in /tmp/, then cherry-pick; never overwrite tracked.
 - Bugs: add regression test when it fits.
