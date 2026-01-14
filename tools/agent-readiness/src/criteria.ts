@@ -70,6 +70,22 @@ const IGNORE_DIRS = [
   "tmp",
 ];
 
+const AGENT_INSTRUCTION_FILES = [
+  "AGENTS.md",
+  "CLAUDE.md",
+  "GEMINI.md",
+  path.join(".github", "copilot-instructions.md"),
+];
+
+const AST_GREP_CONFIG_FILES = [
+  "sgconfig.yml",
+  "sgconfig.yaml",
+  path.join(".ast-grep", "config.yml"),
+  path.join(".ast-grep", "config.yaml"),
+];
+
+const AST_GREP_PATTERN = /\b(ast-grep|ast_grep|astgrep)\b/i;
+
 export const CRITERIA: CriterionDefinition[] = [
   {
     id: "readme",
@@ -118,12 +134,13 @@ export const CRITERIA: CriterionDefinition[] = [
   },
   {
     id: "agents_md",
-    title: "AGENTS.md instructions",
+    title: "Agent instruction file",
     level: 2,
     pillar: "Documentation",
     scope: "repo",
     evaluateRepo: (ctx) => checkAgentsMd(ctx.root),
-    recommendation: () => "Add AGENTS.md with repo workflow and guardrails.",
+    recommendation: () =>
+      "Add AGENTS.md, CLAUDE.md, GEMINI.md, or .github/copilot-instructions.md with repo workflow and guardrails.",
   },
   {
     id: "devcontainer",
@@ -255,6 +272,16 @@ export const CRITERIA: CriterionDefinition[] = [
     recommendation: () => "Add flake detection (retries + reporting) to CI.",
   },
   {
+    id: "ast_grep_rules",
+    title: "AST-grep rules enforced",
+    level: 4,
+    pillar: "Style & Validation",
+    scope: "repo",
+    evaluateRepo: (ctx) => checkAstGrep(ctx.root),
+    recommendation: () =>
+      "Add ast-grep config/rules and run them in CI or pre-commit to block unwanted patterns.",
+  },
+  {
     id: "agent_orchestration_present",
     title: "Agent orchestration present",
     level: 5,
@@ -336,11 +363,15 @@ function checkReadme(root: string): CriterionCheck {
 }
 
 function checkAgentsMd(root: string): CriterionCheck {
-  const agentsPath = path.join(root, "AGENTS.md");
-  if (!pathExists(agentsPath)) {
-    return fail("AGENTS.md not found.");
+  const found = AGENT_INSTRUCTION_FILES.find((relativePath) =>
+    pathExists(path.join(root, relativePath))
+  );
+  if (!found) {
+    return fail(
+      "No agent instruction file found (AGENTS.md, CLAUDE.md, GEMINI.md, or .github/copilot-instructions.md)."
+    );
   }
-  return pass("AGENTS.md present at repo root.");
+  return pass(`Agent instruction file present: ${found}.`);
 }
 
 function checkDevcontainer(root: string): CriterionCheck {
@@ -730,6 +761,64 @@ function checkFlakyTests(ctx: RepoContext): CriterionCheck & { evidence?: string
     return pass("Flaky test retries or detection configuration detected.");
   }
   return fail("No flaky test detection configuration detected.");
+}
+
+function checkAstGrep(root: string): CriterionCheck & { evidence?: string[] } {
+  const configEvidence: string[] = [];
+  const automationEvidence: string[] = [];
+  const configHit = AST_GREP_CONFIG_FILES.find((file) => pathExists(path.join(root, file)));
+  if (configHit) {
+    configEvidence.push(configHit);
+    if (pathExists(path.join(root, "rules"))) {
+      configEvidence.push("rules/");
+    }
+  }
+  if (pathExists(path.join(root, ".ast-grep", "rules"))) {
+    configEvidence.push(path.join(".ast-grep", "rules"));
+  }
+
+  const precommitFiles = [".pre-commit-config.yaml", ".pre-commit-config.yml"];
+  for (const file of precommitFiles) {
+    const content = readFileIfExists(path.join(root, file));
+    if (content && AST_GREP_PATTERN.test(content)) {
+      automationEvidence.push(file);
+    }
+  }
+
+  const workflows = readWorkflowFiles(root);
+  const workflowHit = findFirstWorkflowMatch(workflows, [AST_GREP_PATTERN]);
+  if (workflowHit) {
+    automationEvidence.push(path.relative(root, workflowHit));
+  }
+
+  const pkg = readJsonFile<{ scripts?: Record<string, string> }>(path.join(root, "package.json"));
+  if (pkg?.scripts) {
+    const scriptHit = Object.entries(pkg.scripts).find(([, cmd]) => AST_GREP_PATTERN.test(cmd));
+    if (scriptHit) {
+      automationEvidence.push(`package.json#scripts.${scriptHit[0]}`);
+    }
+  }
+
+  const uniqueEvidence = Array.from(new Set([...configEvidence, ...automationEvidence]));
+  if (configEvidence.length > 0 && automationEvidence.length > 0) {
+    return {
+      ...pass("AST-grep config and automation detected."),
+      evidence: uniqueEvidence,
+    };
+  }
+  if (configEvidence.length > 0) {
+    return {
+      ...fail("AST-grep config found but no automation (CI/pre-commit/scripts) detected."),
+      ...(uniqueEvidence.length ? { evidence: uniqueEvidence } : {}),
+    };
+  }
+  if (automationEvidence.length > 0) {
+    return {
+      ...fail("AST-grep automation detected but no config/rules found."),
+      ...(uniqueEvidence.length ? { evidence: uniqueEvidence } : {}),
+    };
+  }
+  return fail("No ast-grep configuration or automation detected.");
 }
 
 function checkAgentOrchestration(root: string): CriterionCheck & { evidence?: string[] } {

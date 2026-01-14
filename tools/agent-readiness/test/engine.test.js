@@ -58,3 +58,36 @@ test("buildReport scores Level 1 criteria and produces action items", async () =
     cleanup(root);
   }
 });
+
+test("agents_md accepts alternate instruction files", async () => {
+  const variants = [
+    "CLAUDE.md",
+    "GEMINI.md",
+    path.join(".github", "copilot-instructions.md"),
+  ];
+
+  for (const variant of variants) {
+    const root = makeTempDir();
+    try {
+      writeFile(path.join(root, variant), "# Agent Instructions\n");
+      const report = await buildReport(root, "0.1.0-test");
+      assert.equal(report.criteriaMeta.agents_md.status, "pass");
+    } finally {
+      cleanup(root);
+    }
+  }
+});
+
+test("ast_grep_rules passes with sgconfig", async () => {
+  const root = makeTempDir();
+  try {
+    writeFile(path.join(root, "sgconfig.yml"), "rules: ./rules\n");
+    writeJson(path.join(root, "package.json"), {
+      scripts: { "lint:ast": "ast-grep scan" },
+    });
+    const report = await buildReport(root, "0.1.0-test");
+    assert.equal(report.criteriaMeta.ast_grep_rules.status, "pass");
+  } finally {
+    cleanup(root);
+  }
+});
