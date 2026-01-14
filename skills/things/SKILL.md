@@ -55,10 +55,14 @@ Auth + permissions
 - DB reads may require Full Disk Access for your terminal.
 - Repeating add/update writes directly to the Things database and requires Full Disk Access; use `--db` or `THINGSDB` to target a specific database.
 - URL scheme writes can open/foreground Things; use `--dry-run` to print URLs or `--foreground` to force focus.
-- Delete commands prompt for confirmation when interactive; pass `--confirm` for single deletes in non-interactive scripts. Bulk delete requires `--yes`.
+- Update `--when/--later` is verified against the database by default; use `--no-verify` to skip verification.
+- `--later` / `--when=evening` refuses to move tasks that are already scheduled for a non-today date; use `--allow-non-today` to override.
+- Titles that look like flag assignments (e.g. `tag=work`) are rejected; pass `--allow-unsafe-title` to keep them as the title.
+- Delete commands prompt for confirmation when interactive; pass `--confirm` for single deletes in non-interactive scripts. Query deletes require `--confirm=delete` or `--yes`.
 - Bulk update/delete write an action log; use `things undo` to revert the last bulk update or trash.
 
 Notes
 - macOS only.
 - Use `things --help` and `things <command> --help` for the full flag list.
 - Install via Homebrew: `brew install ossianhempel/tap/things3-cli`.
+- When working inside the repo, prefer the repo binary (`make build` then `./bin/things`) or `go run ./cmd/things` to pick up local changes.
