@@ -1,3 +1,8 @@
+---
+name: app-store-changelog
+description: Draft App Store release notes from git history, focusing on user-visible changes.
+---
+
 # App Store Changelog
 
 ## Overview

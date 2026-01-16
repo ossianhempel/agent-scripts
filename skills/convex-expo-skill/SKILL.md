@@ -1,6 +1,6 @@
 ---
 name: convex-expo
-description: Convex + Expo (React Native) workflow for setup, env vars, schema/tables, queries/mutations/actions, auth, file uploads, and CI/CD with Convex deploy + EAS. Triggers: add Convex to my Expo app; design a Convex schema; write a Convex query; Convex auth in React Native; set up CI/CD for Convex + Expo.
+description: "Convex + Expo (React Native) workflow for setup, env vars, schema/tables, queries/mutations/actions, auth, file uploads, and CI/CD with Convex deploy + EAS. Triggers: add Convex to my Expo app; design a Convex schema; write a Convex query; Convex auth in React Native; set up CI/CD for Convex + Expo."
 ---
 
 # Convex + Expo (React Native)
