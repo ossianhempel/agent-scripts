@@ -135,6 +135,7 @@ Run: `pre-commit run --all-files`
 ## Contents
 Skills
 - `agent-readiness`
+- `convex-expo`
 - `create-cli`
 - `frontend-design`
 - `ios-simulator`
