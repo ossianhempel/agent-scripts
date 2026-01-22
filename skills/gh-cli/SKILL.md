@@ -18,6 +18,7 @@ Use `gh` for GitHub interactions. Avoid web UI. No URLs in responses.
 
 - We have multiple GitHub accounts; default assumption: ossianhempel (personal repos).
 - Other accounts: Rebtech, H&M. If repo access fails, check auth and switch.
+- If auth fails, likely on work account; switch back: `gh auth switch -u ossianhempel` (verify with `gh auth status`).
 
 ## Pull requests
 
