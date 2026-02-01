@@ -140,3 +140,10 @@ things update --id <uuid> --repeat=day --repeat-until=2026-01-18
 ```
 
 Repeating updates write directly to the Things database (Full Disk Access may be required).
+
+---
+
+## obsidian
+Obsidian vault for notes and knowledge management.
+
+**Location**: `~/ossians-second-brain-sync`
