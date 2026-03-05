@@ -13,6 +13,7 @@ Ossian owns this. Start: greet user + 1 motivating line. Work style: telegraph; 
 - Bugs: add regression test when it fits.
 - Keep files <~500 LOC; split/refactor as needed.
 - Build using OOP principles, breaking UI and backend logic into clean, reusable components.
+- Theme tokens live in constants/Theme.ts; use them for colors, fonts, spacing, radii, and shadows. Avoid hardcoded style numbers in components where possible.
 - Use a single global theme file for colors, fonts, spacing, corener radius, and shadows. No hardcoded styles inside components.
 - Avoid polyfills unless explicitly required by the target environment.
 - Commits: Conventional Commits (feat|fix|refactor|build|ci|chore|docs|style|perf|test).
