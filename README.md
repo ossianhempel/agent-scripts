@@ -135,7 +135,13 @@ Run: `pre-commit run --all-files`
 ## Contents
 Skills
 - `agent-readiness`
-- `convex-expo`
+- `convex-auth-setup`
+- `convex-components-guide`
+- `convex-function-creator`
+- `convex-helpers-guide`
+- `convex-migration-helper`
+- `convex-quickstart`
+- `convex-schema-builder`
 - `create-cli`
 - `frontend-design`
 - `ios-simulator`
