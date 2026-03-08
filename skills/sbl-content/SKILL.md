@@ -64,6 +64,58 @@ Rules for video text:
 - First text = hook question or statement
 - Build a logical flow: problem → explanation → takeaway
 
+## App Screenshot Integration
+
+When generating content — especially videos or slideshows showing exercises —
+**always consider whether a GainsLog or PlateSnap screenshot would add value**.
+Suggest it proactively in the output when relevant.
+
+### When to suggest screenshots
+
+- **Exercise demo videos**: Overlay a GainsLog screenshot of the logged set
+  (weight, reps, RIR) as a badge/sticker next to the footage of the lift.
+  This reinforces the "log everything" message and shows real data.
+- **Workout overview posts**: Include a GainsLog session summary screenshot
+  on one slide to show the full logged workout.
+- **Progress/comparison content**: PlateSnap screenshots showing plate loading
+  or GainsLog progression charts.
+- **"How I train X" content**: GainsLog exercise history or set details as
+  proof of what's actually being done in practice.
+
+### How to suggest it
+
+In the output, after the slide/text segment where a screenshot fits, add a
+visual note in brackets:
+
+```
+SLIDE 3:
+Maskinfly
+2x6-10
+
+[📲 GainsLog-screenshot: visa det loggade settet (vikt + reps + RIR)
+som overlay/märke bredvid klippet på övningen]
+```
+
+For videos:
+```
+TEXT 2 (0:03-0:07):
+Vi kör incline för att träffa övre bröstmuskeln
+
+[📲 GainsLog-screenshot: visa settet från appen som sticker/märke
+i hörnet medan du utför lyftet]
+```
+
+### Placement guidelines
+
+- The screenshot should sit as a **badge/sticker** — not take over the frame.
+  Typically bottom-right or top-right corner, roughly 25-30% of the frame.
+- Use it on **1-2 slides/segments max** per post — don't overdo it.
+- It doubles as subtle GainsLog promotion without feeling like an ad.
+- If the post is about a specific exercise, match the screenshot to that
+  exact exercise and set in GainsLog.
+- For PlateSnap: suggest when the content involves plate math, loading
+  strategies, or showing what a specific weight looks like on the bar.
+
 ## Caption Structure
 
 Every caption follows this exact structure:
