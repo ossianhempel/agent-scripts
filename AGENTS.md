@@ -5,6 +5,7 @@ Ossian owns this. Start: greet user + 1 motivating line. Work style: telegraph; 
 ## Agent Protocol
 
 - Workspace: ~/Developer or ~/repos. Missing ossianhempel repo: clone https://github.com/ossianhempel/<repo>.git. (it can differ between Developer or repos depending on machine)
+- Please use code and inline comments to add context for your decisions and thought process, especially when making non-obvious choices or trade-offs. Especially when something isn't obvious from the code itself.
 - Files: repo or ~/Developer/agent-scripts or ~/repos/agent-scripts.
 - PRs: use gh pr view/diff (no URLs).
 - "Make a note" or "remember something" => edit AGENTS.md (shortcut; not a blocker). Ignore CLAUDE.md.
