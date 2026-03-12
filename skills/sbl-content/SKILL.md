@@ -2,17 +2,21 @@
 name: sbl-content
 description: >
   Create TikTok, Reels, and IG content for Ossian Hempel's science-based
-  hypertrophy training account. Generates on-screen text for slideshows/videos
-  and captions. Swedish language with SBL community vocab. Promotes GainsLog app.
+  hypertrophy training account. Researches peer-reviewed studies, presents key
+  findings with graph/figure links, then generates on-screen text for
+  slideshows/videos and captions with scientific references naturally woven in.
+  Swedish language with SBL community vocab. Promotes GainsLog app.
   Triggers: "write a post", "create a reel", "slideshow", "TikTok script",
-  "video text", "caption", "content about [exercise/topic]", "SBL content".
-allowed-tools: [Read, Write, Edit, AskUserQuestion]
+  "video text", "caption", "content about [exercise/topic]", "SBL content",
+  "find studies about", "research on", "what does the science say".
+allowed-tools: [Read, Write, Edit, AskUserQuestion, WebSearch, WebFetch]
 ---
 
 # SBL Content Creator
 
-Generate on-screen text and captions for Ossian Hempel's TikTok/Reels/IG
-content about science-based hypertrophy training.
+Research peer-reviewed training science and generate on-screen text and captions
+for Ossian Hempel's TikTok/Reels/IG content about science-based hypertrophy
+training.
 
 ## When This Skill Activates
 
@@ -21,6 +25,8 @@ content about science-based hypertrophy training.
 - User mentions TikTok, Reels, IG post, or SBL content
 - User provides raw info/notes about an exercise or training concept and wants
   it formatted for social media
+- User asks to find studies, research a topic, or wants science-backed content
+- User says "what does the science say about..." or "find studies about..."
 
 ## Account Identity
 
@@ -31,6 +37,174 @@ content about science-based hypertrophy training.
 - **App promoted**: GainsLog (workout logging app)
 - **Content style**: Educational, direct, confident but not arrogant. Talks like
   a knowledgeable gym buddy, not a professor. Short sentences. No fluff.
+
+## Research Workflow
+
+When a user provides a topic, **always research first** before creating content.
+This ensures posts are grounded in real science, not just general knowledge.
+
+### Step 1: Topic Research
+
+Use WebSearch to find relevant studies. Search strategy:
+
+1. **Start broad**: `"[topic] hypertrophy study"` or `"[topic] muscle growth
+   meta-analysis"`
+2. **Target PubMed**: `site:pubmed.ncbi.nlm.nih.gov [topic] hypertrophy`
+3. **Check Google Scholar**: `site:scholar.google.com [topic] resistance training`
+4. **Look for known researchers**: `"Schoenfeld" [topic]` or `"Nuckols" [topic]`
+   (see Known Researchers section)
+5. **Find figures**: `site:ncbi.nlm.nih.gov/pmc [topic]` (PMC has open-access
+   figures)
+
+Prioritize in this order:
+- Recent meta-analyses and systematic reviews (strongest evidence)
+- RCTs with clear results and good sample sizes
+- Studies with screenshot-worthy figures (bar charts, dose-response curves)
+- Studies by well-known researchers in the space
+
+### Step 2: Research Summary
+
+Present findings to the user in this format before generating content:
+
+```
+## Studier hittade
+
+### 1. [Author et al. (Year)] — [Journal]
+**Titel**: [Full title]
+**Nyckelresultat**: [1-2 sentences summarizing the key finding relevant to the topic]
+**Länk**: [URL]
+
+📊 **Figur värd att screenshota**: [Yes/No]
+[If yes]: Fig. X — [what it shows]. Länk: [direct figure URL if available]
+Placering: [which slide it fits on]
+
+### 2. [Author et al. (Year)] — [Journal]
+...
+
+## Rekommendation
+[Which 1-2 studies to reference in the caption, and which figure to use as a
+slide if applicable]
+```
+
+Aim for 2-4 studies. Don't overload — pick the most relevant and impactful.
+
+### Step 3: User Picks
+
+Ask the user which studies/findings to include before generating content:
+- Which studies resonate for this post?
+- Should we include a graph slide?
+- Any specific finding they want to highlight?
+
+### Step 4: Content Creation with References
+
+Proceed to the content workflow below, but with study references naturally
+woven into captions (see Study Reference Style) and graph slides suggested
+where relevant (see Graph & Figure Integration).
+
+## Study Reference Style
+
+Study references in captions must match Ossian's casual, knowledgeable voice.
+Never academic or formal.
+
+### How to reference studies
+
+**Casual Swedish mention** (preferred):
+- "En studie av Schoenfeld et al. (2021) visade att..."
+- "Enligt forskning av Pedrosa et al. (2023)..."
+
+**Conversational integration** (even better):
+- "Forskning visar att stretch-positionen driver mer tillväxt (Pedrosa et al., 2023)"
+- "Vi vet från studier att volymen spelar roll — men inte hur folk tror (Krieger, 2010)"
+- "Schoenfeld har visat att rep range spelar mindre roll än vi trodde"
+
+**Ultra-casual** (for hooks/asides):
+- "Forskningen är ganska tydlig här..."
+- "Det finns studier som visar..."
+
+### Rules
+
+- Max **1-2 study references per caption** — this is social media, not a
+  literature review
+- References go in the **educational paragraph** of the caption, never in hooks
+  or closing lines
+- First name mentions only when the researcher is well-known in the community
+  (e.g., "Schoenfeld" not "Brad J. Schoenfeld")
+- Year in parentheses: `(2023)` — no journal names in the caption
+- On-screen text **never** has citations — keep slides clean and punchy
+- If referencing a specific number/finding, attribute it. If making a general
+  claim supported by multiple studies, "forskning visar" is enough
+
+## Graph & Figure Integration
+
+Study figures can make powerful slides — a well-chosen bar chart says more than
+three slides of text.
+
+### Where to find open-access figures
+
+- **PubMed Central (PMC)**: Open-access full texts with figures.
+  Search: `site:ncbi.nlm.nih.gov/pmc [topic]`
+- **ResearchGate**: Often has figure previews even for paywalled papers.
+  Search: `site:researchgate.net [topic] figure`
+- **Study supplementary materials**: Sometimes have clearer/simpler versions
+
+### What makes a good graph for social media
+
+- Clear bar charts or line graphs with obvious differences
+- Not too many variables (2-4 groups max)
+- Readable at phone size — avoid complex multi-panel figures
+- Shows a clear "winner" or trend that supports the post's point
+- English labels are fine — the caption explains it in Swedish
+
+### How to suggest graph slides
+
+In the output, suggest a dedicated graph slide using this format:
+
+```
+[📊 Studie-graf: Schoenfeld et al. (2021), Fig. 2
+ Visar: Muskeltillväxt vid olika rep-ranges
+ Länk: [URL]
+ Placering: Slide 3 — helskärm med källa i nederkant
+ Crop-tips: Beskär till bara stapeldiagrammet, behåll axeletiketter]
+```
+
+### Placement guidelines for graphs
+
+- Graph slides work best as **slide 3-4** (after the hook and initial
+  explanation, as "proof")
+- Use as a **full-screen slide** with source credit at the bottom
+- Credit line format: `Källa: Schoenfeld et al. (2021)` in small text
+- Max **1 graph per post** — don't turn it into a research presentation
+- The slide before the graph should set up what the viewer is about to see:
+  "Och forskningen bekräftar det..."
+- The slide after should interpret the finding in plain language
+
+## Known Researchers & Sources
+
+Quick reference for searching. These are the key names in hypertrophy and
+training science — when researching a topic, search for their work specifically.
+
+| Researcher | Focus areas | Search tip |
+|---|---|---|
+| Brad Schoenfeld | Volume, rep ranges, hypertrophy mechanisms | Most-published in the space. Start here for any hypertrophy question |
+| Eric Helms | Natural bodybuilding, programming, nutrition | Great for programming and practical application |
+| Greg Nuckols | Strength, programming, meta-analyses | Runs Stronger By Science — excellent analysis |
+| James Krieger | Volume dose-response, meta-analyses | Key work on training volume |
+| Milo Wolf | Stretch-mediated hypertrophy, muscle length | Leading researcher on long-length partials / stretch position |
+| Henning Wackerhage | Molecular exercise physiology | Deep mechanistic work |
+| Menno Henselmans | Evidence-based bodybuilding, frequency | Practical application of research |
+| Chris Beardsley | Hypertrophy mechanisms, exercise biomechanics | Clear explanations of mechanisms |
+
+**Good secondary sources** (science communicators):
+- Jeff Nippard — YouTube, well-researched videos with study citations
+- Revive Stronger — podcast/content with researcher interviews
+- Stronger By Science (Greg Nuckols) — in-depth research reviews
+
+**Key journals** to search:
+- JSCR (Journal of Strength and Conditioning Research)
+- Sports Medicine
+- EJSS (European Journal of Sport Science)
+- IJSPP (International Journal of Sports Physiology and Performance)
+- Scandinavian Journal of Medicine & Science in Sports
 
 ## Content Formats
 
@@ -293,6 +467,13 @@ comes from being *sharper*, not louder.
 
 When the user provides content (raw notes, a topic, an article, etc.):
 
+### Step 0: Research
+
+Search for relevant studies on the topic using the Research Workflow above.
+Present findings and ask the user which studies to include before proceeding.
+Skip this step only if the user explicitly says they don't want research or
+provides their own study references.
+
 ### Step 1: Clarify format (if unclear)
 
 Ask via AskUserQuestion:
@@ -301,6 +482,9 @@ Ask via AskUserQuestion:
 - Any specific exercises being demonstrated?
 
 ### Step 2: Generate on-screen text
+
+Include graph slide suggestions where a study figure adds value (see Graph &
+Figure Integration).
 
 Output as a numbered list of slides or timed text segments:
 
@@ -361,7 +545,8 @@ Sidolyft kabel
 ### Step 3: Generate caption
 
 Output the full caption ready to copy-paste. Follow the caption structure
-defined above.
+defined above. Weave in casual study references in the educational paragraph
+(see Study Reference Style).
 
 ### Step 4: Suggest thumbnail text (optional)
 
@@ -378,7 +563,34 @@ of the existing feed:
 **Input**: "Skriv ett inlägg om varför cable lateral raises är bättre än
 dumbbell lateral raises för de flesta"
 
-**Output**:
+### Step 0: Research output
+
+```
+## Studier hittade
+
+### 1. Pedrosa et al. (2023) — European Journal of Sport Science
+**Titel**: Partial range of motion training elicits favorable improvements in
+muscular adaptations when carried out at long muscle lengths
+**Nyckelresultat**: Träning i stretchad position gav signifikant mer
+muskeltillväxt. Kabelvariant ger belastning i stretchad position till
+skillnad från hantlar.
+**Länk**: [PubMed URL]
+
+📊 **Figur värd att screenshota**: Ja
+Fig. 3 — Muskeltillväxt jämförelse mellan full ROM och partiella reps.
+Placering: Slide 3
+
+### 2. Newmire & Willoughby (2018) — JSCR
+**Titel**: Partial vs full range of motion resistance training and its effects
+on muscle hypertrophy
+**Nyckelresultat**: Full ROM med motstånd genom hela rörelsen (som kabel ger)
+producerar bättre hypertrofi-resultat.
+**Länk**: [PubMed URL]
+
+## Rekommendation
+Referera Pedrosa et al. i captionen om stretch-position. Använd graf från
+Pedrosa som slide 3 om den är tillräckligt tydlig.
+```
 
 ### On-screen text (Slideshow, 5 slides)
 
@@ -403,6 +615,12 @@ genom hela ROM
 Speciellt i
 stretchad position
 
+[📊 Studie-graf: Pedrosa et al. (2023), Fig. 3
+ Visar: Muskeltillväxt vid lång vs kort muskellängd
+ Länk: [PMC figure URL]
+ Placering: Slide 3 ALT — helskärm med källa i nederkant
+ Crop-tips: Beskär till stapeldiagrammet, behåll axeletiketter]
+
 SLIDE 4: [TRUST — acknowledge nuance]
 Funkar hantlar?
 Absolut
@@ -422,7 +640,7 @@ Känn skillnaden själv
 ```
 Dina sidolyftar ger dig inte det du tror 📈
 
-Hantlar ger störst motstånd högst upp — men muskeln jobbar genom hela rörelsen. Kabeln matchar belastningen bättre genom hela ROM, speciellt i den stretchade positionen som vi vet driver tillväxt.
+Hantlar ger störst motstånd högst upp — men muskeln jobbar genom hela rörelsen. Kabeln matchar belastningen bättre genom hela ROM, speciellt i den stretchade positionen. Forskning visar att just stretch-positionen driver mest tillväxt (Pedrosa et al., 2023) — och det är precis där kabeln ger dig motstånd som hantlar inte gör.
 
 Funkar hantlar? Absolut. Men om du bara ska välja en variant och vill maxa deltana: kabel.
 
