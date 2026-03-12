@@ -1,6 +1,6 @@
 ---
-name: revenuecat
-description: Comprehensive assistance with RevenueCat in-app subscriptions and purchases
+name: revenuecat-sdk
+description: Comprehensive assistance with RevenueCat SDK integration for in-app subscriptions and purchases
 ---
 
 # RevenueCat Skill

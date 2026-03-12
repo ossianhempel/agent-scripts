@@ -1,0 +1,7 @@
+{
+  "name": "My iOS App",
+  "type": "app_store",
+  "app_store": {
+    "bundle_id": "com.example.myapp"
+  }
+}

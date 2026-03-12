@@ -1,0 +1,5 @@
+{
+  "name": "Customer updates webhook",
+  "url": "https://hooks.example.com/revenuecat",
+  "environment": "production"
+}

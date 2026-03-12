@@ -1,0 +1,13 @@
+interface:
+  display_name: "RevenueCat API"
+  short_description: "Manage RevenueCat via MCP first, then CLI or API v2 fallback."
+  default_prompt: "Use RevenueCat MCP when available. Otherwise use the bundled RevenueCat API v2 helper with read-before-write discipline."
+policy:
+  allow_implicit_invocation: false
+dependencies:
+  tools:
+    - type: "mcp"
+      value: "revenuecat"
+      description: "RevenueCat MCP server"
+      transport: "streamable_http"
+      url: "https://mcp.revenuecat.ai/mcp"

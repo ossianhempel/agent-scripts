@@ -1,0 +1,10 @@
+{
+  "store_identifier": "com.example.app.premium.monthly",
+  "app_id": "app_your_app_id",
+  "type": "subscription",
+  "display_name": "Premium Monthly",
+  "title": "Premium Monthly",
+  "subscription": {
+    "duration": "P1M"
+  }
+}
