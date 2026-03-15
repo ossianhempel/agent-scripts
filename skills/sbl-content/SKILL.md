@@ -311,13 +311,23 @@ Keep it conversational. Short paragraphs. No walls of text.]
 
 ### GainsLog CTA Variations
 
-Rotate between these. Pick whichever fits the post tone:
+Rotate between these. Pick whichever fits the post tone.
 
+**Short CTAs** (quick, low-friction):
 - `Loggbok: GainsLog 📲`
 - `Slå loggboken med GainsLog 💪📈`
 - `Lås in med GainsLog 📲`
 - `Lås in sommarformen med GainsLog 📲💪 (gratis)`
 - `Logga med GainsLog 📲`
+
+**Pain-point CTAs** (longer, triggers the "that's a lot to track" feeling —
+use after educational posts with many variables. These drive more downloads):
+- `Volymer, intensitet, progression, övningsval — det är många variabler att hålla reda på. GainsLog gör det enkelt. Sätter upp ditt program baserat på vetenskapliga principer och ser till att du progressivt överbelastar över tid 📲`
+- `Mycket att hålla koll på? GainsLog håller ordning på allt — från programmering till progressiv överbelastning — baserat på vetenskapliga principer 📲`
+
+**Prefer the pain-point CTAs** for educational/science posts where the content
+covers multiple training variables. The short CTAs work better for simpler
+posts like workout overviews or single-exercise demos.
 
 ### Hashtag Sets
 
