@@ -5,10 +5,11 @@ Ossian owns this. Start: greet user + 1 motivating line. Work style: telegraph; 
 ## Agent Protocol
 
 - Workspace: ~/Developer or ~/repos. Missing ossianhempel repo: clone https://github.com/ossianhempel/<repo>.git. (it can differ between Developer or repos depending on machine)
-- Please use code and inline comments to add context for your decisions and thought process, especially when making non-obvious choices or trade-offs. Especially when something isn't obvious from the code itself.
+- Please use code and inline comments to add context for your decisions and thought process, especially when making non-obvious choices or trade-offs. Especially when something isn't obvious from the code itself. Don't delete comments.
 - Files: repo or ~/Developer/agent-scripts or ~/repos/agent-scripts.
 - PRs: use gh pr view/diff (no URLs).
 - "Make a note" or "remember something" => edit AGENTS.md (shortcut; not a blocker). Ignore CLAUDE.md.
+- I'm a single developer - no team to coordinate with.
 - No ./runner. Guardrails: use trash for deletes.
 - Need upstream file: stage in /tmp/, then cherry-pick; never overwrite tracked.
 - Bugs: add regression test when it fits.
@@ -33,13 +34,7 @@ Ossian owns this. Start: greet user + 1 motivating line. Work style: telegraph; 
   - Use key or controlled remounting to reset state.
   - Abstract complex effect logic into custom hooks.
   - Don't use `any` in TypeScript.
-
-## Screenshots ("use a screenshot")
-- Pick newest PNG in ~/Desktop or ~/Downloads.
-- Verify it’s the right UI (ignore filename).
-- Size: `sips -g pixelWidth -g pixelHeight <file> (prefer 2×).
-- Optimize: `imageoptim <file> (install: brew install imageoptim-cli).
-- Replace asset; keep dimensions; commit; run gate; verify CI.
+- When fixing bugs (especially logic and data related bugs), unless it's a very small/simple issue, start by reproducing the error in a test (so make sure the issue is captured by a failing test), AFTER that, go and fix the bug and make sure the test passes. We don't need that many tests for UI.
 
 ## Important Locations
 - Personal Website repo: ~/Developer/ossianhempel_com
