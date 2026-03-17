@@ -134,6 +134,7 @@ Run: `pre-commit run --all-files`
 
 ## Contents
 Skills
+- `agent-food-admin`
 - `agent-readiness`
 - `convex-auth-setup`
 - `convex-components-guide`
