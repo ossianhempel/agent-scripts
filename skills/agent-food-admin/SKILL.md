@@ -5,6 +5,28 @@ description: Use the PlateSnap agent food admin HTTP API to search, inspect, cre
 
 # Agent Food Admin
 
+## Feedback Log (DO THIS FIRST)
+
+**At the start of every session, before doing anything else**, read the file
+`feedback.log` in this skill's folder. It contains accumulated preferences and
+corrections from previous sessions. Apply everything in it as if it were part of
+this SKILL.md.
+
+**During a session**, whenever the user gives a correction, states a preference,
+or says something like "don't do X" / "I prefer Y" / "always do Z":
+
+1. Decide: is this a **general preference** that applies to future sessions, or
+   is it **specific to the current task only** (e.g., "use this exact brand name
+   for this food")?
+2. If it's general, **immediately append it to `feedback.log`** using the Edit
+   or Write tool. Don't wait until the end of the session.
+3. Use your judgment on length. A simple preference like "always confirm
+   deployment target" is one line. Something nuanced like a nutrition data
+   sourcing correction needs a sentence or two of context so it's useful when
+   re-read later.
+4. Format each entry as: `[YYYY-MM-DD] <the preference or correction>`
+5. Skip anything that only matters for the current task and wouldn't apply again.
+
 ## Purpose
 Use the machine-facing food admin API for sidecar admin work. This skill exists so agents can manage foods programmatically without driving the admin web UI.
 
@@ -27,6 +49,14 @@ Expect these env vars to be available before using the API:
   Example: bearer token for `Authorization: Bearer ...`
 
 If either value is missing, stop and tell the user exactly which env var is missing. Do not fall back to browser automation unless the user explicitly asks for that.
+
+## Deployment targeting
+
+`npx convex run` defaults to the dev deployment (reads `.env.local`).
+
+- **Production**: `npx convex run --prod <function> '<args>'`
+- When using the HTTP API, verify `PLATESNAP_AGENT_ADMIN_BASE_URL` points to the correct deployment (dev vs prod).
+- Never run mutations without confirming the target deployment with the user.
 
 ## Endpoint summary
 - `POST /agent-admin/v1/foods/search`
@@ -78,6 +108,75 @@ Prefer sending the strongest identifiers available:
 - `query` using Swedish food name and optional brand
 - `status` only when the user explicitly cares about verified/unverified/rejected state
 
+## Serving options reference
+
+Label format: exactly `"<integer> <unit>"` — e.g., `"1 st"`, `"2 dl"`.
+
+**Supported canonical units**: `g`, `kg`, `ml`, `cl`, `dl`, `l`, `tsk`, `msk`, `kopp`, `glas`, `skopa`, `st`, `portion`
+
+Common aliases are accepted (e.g., `piece` → `st`, `cup` → `kopp`, `scoop` → `skopa`, `serving` → `portion`).
+
+Rules:
+- Amount must be a positive integer (no decimals, fractions, or zero)
+- Weight goes in `gramsPerUnit`, NOT in the label
+  - Correct: `{"label": "1 st", "gramsPerUnit": 121}`
+  - Wrong: `{"label": "1 st (121 g)", "gramsPerUnit": 121}` — silently dropped
+- `g_1` and `g_100` are always auto-included (do not add them manually)
+- Invalid labels are silently dropped by `upsertMany`, rejected by the HTTP API
+- If `defaultServingOptionId` references a dropped/missing option, falls back to `g_100`
+
+## Source field
+
+Agent-created foods must always use `source: "agent"`.
+
+- `sourceName` — human-readable data origin (e.g., `"mcdonalds.com/se API"`, `"Livsmedelsverket"`)
+- `sourceId` — stable unique ID for idempotent upserts (e.g., `"mcd_se_200002"`)
+- The HTTP admin API sets `source: "agent"` automatically
+- When using `upsertMany` directly via `npx convex run`, set `"source": "agent"` explicitly
+
+Do NOT use source values like `"mcdonalds_se"` or other brand-specific strings — always `"agent"`.
+
+## Data integrity
+
+- NEVER fabricate or estimate nutrition values
+- Always source from official product pages, APIs, or databases
+- Include data source attribution in `sourceName`
+- If a value is uncertain or unavailable, omit it rather than guess
+
+## Bulk operations via upsertMany
+
+Alternative to the HTTP API for batch inserts/updates:
+
+```bash
+npx convex run --prod foods:upsertMany '{
+  "items": [
+    {
+      "name": "Cheeseburgare",
+      "brand": "McDonald's",
+      "source": "agent",
+      "sourceId": "mcd_se_200002",
+      "sourceName": "mcdonalds.com/se API",
+      "nutrientsPer100": {
+        "calories": 253,
+        "proteinG": 14.0,
+        "carbsG": 27.0,
+        "fatG": 10.0
+      },
+      "servingOptions": [
+        { "id": "1_st", "label": "1 st", "gramsPerUnit": 121 }
+      ],
+      "defaultServingOptionId": "1_st"
+    }
+  ]
+}'
+```
+
+Key differences from the HTTP API:
+- `upsertMany` matches on `(source, sourceId)` for idempotent upserts — updates if found, inserts if not
+- Invalid serving labels are silently **dropped** (not rejected)
+- No audit logging (unlike the HTTP API)
+- No auth token required (uses Convex CLI auth directly)
+
 ## Request patterns
 
 ### Search
@@ -111,6 +210,7 @@ curl -sS \
   -d '{
     "name": "Kvarg vanilj",
     "brand": "Lindahls",
+    "sourceName": "lindahls.se",
     "nutrientsPer100": {
       "calories": 92,
       "proteinG": 10.0,
@@ -118,9 +218,9 @@ curl -sS \
       "fatG": 0.2
     },
     "servingOptions": [
-      { "id": "portion", "label": "1 portion", "gramsPerUnit": 150 }
+      { "id": "1_portion", "label": "1 portion", "gramsPerUnit": 150 }
     ],
-    "defaultServingOptionId": "portion"
+    "defaultServingOptionId": "1_portion"
   }'
 ```
 

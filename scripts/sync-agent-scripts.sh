@@ -102,7 +102,7 @@ dirs_identical() {
   if [[ ! -d "$dest" ]]; then
     return 1
   fi
-  diff -qr "$src" "$dest" >/dev/null 2>&1
+  diff -qr --exclude='feedback.log' "$src" "$dest" >/dev/null 2>&1
 }
 
 to_lower() {
@@ -147,9 +147,23 @@ run_sync_dir() {
   if [[ "$DRY_RUN" -eq 1 ]]; then
     return 0
   fi
+
+  # Preserve destination feedback.log (written by agents during sessions)
+  local saved_feedback=""
+  if [[ -f "$dest/feedback.log" ]]; then
+    saved_feedback=$(mktemp)
+    cp -f "$dest/feedback.log" "$saved_feedback"
+  fi
+
   rm -rf "$dest"
   mkdir -p "$(dirname "$dest")"
   cp -a "$src" "$dest"
+
+  # Restore preserved feedback.log
+  if [[ -n "$saved_feedback" ]]; then
+    cp -f "$saved_feedback" "$dest/feedback.log"
+    rm -f "$saved_feedback"
+  fi
 }
 
 update_gemini_settings() {

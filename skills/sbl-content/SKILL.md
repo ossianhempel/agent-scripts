@@ -18,6 +18,27 @@ Research peer-reviewed training science and generate on-screen text and captions
 for Ossian Hempel's TikTok/Reels/IG content about science-based hypertrophy
 training.
 
+## Feedback Log (DO THIS FIRST)
+
+**At the start of every session, before doing anything else**, read the file
+`feedback.log` in this skill's folder. It contains accumulated preferences and
+corrections from previous sessions. Apply everything in it as if it were part of
+this SKILL.md.
+
+**During a session**, whenever Ossian gives a correction, states a preference, or
+says something like "don't do X" / "I prefer Y" / "always do Z":
+
+1. Decide: is this a **general preference** that applies to future sessions, or
+   is it **specific to the current task only** (e.g., "use this specific study
+   for this post")?
+2. If it's general, **immediately append it to `feedback.log`** using the Edit
+   or Write tool. Don't wait until the end of the session.
+3. Use your judgment on length. A simple preference like "never use 🔥 emoji"
+   is one line. Something nuanced like a tone correction needs a sentence or two
+   of context so it's useful when re-read later.
+4. Format each entry as: `[YYYY-MM-DD] <the preference or correction>`
+5. Skip anything that only matters for the current task and wouldn't apply again.
+
 ## When This Skill Activates
 
 - User wants to turn a training topic into a post
