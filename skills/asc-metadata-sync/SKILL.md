@@ -131,7 +131,16 @@ asc localizations list --version "VERSION_ID" --output table
 
 ## Character Limits
 
-See `shared/references/asc-locales-and-limits.md` for character limits. Use `asc migrate validate` to check before upload.
+| Field | Limit |
+|-------|-------|
+| Name | 30 |
+| Subtitle | 30 |
+| Keywords | 100 (comma-separated) |
+| Description | 4000 |
+| What's New | 4000 |
+| Promotional Text | 170 |
+
+Use `asc migrate validate` to check limits before upload.
 
 ## Notes
 - Version localizations and app info localizations are different; use the right command and `--type` flag.

@@ -162,8 +162,6 @@ returns: v.union(v.object({ /* ... */ }), v.null())
 
 ### 3. Authentication Check
 
-> For reusable auth helpers (`getCurrentUser`, `requireAdmin`, etc.), see `convex-auth-setup`.
-
 **Always** verify auth in public functions:
 
 ```typescript

@@ -25,7 +25,13 @@ Use this skill to pull English (or any source locale) App Store metadata, transl
 
 ## Supported Locales
 
-See `shared/references/asc-locales-and-limits.md` for the full locale list and character limits.
+App Store Connect locales for version and app-info localizations:
+```
+ar-SA, ca, cs, da, de-DE, el, en-AU, en-CA, en-GB, en-US,
+es-ES, es-MX, fi, fr-CA, fr-FR, he, hi, hr, hu, id, it,
+ja, ko, ms, nl-NL, no, pl, pt-BR, pt-PT, ro, ru, sk,
+sv, th, tr, uk, vi, zh-Hans, zh-Hant
+```
 
 ## Two Types of Metadata
 
@@ -190,9 +196,18 @@ asc localizations list --version "VERSION_ID" --output table
 asc localizations list --app "APP_ID" --type app-info --app-info "APP_INFO_ID" --output table
 ```
 
-## Character Limits
+## Character Limits (enforce before upload!)
 
-See `shared/references/asc-locales-and-limits.md` for character limits. Always validate before upload.
+| Field | Limit |
+|-------|-------|
+| Name | 30 |
+| Subtitle | 30 |
+| Keywords | 100 (comma-separated) |
+| Description | 4000 |
+| What's New | 4000 |
+| Promotional Text | 170 |
+
+**Always validate** translated text fits within limits before uploading. Truncated text looks unprofessional. If translation exceeds the limit, shorten it — do not truncate mid-sentence.
 
 ## Full Example: Add nl-NL and ru to Roxy Math
 
