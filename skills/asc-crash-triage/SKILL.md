@@ -44,10 +44,10 @@ Requires a build ID. Resolve via `asc builds latest --app "APP_ID" --platform IO
 
 ## Resolving IDs
 
-- App ID from name: `asc apps list --name "AppName"` or `asc apps list --bundle-id "com.example.app"`
-- Latest build ID: `asc builds latest --app "APP_ID" --platform IOS`
+Use the `asc-id-resolver` skill for full ID resolution (apps, builds, versions, groups, testers). Quick shortcuts:
+
+- Latest build: `asc builds latest --app "APP_ID" --platform IOS`
 - Recent builds: `asc builds list --app "APP_ID" --sort -uploadedDate --limit 5`
-- Set default: `export ASC_APP_ID="APP_ID"`
 
 ## Summary format
 

@@ -14,14 +14,7 @@ Use this skill to bulk-create or bulk-update display names (and descriptions) fo
 
 ## Supported App Store Locales
 
-These are the locales supported by App Store Connect for subscription and IAP localizations:
-
-```
-ar-SA, ca, cs, da, de-DE, el, en-AU, en-CA, en-GB, en-US,
-es-ES, es-MX, fi, fr-CA, fr-FR, he, hi, hr, hu, id, it,
-ja, ko, ms, nl-NL, no, pl, pt-BR, pt-PT, ro, ru, sk,
-sv, th, tr, uk, vi, zh-Hans, zh-Hant
-```
+See `shared/references/asc-locales-and-limits.md` for the full locale list and character limits.
 
 ## Workflow: Bulk-Localize a Subscription
 

@@ -35,7 +35,7 @@ Repeating (database writes)
 - Repeat every 2 weeks after completion: `things update --id <uuid> --repeat=week --repeat-every=2`
 - Anchor a schedule on a date: `things add "Monthly bill" --repeat=month --repeat-mode=schedule --repeat-start=2026-02-01`
 - Add repeating deadlines: `things update --id <uuid> --repeat=week --repeat-deadline=2`
-- Stop repeating after a date: `things update --id <uuid> --repeat=day --repeat-until=2026-01-18`
+- Stop repeating after a date: `things update --id <uuid> --repeat=day --repeat-until=2027-06-01`
 - Clear repeating schedule: `things update --id <uuid> --repeat-clear`
  - Repeating adds launch Things in the background first to ensure the item hits the database before the repeat rule is applied.
 

@@ -72,6 +72,8 @@ export default defineSchema({
 
 ### Step 3: Set Up Authentication
 
+> For detailed auth patterns (access control, team-based auth, admin roles), see `convex-auth-setup`.
+
 We'll use WorkOS AuthKit, which provides a complete auth solution with minimal setup.
 
 ```bash
@@ -288,11 +290,10 @@ export const update = mutation({
     if (!task) throw new Error("Task not found");
     if (task.userId !== user._id) throw new Error("Unauthorized");
 
-    const updates: any = {};
-    if (args.title !== undefined) updates.title = args.title;
-    if (args.completed !== undefined) updates.completed = args.completed;
-
-    await ctx.db.patch(args.taskId, updates);
+    await ctx.db.patch(args.taskId, {
+      ...(args.title !== undefined && { title: args.title }),
+      ...(args.completed !== undefined && { completed: args.completed }),
+    });
   },
 });
 
