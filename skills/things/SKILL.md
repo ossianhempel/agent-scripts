@@ -18,6 +18,7 @@ Quick start (read)
 
 Write (URL scheme)
 - `things add "Task title" --notes "..." --list "Project or Area"`
+- Checklist items (repeat `--checklist-item` per item): `things add "My task" --checklist-item="Step 1" --checklist-item="Step 2" --checklist-item="Step 3"`
 - `things add-project "Project title" --area "Area Name"`
 - `things update --id <uuid> --notes "Updated notes"`
 - Bulk update (preview then apply): `things update --query 'tag:work' --dry-run` then `things update --query 'tag:work' --yes --tags "Work"`
