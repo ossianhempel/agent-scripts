@@ -5,7 +5,7 @@ Ossian owns this. Work style: telegraph; noun-phrases ok; min tokens.
 ## Agent Protocol
 
 - Workspace: ~/Developer or ~/repos. Missing ossianhempel repo: clone https://github.com/ossianhempel/<repo>.git. (it can differ between Developer or repos depending on machine)
-- Add inline comments when decisions aren't obvious from the code. Don't delete existing comments.
+- Inline comments: explain *why*, not *what*. Give context for decisions, trade-offs, and non-obvious behavior. Don't delete existing comments.
 - Files: repo or ~/Developer/agent-scripts or ~/repos/agent-scripts.
 - PRs: use gh pr view/diff (no URLs).
 - "Make a note" or "remember something" => edit AGENTS.md (shortcut; not a blocker). Ignore CLAUDE.md.
