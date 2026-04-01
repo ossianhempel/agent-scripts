@@ -1,0 +1,484 @@
+---
+name: article-outline
+description: >
+  Plan and outline long-form blog posts and articles. Mines Ossian's Obsidian
+  vault for existing thinking, finds relevant studies and research, then
+  produces a structured working outline that reads like a real writer's notes.
+  Trained to avoid AI writing patterns. Supports Swedish and English.
+  Triggers: "outline a blog post", "article about [topic]", "help me outline",
+  "I want to write about", "blog post about", "plan an article",
+  "write about [topic]", "article outline", "post outline".
+allowed-tools: [Read, Glob, Grep, WebSearch, WebFetch, Write, Edit, AskUserQuestion]
+---
+
+# Article Outline
+
+Research a topic by **starting in Ossian's Obsidian vault**, then filling gaps
+with external sources. The vault is the anchor - it contains Ossian's existing
+thinking, highlights, and positions. External research supports and challenges
+vault findings, it doesn't replace them. If the vault has nothing on a topic,
+that's a signal worth flagging (maybe the topic isn't ripe yet, or the angle
+needs rethinking).
+
+The output is a working outline that feels like a smart person's notes -
+opinionated, specific, and structurally driven by the content itself.
+
+## Feedback Log (DO THIS FIRST)
+
+**At the start of every session, before doing anything else**, read the file
+`feedback.log` in this skill's folder. It contains accumulated preferences and
+corrections from previous sessions. Apply everything in it as if it were part of
+this SKILL.md.
+
+**During a session**, whenever Ossian gives a correction, states a preference, or
+says something like "don't do X" / "I prefer Y" / "always do Z":
+
+1. Decide: is this a **general preference** that applies to future sessions, or
+   is it **specific to the current task only**?
+2. If it's general, **immediately append it to `feedback.log`** using the Edit
+   or Write tool. Don't wait until the end of the session.
+3. Format each entry as: `[YYYY-MM-DD] <the preference or correction>`
+4. Skip anything that only matters for the current task.
+
+## When This Skill Activates
+
+- User wants to plan or outline a blog post or article
+- User says "I want to write about..." or "article about..."
+- User asks for help structuring long-form content
+- User mentions blog post, article, essay, or long-form writing
+- User wants to explore a topic before writing
+
+**Not for**: social media posts (use sbl-content or gainslog-content), prose
+drafts, copywriting, or non-article formats.
+
+## Scope
+
+- **Output**: Working outline only. Never generate full prose drafts.
+- **Format**: Blog posts, articles, essays. Not social media.
+- **Topics**: Anything. Training, tech, personal essays, cross-domain.
+- **Language**: Swedish or English. Match the user's language, or ask.
+
+---
+
+## Workflow
+
+### Step 1: Understand the Topic
+
+Read the user's request and identify:
+- **Topic**: What is this about?
+- **Angle**: What's the specific take or framing?
+- **Audience**: Who's reading this? (Ossian's blog readers by default)
+- **Language**: Swedish or English?
+
+If the angle is vague, ask 1-2 clarifying questions. Don't over-interview.
+Examples of good clarifying questions:
+- "Is this more of a practical how-to or an opinion piece?"
+- "Are you arguing a specific position or exploring the question?"
+- "Who's the reader - developers, gym people, general audience?"
+
+If the topic and angle are clear, skip straight to research.
+
+### Step 2: Search the Obsidian Vault (THE FOUNDATION)
+
+**This is the most important step in the entire workflow.** Every outline should
+be anchored in what Ossian has already thought, read, and highlighted. The vault
+is the difference between "AI researched a topic" and "Ossian's existing thinking
+organized into an outline."
+
+Mine Ossian's vault at `/Users/ossianhempel/ossians-second-brain-sync`
+thoroughly. Don't do a single search and move on - exhaust the vault before
+touching external sources.
+
+**Spend more time here than on any other step.** A good vault search is 5-10
+Glob/Grep/Read operations, not 1-2.
+
+**Search strategy** (use all three approaches):
+
+1. **Filename search** - Glob for notes with topic keywords:
+   ```
+   pages/**/*keyword*.md
+   moc/**/*keyword*.md
+   Readwise/**/*keyword*.md
+   ```
+
+2. **Content search** - Grep for topic terms across the vault:
+   ```
+   pattern: "keyword|related_term|synonym"
+   path: /Users/ossianhempel/ossians-second-brain-sync
+   glob: "**/*.md"
+   ```
+
+3. **Follow wiki-link trails** - When you find a relevant note:
+   - Read the full note
+   - Extract `[[wiki-links]]` from the content
+   - Read linked notes that look relevant
+   - Check backlinks: Grep for `\[\[Note Name\]\]` across the vault
+   - Follow 1-2 levels deep, not more
+
+**Search locations by priority**:
+- `pages/` - Ossian's own notes and writing
+- `moc/` - Maps of content (hub notes linking related ideas)
+- `Readwise/` - Highlights and annotations from books/articles
+- `daily-notes/` - Only if topic-specific search turns up references there
+
+**What to extract from vault findings**:
+- Direct quotes and highlights (with note title for attribution)
+- Key ideas and positions Ossian has already formed
+- Connections between notes (these become the outline's structure)
+- Open questions or unresolved tensions in the notes
+- Specific claims, numbers, or frameworks already captured
+
+**If the vault search finds rich material**: The outline's sections should map
+directly to clusters of vault findings. External research fills gaps.
+
+**If the vault search finds little or nothing**: Tell the user. Options:
+- Proceed with mostly external research (but flag that the piece won't be
+  anchored in existing thinking)
+- Suggest the user spend time in the vault first, then come back
+- Adjust the angle to match what the vault does have
+
+### Step 3: Search for Studies and Research
+
+**Only after exhausting the vault.** External research has one job: support,
+challenge, or add data to what the vault already contains. The vault tells you
+what Ossian thinks; external sources tell you whether the evidence backs it up.
+
+Use WebSearch to find sources that connect to vault findings.
+
+**Search strategy by domain**:
+
+| Topic domain | Where to search | Example queries |
+|---|---|---|
+| Training/health | PubMed, Google Scholar | `site:pubmed.ncbi.nlm.nih.gov [topic] meta-analysis` |
+| CS/AI/tech | arxiv, HN, tech blogs | `site:arxiv.org [topic]`, `site:news.ycombinator.com [topic]` |
+| General/essays | Web, specific authors | `"[topic]" [known author]`, `"[topic]" essay` |
+
+**Prioritize**:
+- Sources that add specific data or evidence to vault findings
+- Contrarian or nuanced takes (not just confirmation)
+- Recent work (last 2-3 years unless it's a foundational piece)
+- Sources Ossian would actually cite (not generic listicles)
+
+**For each source found, note**:
+- Author and year
+- Key finding or argument (1-2 sentences)
+- URL
+- How it connects to vault findings
+
+Aim for 3-6 sources. Quality over quantity.
+
+### Step 4: Present Combined Findings
+
+**Lead with vault findings.** The vault material is the backbone; external
+research is supporting evidence. Present them so the user sees their own
+thinking organized first, then what external sources add to it.
+
+Format:
+
+```
+## Your Vault - What You Already Have
+
+### [Theme/Cluster 1]
+- [Note title]: [key idea or quote from the note]
+- [Note title]: [related point]
+- Links to: [[Other Note]] (which adds [connection])
+
+### [Theme/Cluster 2]
+- [Note title]: [key idea]
+- [Readwise highlight]: "[quote]" - from [book/article title]
+
+**Vault coverage assessment**: [How much of the topic is already covered in the
+vault? Where are the gaps that external research needs to fill?]
+
+## External Research - Filling the Gaps
+
+### 1. [Author (Year)] - [Short descriptor]
+**Key finding**: [1-2 sentences]
+**Connects to**: [which vault finding it supports/challenges/extends]
+**Link**: [URL]
+
+### 2. [Author (Year)] - [Short descriptor]
+...
+
+## Emerging Structure
+[2-3 sentences on what story or argument is emerging. The structure should be
+visible from the vault clusters - external research adds evidence, not new
+sections.]
+```
+
+### Step 5: User Picks
+
+Ask the user:
+- Which findings resonate? Anything to drop?
+- Is there an angle or structure emerging that they want to lean into?
+- Any findings that surprised them or shifted their thinking?
+
+This is a conversation, not a checkbox. Keep it brief.
+
+### Step 6: Generate the Outline
+
+Produce the working outline based on selected findings.
+
+---
+
+## Outline Format
+
+The outline is a **working document** - it should feel like notes a writer makes
+before drafting. Not a template, not a table of contents, not a listicle
+skeleton.
+
+### Structure
+
+```
+# [Title Option A]
+# [Title Option B]
+
+**Thesis**: [One sentence. What is this article actually arguing or showing?]
+
+**Angle**: [How is this different from what's already been written about this?
+What's the specific lens?]
+
+---
+
+## [Section Name]
+
+Key points:
+- [Specific claim, not a topic label]
+  - Support: [vault note or study reference]
+  - Note to self: [marginal thought, question, or drafting hint]
+- [Another specific claim]
+  - Support: [reference]
+
+## [Section Name]
+
+Key points:
+- [Claim]
+  - Support: [reference]
+  - "Quote worth using" - [source]
+- [Claim]
+  - Tension: [counterargument or complication to address]
+
+## [Section Name]
+...
+
+---
+
+## Connections & Threads
+
+- [Connection between Section X and Section Y that could be a transition]
+- [Recurring theme that ties the piece together]
+- [Unexpected parallel worth exploring]
+
+## Open Questions
+
+- [Something unresolved that might need more research or just acknowledgment]
+- [A claim that needs stronger support]
+- [An angle the author hasn't decided on yet]
+```
+
+### Outline Principles
+
+- **Vault findings shape the structure.** Sections should map to clusters of
+  vault material. If Ossian has three distinct threads in his notes, those
+  become three sections. Don't invent sections that have no vault anchor.
+- **Vault references outnumber external references.** A healthy outline has
+  more `[vault: ...]` citations than `[Author (Year)]` citations. If external
+  sources dominate, the outline isn't anchored enough - go back to the vault.
+- **Sections emerge from content, not a formula.** A training article might have
+  3 sections; a tech essay might have 6. Let the material decide.
+- **Key points are claims, not topic labels.** Write "Most people overtrain
+  volume and undertrain intensity" not "Discussion of volume vs intensity."
+- **Every claim links to support.** Vault note, study, or personal experience.
+  No unsupported assertions in the outline.
+- **Notes to self are first-person.** These are the writer's margin scribbles:
+  "I should probably address the counterargument here", "This connects to the
+  thing about progressive overload", "Need a concrete example."
+- **Title options, not one title.** Give 2-3 options so the writer can feel out
+  the voice.
+- **Thesis is one sentence.** If it takes more, the angle isn't sharp enough.
+
+---
+
+## Anti-AI-Writing Rules
+
+This is the most important section. The outline must avoid every common marker
+of AI-generated writing. These rules apply to all text in the outline itself,
+and serve as guardrails the writer should follow when drafting.
+
+### Banned Vocabulary
+
+Never use these words in the outline. They are the most common AI writing tells:
+
+> delve, intricate, tapestry, pivotal, underscore, landscape, foster, testament,
+> enhance, crucial, vital, significant, profound, steadfast, breathtaking,
+> captivate, watershed, solidify, multifaceted, nuanced (as filler), robust,
+> leverage, utilize, facilitate, paradigm, synergy, holistic, comprehensive,
+> streamline, innovative, cutting-edge, game-changing, revolutionary
+
+If you catch yourself reaching for one of these words, find the concrete,
+specific word that actually says what you mean.
+
+### Structural Tells to Avoid
+
+These patterns scream "AI wrote this":
+
+- **Rule of three**: "X, Y, and Z" lists everywhere. Real writers don't
+  naturally group things in threes. Use 2 or 4 or 7 - whatever the content
+  actually has.
+- **Em dash overuse**: One em dash per article is fine. Five is a tell.
+  Restructure sentences instead.
+- **Negative parallelism**: "It's not about X - it's about Y." Once per article
+  max. Twice is a pattern. Three times is a parody.
+- **False ranges**: "From X to Y" or "Whether X or Y" used to sound inclusive
+  but saying nothing. Be specific.
+- **Reflexive summaries**: Starting a conclusion with "In conclusion" or
+  restating every point. Trust the reader.
+- **Bold-bullet format**: Section header, then bold keyword + explanation for
+  every point. Vary the structure.
+- **Symmetrical section lengths**: Real articles have a long meaty section and
+  a short punchy one. AI makes them all the same length.
+
+### Tone Tells to Avoid
+
+- **Inflated symbolism**: Don't frame mundane things as epic narratives.
+  Training is training, not "a journey of self-discovery."
+- **Editorializing**: Don't tell the reader how to feel. "This is exciting"
+  or "Interestingly" - just present the thing and let it be interesting.
+- **Conjunctive filler**: "Moreover", "Furthermore", "Additionally" - these
+  are crutch words. Cut them or use a real transition.
+- **Superficial -ing commentary**: "Creating a more effective workout" or
+  "Building on this foundation" - vague gerund phrases that add nothing.
+- **Vague attribution**: "Experts say" or "Research suggests" without naming
+  who. Always name the source or drop the claim.
+- **Promotional tone**: Never sell the article's own content. "In this article,
+  we'll explore..." - just start.
+- **False humility**: "It's worth noting that..." - if it's worth noting, just
+  note it.
+
+### The Core Principle
+
+> Write like a specific person thinking through a specific topic. Be concrete,
+> have an opinion, let structure follow content. The reader should be able to
+> tell that a human with particular experiences and views wrote this.
+
+This means:
+- **Specific over general.** "I gained 3kg on my squat 1RM in 8 weeks" beats
+  "strength gains were observed."
+- **Opinionated over balanced.** Take a position. Acknowledge counterarguments
+  in passing, don't give them equal weight unless you genuinely think both sides
+  have merit.
+- **Concrete over abstract.** Name the study. Quote the number. Describe the
+  actual experience. Abstractions are for summarizing, not for making points.
+- **Asymmetric over symmetrical.** Not every point needs the same treatment.
+  Spend 60% of the article on the core insight and 40% on everything else.
+
+---
+
+## Citation Style
+
+References in the outline should be casual and attributive, matching how Ossian
+would actually cite things in a blog post.
+
+**From the vault**:
+- `[from vault: "Note Title"]` or `[vault: "Note Title" - specific claim]`
+- Direct quotes: `"The actual quote" - [vault: "Note Title"]`
+
+**From studies**:
+- `[Author et al. (Year)]` - casual inline
+- For key findings: `Author (Year) found that [specific result]`
+- Never: full journal citations, DOIs, or formal bibliography format
+
+**From other sources**:
+- `[Author, "Article Title"]` or `[Author on Blog/Publication]`
+
+The outline is a working doc. Citations are breadcrumbs for the writer, not
+formatted references for the reader.
+
+---
+
+## Language Handling
+
+- Match the user's language. If they write in Swedish, outline in Swedish.
+- If language is ambiguous, ask.
+- Vault notes may be in either language - extract and present findings in
+  whichever language the outline uses.
+- Study titles stay in English regardless of outline language.
+- Section headers and "notes to self" in the outline language.
+
+---
+
+## Example: Partial Outline
+
+For a request like "Jag vill skriva om varfor folk overskattar traningsvolym":
+
+```
+# Mer ar inte battre: varfor volym ar overskattad
+# Varfor du formodligen gor for manga set
+
+**Tes**: De flesta som traner for hypertrofi gor fler set an de behover, och
+skulle vaxa mer av farre set med hogre intensitet.
+
+**Vinkel**: Personlig erfarenhet + forskning som visar att volym har avtagande
+avkastning langre an folk tror.
+
+---
+
+## Volymdogmen
+
+Nyckelpunkter:
+- SBL-communityt har hamnat i en "mer ar battre"-mentalitet kring set per
+  muskelgrupp per vecka
+  - Support: [vault: "Training Volume Notes" - observation about volume creep]
+  - Notering: Bor borja med ett konkret exempel fran min egen traningshistorik
+- Schoenfelds volumstudier tolkas som att 20+ set ar optimalt, men det ar inte
+  vad datan faktiskt visar
+  - Support: [Schoenfeld & Krieger (2019)] - meta-analysen visar avtagande
+    effekt ovanfor ~10 set/vecka
+  - Notering: Ska jag ta med figuren fran meta-analysen? Tydlig kurva.
+
+## Intensitet ar den saknade variabeln
+
+Nyckelpunkter:
+- Nar folk okar volym kompenserar de nastan alltid med lagre intensitet per set
+  - Support: Personlig erfarenhet - mina loggar visar battre progression med
+    farre, hardare set
+  - "De flesta vet inte hur nara failure de faktiskt ar" - [vault: "RIR Notes"]
+- Proximitet till failure driver tillvaxt mer an antal set
+  - Support: [Refalo et al. (2022)] - systematisk review om proximity to failure
+  - Tension: Men total volym spelar ocksa roll - var gar gransen?
+
+---
+
+## Kopplingar
+
+- Volym-dogmen kopplar till progressiv overbelastning: folk lagger till set
+  istallet for vikt/reps
+- Min egen resa fran 20+ set till 10-12 per muskelgrupp speglar forskningen
+
+## Oppna fragor
+
+- Hur mycket ar individuellt? Bor jag adressa att nybborjare kanske behover
+  mer volym for motorisk inlarning?
+- Finns det en bra studie pa volym + intensitet interaktionen?
+```
+
+---
+
+## What NOT to Do
+
+- Don't skip or rush the vault search. A 1-query vault search is never enough.
+  If you searched for "volume" but didn't also try "sets", "training volume",
+  "overtraining", and related terms, you didn't search thoroughly.
+- Don't let external research drive the outline structure. Vault findings come
+  first. External sources fill gaps and add evidence.
+- Don't generate full prose. The outline is notes and structure, not a draft.
+- Don't use a fixed template with the same sections every time. Let the content
+  determine the structure.
+- Don't pad sections to make them equal length.
+- Don't add a "Sources" or "Bibliography" section at the end. Citations live
+  inline next to the claims they support.
+- Don't include meta-commentary about the outline itself ("This section could
+  be expanded..."). Notes to self are about the *content*, not the outline.
+- Don't summarize the outline at the end. It's a working doc, not a pitch.
+- Don't use any word from the banned vocabulary list.
+- Don't suggest social media repurposing. That's a different skill.

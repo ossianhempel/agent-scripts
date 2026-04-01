@@ -449,9 +449,16 @@ comes from being *sharper*, not louder.
 ## Writing Style Guide
 
 ### Tone
-- **Sharing learnings, not lecturing.** The voice is "here's what I figured out"
-  not "here's what you should do." Frame insights as personal experience that
-  happens to be useful, not instructions from above.
+- **First-person POV, always.** The default framing is "this is why I do X" or
+  "this is what I've found works" -never "you should do X." Ossian shares his
+  own reasoning and choices. The viewer gets value by overhearing his thought
+  process, not by being told what to do. This is the single most important
+  tone rule.
+  - "Jag väljer sittande varianter för att..." > "Du borde köra sittande"
+  - "Därför kör jag chest supported row" > "Kör chest supported row"
+  - "Det här är anledningen till att jag..." > "Det här är anledningen till att du..."
+  - Hooks can be general ("Varför stabila övningar?") but the body should
+    quickly shift to first-person reasoning
 - Confident and direct, but never condescending or commanding
 - OK to be opinionated -just ground it in experience, not authority
   ("personligen hade jag stannat under 10" > "kör under 10 reps")
@@ -491,8 +498,9 @@ comes from being *sharper*, not louder.
 - No "Glöm inte att gilla och följa!" CTAs (only GainsLog CTA)
 - No overclaiming ("bästa övningen NÅGONSIN")
 - No clickbait hooks that overpromise ("DU KOMMER INTE TRO...")
-- No commanding tone ("Gör detta", "Du MÅSTE") -prefer sharing framing
-  ("Personligen...", "Det här tog mig lång tid att inse...")
+- No commanding tone ("Gör detta", "Du MÅSTE", "Testa detta") -always prefer
+  first-person sharing framing ("Personligen...", "Det här tog mig lång tid
+  att inse...", "Därför väljer jag...", "Jag har märkt att...")
 - No long disclaimers (a short "Behöver man X? Nej. Men personligen..." is fine)
 - No numbered lists in captions unless it's an exercise prescription
 - Never write "science-based" in Swedish -keep it English or use "vetenskapsbaserad" sparingly
@@ -632,9 +640,8 @@ Pedrosa som slide 3 om den är tillräckligt tydlig.
 
 ```
 SLIDE 1: [HOOK -promise value]
-Dina sidolyftar ger
-hälften av resultatet
-de borde
+Varför jag alltid väljer
+kabel för sidolyftar
 
 SLIDE 2: [TRUST -explain the problem]
 Hantlar ger mest motstånd
@@ -661,26 +668,25 @@ SLIDE 4: [TRUST -acknowledge nuance]
 Funkar hantlar?
 Absolut
 
-Men kabeln ger dig
+Men kabeln ger mig
 mer tillväxt per set
 
-SLIDE 5: [EMOTION -close with action]
-Byt ut en variant
-nästa pass
-
-Känn skillnaden själv
+SLIDE 5: [EMOTION -close with personal conviction]
+En liten justering
+som gjort stor skillnad
+för mina deltar
 ```
 
 ### Caption
 
 ```
-Dina sidolyftar ger dig inte det du tror 📈
+Varför jag alltid väljer kabel framför hantlar för sidolyftar 📈
 
-Hantlar ger störst motstånd högst upp -men muskeln jobbar genom hela rörelsen. Kabeln matchar belastningen bättre genom hela ROM, speciellt i den stretchade positionen. Forskning visar att just stretch-positionen driver mest tillväxt (Pedrosa et al., 2023) -och det är precis där kabeln ger dig motstånd som hantlar inte gör.
+Hantlar ger störst motstånd högst upp -men muskeln jobbar genom hela rörelsen. Kabeln matchar belastningen bättre genom hela ROM, speciellt i den stretchade positionen. Forskning visar att just stretch-positionen driver mest tillväxt (Pedrosa et al., 2023) -och det är precis där kabeln ger motstånd som hantlar inte gör.
 
-Funkar hantlar? Absolut. Men om du bara ska välja en variant och vill maxa deltana: kabel.
+Funkar hantlar? Absolut. Men personligen väljer jag kabel varje gång om målet är maximal deltatillväxt.
 
-Testa det nästa pass. En övning, en justering.
+En liten justering som gjort stor skillnad.
 
 -
 Logga med GainsLog 📲
