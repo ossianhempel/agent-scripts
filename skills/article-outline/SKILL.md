@@ -137,9 +137,23 @@ directly to clusters of vault findings. External research fills gaps.
 - Suggest the user spend time in the vault first, then come back
 - Adjust the angle to match what the vault does have
 
-### Step 3: Search for Studies and Research
+### Step 3: Ask Before External Research
 
-**Only after exhausting the vault.** External research has one job: support,
+**After presenting vault findings, ask the user** whether to search the web for
+external sources. Web research takes time, and sometimes the vault material is
+enough on its own.
+
+Use AskUserQuestion with options like:
+- **Yes, search the web** (find studies, articles, and data to support/challenge vault findings)
+- **Vault only** (skip external research and build the outline from what's already in the vault)
+
+If the user chooses vault only, skip Step 4 and go straight to presenting
+findings (Step 5) using only vault material. Adjust the findings presentation
+to omit the "External Research" section.
+
+### Step 4: Search for Studies and Research
+
+**Only after the user confirms.** External research has one job: support,
 challenge, or add data to what the vault already contains. The vault tells you
 what Ossian thinks; external sources tell you whether the evidence backs it up.
 
@@ -167,7 +181,7 @@ Use WebSearch to find sources that connect to vault findings.
 
 Aim for 3-6 sources. Quality over quantity.
 
-### Step 4: Present Combined Findings
+### Step 5: Present Combined Findings
 
 **Lead with vault findings.** The vault material is the backbone; external
 research is supporting evidence. Present them so the user sees their own
@@ -206,7 +220,7 @@ visible from the vault clusters - external research adds evidence, not new
 sections.]
 ```
 
-### Step 5: User Picks
+### Step 6: User Picks
 
 Ask the user:
 - Which findings resonate? Anything to drop?
@@ -215,7 +229,7 @@ Ask the user:
 
 This is a conversation, not a checkbox. Keep it brief.
 
-### Step 6: Generate the Outline
+### Step 7: Generate the Outline
 
 Produce the working outline based on selected findings.
 
@@ -325,8 +339,11 @@ These patterns scream "AI wrote this":
 - **Rule of three**: "X, Y, and Z" lists everywhere. Real writers don't
   naturally group things in threes. Use 2 or 4 or 7 - whatever the content
   actually has.
-- **Em dash overuse**: One em dash per article is fine. Five is a tell.
-  Restructure sentences instead.
+- **Em dashes are banned**: Never use em dashes (—) in any outline or output.
+  Restructure sentences using commas, periods, or parentheses instead. Do not
+  substitute hyphens (-) as a workaround for em dashes either. If you find
+  yourself reaching for a dash to insert a clause, use a comma or split into
+  two sentences.
 - **Negative parallelism**: "It's not about X - it's about Y." Once per article
   max. Twice is a pattern. Three times is a parody.
 - **False ranges**: "From X to Y" or "Whether X or Y" used to sound inclusive
