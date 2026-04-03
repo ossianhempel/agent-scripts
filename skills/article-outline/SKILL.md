@@ -8,7 +8,7 @@ description: >
   Triggers: "outline a blog post", "article about [topic]", "help me outline",
   "I want to write about", "blog post about", "plan an article",
   "write about [topic]", "article outline", "post outline".
-allowed-tools: [Read, Glob, Grep, WebSearch, WebFetch, Write, Edit, AskUserQuestion]
+allowed-tools: [Bash, Read, Glob, Grep, WebSearch, WebFetch, Write, Edit, AskUserQuestion]
 ---
 
 # Article Outline
@@ -85,41 +85,34 @@ be anchored in what Ossian has already thought, read, and highlighted. The vault
 is the difference between "AI researched a topic" and "Ossian's existing thinking
 organized into an outline."
 
-Mine Ossian's vault at `/Users/ossianhempel/ossians-second-brain-sync`
-thoroughly. Don't do a single search and move on - exhaust the vault before
-touching external sources.
+Mine Ossian's vault using the **Obsidian CLI** (`obsidian` command). This
+requires Obsidian to be running. Don't do a single search and move on, exhaust
+the vault before touching external sources.
 
 **Spend more time here than on any other step.** A good vault search is 5-10
-Glob/Grep/Read operations, not 1-2.
+operations, not 1-2.
 
 **Search strategy** (use all three approaches):
 
-1. **Filename search** - Glob for notes with topic keywords:
+1. **Content search** with the CLI:
+   ```bash
+   obsidian search query="keyword" limit=20
+   obsidian search query="related term" limit=20
+   obsidian search query="synonym" limit=20
    ```
-   pages/**/*keyword*.md
-   moc/**/*keyword*.md
-   Readwise/**/*keyword*.md
+   Run multiple searches with different terms (synonyms, related concepts).
+
+2. **Read relevant notes** found by search:
+   ```bash
+   obsidian read file="Note Name"
    ```
 
-2. **Content search** - Grep for topic terms across the vault:
+3. **Follow wiki-link trails** using backlinks:
+   ```bash
+   obsidian backlinks file="Note Name"
    ```
-   pattern: "keyword|related_term|synonym"
-   path: /Users/ossianhempel/ossians-second-brain-sync
-   glob: "**/*.md"
-   ```
-
-3. **Follow wiki-link trails** - When you find a relevant note:
-   - Read the full note
-   - Extract `[[wiki-links]]` from the content
-   - Read linked notes that look relevant
-   - Check backlinks: Grep for `\[\[Note Name\]\]` across the vault
-   - Follow 1-2 levels deep, not more
-
-**Search locations by priority**:
-- `pages/` - Ossian's own notes and writing
-- `moc/` - Maps of content (hub notes linking related ideas)
-- `Readwise/` - Highlights and annotations from books/articles
-- `daily-notes/` - Only if topic-specific search turns up references there
+   When you find a relevant note, read it, then check its backlinks.
+   Follow 1-2 levels deep, not more.
 
 **What to extract from vault findings**:
 - Direct quotes and highlights (with note title for attribution)
