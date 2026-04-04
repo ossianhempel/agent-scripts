@@ -7,6 +7,8 @@ read_when:
 
 # Syncing Agent Scripts
 
+> **Note:** Slash commands (in `slash-commands/`) are deprecated in Codex. Use skills instead. Claude Code still supports slash commands, but skills work everywhere and are the recommended approach.
+
 Use `scripts/sync-agent-scripts.sh` to copy the skills and slash commands in this
 repo into each agent runtime's standard locations.
 
@@ -53,7 +55,7 @@ git config --unset core.hooksPath
 Global (user) locations:
 - Codex: `~/.codex/skills` and `~/.codex/prompts`
 - Claude Code: `~/.claude/skills` and `~/.claude/commands`
-- Gemini CLI: `~/.gemini/commands` (slash commands are converted to `.toml`)
+- Gemini CLI: `~/.gemini/skills` and `~/.gemini/commands` (slash commands are converted to `.toml`)
 
 Cursor locations:
 - Global skills: `~/.cursor/skills`
@@ -72,7 +74,8 @@ Copilot locations:
 - `--claude-skills-dir`
 - `--cursor-commands-dir`, `--cursor-skills-dir`, `--cursor-scope`
 - `--copilot-skills-dir`, `--copilot-prompts-dir`, `--copilot-user-prompts-dir`, `--copilot-scope`
-- Or set `CODEX_HOME`, `CLAUDE_HOME`, `GEMINI_HOME`, `CURSOR_COMMANDS_DIR`,
+- `--gemini-skills-dir`
+- Or set `CODEX_HOME`, `CLAUDE_HOME`, `GEMINI_HOME`, `GEMINI_SKILLS_DIR`, `CURSOR_COMMANDS_DIR`,
   `COPILOT_PROMPTS_DIR`, `COPILOT_USER_PROMPTS_DIR`, `CURSOR_SCOPE`,
   `COPILOT_SCOPE`
 
