@@ -226,6 +226,91 @@ This is a conversation, not a checkbox. Keep it brief.
 
 Produce the working outline based on selected findings.
 
+### Step 8: Generate Image Prompts
+
+After the outline is complete, generate image prompts for the article. Every
+article needs at least a hero image. Most articles also benefit from one or more
+inline visuals (infographics, diagrams, charts, flowcharts) that make a key
+point more concrete or scannable.
+
+#### 8a: Hero Image
+
+One prompt for the cover/header image that captures the article's thesis or
+central tension.
+
+**Hero image principles**:
+- **Specific to the article**, not the general topic. An article about
+  overestimating training volume needs a different image than a general fitness
+  article.
+- **Visual concept first.** Describe a concrete scene, composition, or visual
+  metaphor that captures the thesis.
+- **Include style direction.** Specify a visual style (e.g. editorial
+  illustration, photorealistic, flat design, watercolor, etc.) that fits the
+  article's tone.
+- **Describe mood and color palette.** A contrarian opinion piece has different
+  energy than a practical how-to.
+- **Avoid cliches.** No generic stock photo concepts (person at laptop, light
+  bulb for ideas, puzzle pieces). Find something visually interesting that a
+  reader would actually stop scrolling for.
+- **Keep it one paragraph.** 2-5 sentences, dense with visual detail.
+
+#### 8b: Inline Visuals
+
+Look at the outline's key points and identify where a visual would communicate
+something better than text alone. Generate a prompt for each one.
+
+**When to include an inline visual**:
+- A claim involves a comparison (before/after, X vs Y, dose-response)
+- There's data worth visualizing (a trend, a distribution, a threshold)
+- A process or decision has multiple steps or branches
+- A concept has a spatial or structural relationship
+
+**Types of inline visuals** (pick what fits the content):
+- **Chart/graph**: for data, trends, dose-response curves, comparisons
+- **Flowchart**: for decision trees, processes, "if X then Y" logic
+- **Diagram**: for relationships, system architecture, mental models
+- **Infographic**: for summarizing a section's key points visually
+- **Comparison visual**: side-by-side, before/after, spectrum
+
+**Inline visual prompt principles**:
+- **State the visual type explicitly** (e.g. "bar chart", "flowchart",
+  "comparison infographic").
+- **Describe the actual content/data** to include, not just the topic. "Bar
+  chart showing sets per week (x-axis, 5 to 30) vs hypertrophy response
+  (y-axis), with a clear plateau after ~12 sets" is useful. "A chart about
+  training volume" is not.
+- **Reference the section** it belongs in so the writer knows where it goes.
+- **Keep style consistent** with the hero image when possible.
+
+**If no inline visuals make sense**, skip this section. Don't force visuals
+where text works fine. But most articles with data, comparisons, or processes
+will benefit from at least one.
+
+**Format in the outline**:
+
+```
+## Image Prompts
+
+### Hero Image
+
+[Detailed image generation prompt]
+
+Style: [e.g. editorial photography, muted tones]
+Aspect ratio: 16:9
+
+### Inline: [Short descriptor] (for [Section Name])
+
+Type: [chart / flowchart / diagram / infographic / comparison]
+
+[Detailed prompt describing the visual's content, layout, labels, and data]
+
+Style: [consistent with hero or adjusted for clarity]
+Aspect ratio: [16:9 / 4:3 / 1:1, whatever fits]
+
+### Inline: [Short descriptor] (for [Section Name])
+...
+```
+
 ---
 
 ## Outline Format
@@ -281,6 +366,24 @@ Key points:
 - [Something unresolved that might need more research or just acknowledgment]
 - [A claim that needs stronger support]
 - [An angle the author hasn't decided on yet]
+
+## Image Prompts
+
+### Hero Image
+
+[Detailed image generation prompt specific to this article's content and angle]
+
+Style: [visual style that matches the article's tone]
+Aspect ratio: 16:9
+
+### Inline: [Short descriptor] (for [Section Name])
+
+Type: [chart / flowchart / diagram / infographic / comparison]
+
+[Detailed prompt describing the visual content, layout, labels, and data]
+
+Style: [consistent with hero]
+Aspect ratio: [as needed]
 ```
 
 ### Outline Principles
@@ -470,6 +573,33 @@ Nyckelpunkter:
 - Hur mycket ar individuellt? Bor jag adressa att nybborjare kanske behover
   mer volym for motorisk inlarning?
 - Finns det en bra studie pa volym + intensitet interaktionen?
+
+## Image Prompts
+
+### Hero Image
+
+A single barbell loaded with far too many small plates on each side, bowing
+under its own absurd volume, next to a second barbell with just two heavy
+plates sitting perfectly balanced. Shot from slightly above on a clean gym
+floor, shallow depth of field pulling focus to the overloaded bar. The contrast
+between cluttered excess and simple sufficiency is the whole argument in one frame.
+
+Style: editorial photography, slightly desaturated with warm gym lighting
+Aspect ratio: 16:9
+
+### Inline: Dose-response curve (for Volymdogmen)
+
+Type: chart
+
+Line chart with sets per muscle group per week on the x-axis (range 4 to 30)
+and hypertrophy response on the y-axis. The curve rises steeply from 4 to 10
+sets, flattens noticeably between 10 and 15, and goes nearly flat (possibly
+slightly declining) above 20. A vertical dashed line at ~12 sets labeled
+"diminishing returns." Clean, minimal axes, no grid clutter. Based on
+Schoenfeld & Krieger (2019) meta-analysis data.
+
+Style: clean editorial chart, same warm muted palette as hero
+Aspect ratio: 16:9
 ```
 
 ---
