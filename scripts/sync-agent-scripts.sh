@@ -29,6 +29,7 @@ Options:
   --claude-home <path>        Override Claude home (default: ~/.claude)
   --claude-skills-dir <path>  Override Claude skills directory (default: ~/.claude/skills)
   --gemini-home <path>        Override Gemini home (default: ~/.gemini)
+  --gemini-skills-dir <path>  Override Gemini skills directory (default: ~/.gemini/skills)
   --cursor-commands-dir <path>Override Cursor project commands dir (default: ./.cursor/commands)
   --cursor-skills-dir <path>  Override Cursor project skills dir (default: ./.cursor/skills)
   --cursor-scope <scope>      Cursor scope: project, global, or both (default: global)
@@ -351,6 +352,8 @@ CLAUDE_HOME="$CLAUDE_HOME_DEFAULT"
 GEMINI_HOME="$GEMINI_HOME_DEFAULT"
 CLAUDE_SKILLS_DIR_DEFAULT="$HOME/.claude/skills"
 CLAUDE_SKILLS_DIR="$CLAUDE_SKILLS_DIR_DEFAULT"
+GEMINI_SKILLS_DIR_DEFAULT="$HOME/.gemini/skills"
+GEMINI_SKILLS_DIR="$GEMINI_SKILLS_DIR_DEFAULT"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -383,6 +386,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --gemini-home)
       GEMINI_HOME="$2"
+      shift 2
+      ;;
+    --gemini-skills-dir)
+      GEMINI_SKILLS_DIR="$2"
       shift 2
       ;;
     --cursor-commands-dir)
@@ -487,6 +494,16 @@ fi
 if want_provider "gemini"; then
   gemini_commands_dir="$GEMINI_HOME/commands"
   log_section "Gemini"
+
+  log_sub "Skills -> $GEMINI_SKILLS_DIR"
+  shopt -s nullglob
+  for skill_dir in "$ROOT/skills"/*; do
+    [[ -d "$skill_dir" ]] || continue
+    skill_name="$(basename "$skill_dir")"
+    run_sync_dir "$skill_dir" "$GEMINI_SKILLS_DIR/$skill_name" "$skill_name"
+  done
+  shopt -u nullglob
+
   log_sub "Commands -> $gemini_commands_dir"
 
   while IFS= read -r -d '' file; do
