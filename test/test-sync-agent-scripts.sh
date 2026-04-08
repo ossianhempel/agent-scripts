@@ -42,9 +42,10 @@ assert_not_contains() {
 }
 
 assert_contains "Skills -> $HOME_DIR/.codex/skills"
+assert_contains "Skipping skills: ios-debugger-agent,swiftui-liquid-glass,swiftui-performance-audit,swiftui-ui-patterns,swiftui-view-refactor"
 assert_contains "Skills -> $HOME_DIR/.claude/skills"
 assert_contains "Global skills -> $HOME_DIR/.cursor/skills"
-assert_contains "- create skill create-cli ("
+assert_contains "- create skill ios-simulator ("
 assert_contains "- create $ROOT/slash-commands/commit.md -> $HOME_DIR/.claude/commands/commit.md"
 assert_contains "- create $ROOT/slash-commands/commit.md -> $HOME_DIR/.gemini/commands/commit.toml"
 assert_contains "- create contextFileName -> $HOME_DIR/.gemini/settings.json"
@@ -68,7 +69,7 @@ OUTPUT_FILE="$TMP_DIR/output-skills.txt"
   "$ROOT/scripts/sync-agent-scripts.sh" --dry-run --providers copilot
 ) > "$OUTPUT_FILE"
 
-assert_contains "- create skill create-cli ("
+assert_contains "- create skill ios-simulator ("
 
 OUTPUT_FILE="$TMP_DIR/output-prompts.txt"
 
@@ -116,5 +117,18 @@ assert_not_contains "- create $ROOT/slash-commands/commit.md -> $HOME_DIR/.gemin
 assert_not_contains "- update $ROOT/slash-commands/commit.md -> $HOME_DIR/.gemini/commands/commit.toml"
 assert_not_contains "- create $ROOT/slash-commands/commit.md -> $HOME_DIR/.cursor/commands/commit.md"
 assert_not_contains "- update $ROOT/slash-commands/commit.md -> $HOME_DIR/.cursor/commands/commit.md"
+
+OUTPUT_FILE="$TMP_DIR/output-codex-skip.txt"
+
+(
+  cd "$WORKSPACE_DIR"
+  HOME="$HOME_DIR" \
+  CODEX_SKIP_SKILLS="ios-simulator" \
+  "$ROOT/scripts/sync-agent-scripts.sh" --dry-run --providers codex
+) > "$OUTPUT_FILE"
+
+assert_contains "Skipping skills: ios-debugger-agent,swiftui-liquid-glass,swiftui-performance-audit,swiftui-ui-patterns,swiftui-view-refactor,ios-simulator"
+assert_contains "skip ios-simulator -> $HOME_DIR/.codex/skills/ios-simulator"
+assert_not_contains "- create skill ios-simulator ("
 
 echo "ok"

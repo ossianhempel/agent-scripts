@@ -11,6 +11,8 @@ RUN_DIR="$(pwd)"
 COPILOT_PROMPTS_DIR="${COPILOT_PROMPTS_DIR:-}"
 COPILOT_USER_PROMPTS_DIR="${COPILOT_USER_PROMPTS_DIR:-}"
 COPILOT_SKILLS_DIR="${COPILOT_SKILLS_DIR:-}"
+CODEX_SKIP_SKILLS="${CODEX_SKIP_SKILLS:-}"
+CODEX_SKIP_SKILLS_DEFAULT="ios-debugger-agent,swiftui-liquid-glass,swiftui-performance-audit,swiftui-ui-patterns,swiftui-view-refactor"
 CURSOR_COMMANDS_DIR="${CURSOR_COMMANDS_DIR:-}"
 CURSOR_SKILLS_DIR="${CURSOR_SKILLS_DIR:-}"
 CURSOR_SCOPE="${CURSOR_SCOPE:-global}"
@@ -26,6 +28,7 @@ Options:
   --providers <list>          Comma-separated providers (codex,claude,gemini,cursor,copilot)
   --provider <name>           Add a single provider (repeatable)
   --codex-home <path>         Override Codex home (default: ~/.codex)
+  --codex-skip-skills <list>   Comma-separated extra skill names to skip for Codex
   --claude-home <path>        Override Claude home (default: ~/.claude)
   --claude-skills-dir <path>  Override Claude skills directory (default: ~/.claude/skills)
   --gemini-home <path>        Override Gemini home (default: ~/.gemini)
@@ -43,6 +46,7 @@ Options:
 Examples:
   scripts/sync-agent-scripts.sh
   scripts/sync-agent-scripts.sh --providers codex,claude
+  CODEX_SKIP_SKILLS=ios-debugger-agent,swiftui-ui-patterns scripts/sync-agent-scripts.sh --provider codex
   COPILOT_PROMPTS_DIR=~/work/myrepo/.github/prompts scripts/sync-agent-scripts.sh --provider copilot
   scripts/sync-agent-scripts.sh --provider cursor --cursor-scope global
   scripts/sync-agent-scripts.sh --provider copilot --copilot-scope user --copilot-user-prompts-dir ~/Library/Application\\ Support/Code/User/profiles/Default
@@ -333,6 +337,23 @@ want_provider() {
   return 1
 }
 
+skill_is_skipped_for_codex() {
+  local skill_name="$1"
+  local skip_list="${CODEX_SKIP_SKILLS_DEFAULT},${CODEX_SKIP_SKILLS}"
+  skip_list="${skip_list#,}"
+  skip_list="${skip_list%,}"
+  skip_list="${skip_list//,/ }"
+  local skip
+
+  for skip in $skip_list; do
+    if [[ "$(to_lower "$skip")" == "$(to_lower "$skill_name")" ]]; then
+      return 0
+    fi
+  done
+
+  return 1
+}
+
 scope_has() {
   local scope="$1"
   local target="$2"
@@ -374,6 +395,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --codex-home)
       CODEX_HOME="$2"
+      shift 2
+      ;;
+    --codex-skip-skills)
+      CODEX_SKIP_SKILLS="$2"
       shift 2
       ;;
     --claude-home)
@@ -460,10 +485,15 @@ if want_provider "codex"; then
 
   log_section "Codex"
   log_sub "Skills -> $codex_skills_dir"
+  log_sub "Skipping skills: $CODEX_SKIP_SKILLS_DEFAULT${CODEX_SKIP_SKILLS:+,$CODEX_SKIP_SKILLS}"
   shopt -s nullglob
   for skill_dir in "$local_skills_dir"/*; do
     [[ -d "$skill_dir" ]] || continue
     skill_name="$(basename "$skill_dir")"
+    if skill_is_skipped_for_codex "$skill_name"; then
+      log_action "skip" "$skill_name" "$codex_skills_dir/$skill_name"
+      continue
+    fi
     run_sync_dir "$skill_dir" "$codex_skills_dir/$skill_name" "$skill_name"
   done
 

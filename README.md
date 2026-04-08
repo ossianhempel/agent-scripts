@@ -58,6 +58,7 @@ Examples:
 ./scripts/sync-agent-scripts.sh --dry-run
 ./scripts/sync-agent-scripts.sh
 ./scripts/sync-agent-scripts.sh --providers codex,claude
+CODEX_SKIP_SKILLS=some-extra-skill ./scripts/sync-agent-scripts.sh --provider codex
 COPILOT_PROMPTS_DIR=~/my-repo/.github/prompts ./scripts/sync-agent-scripts.sh --provider copilot --copilot-scope workspace
 COPILOT_SKILLS_DIR=~/my-repo/.github/skills ./scripts/sync-agent-scripts.sh --provider copilot
 ```
@@ -89,6 +90,8 @@ Defaults:
 
 Overrides:
 - `CODEX_HOME`, `CLAUDE_HOME`, `CLAUDE_SKILLS_DIR`, `GEMINI_HOME`
+- `CODEX_SKIP_SKILLS` adds more Codex skip entries on top of the built-in iOS
+  plugin defaults
 - `CURSOR_COMMANDS_DIR`, `CURSOR_SKILLS_DIR`, `CURSOR_SCOPE`
 - `COPILOT_SKILLS_DIR`, `COPILOT_PROMPTS_DIR`, `COPILOT_USER_PROMPTS_DIR`,
   `COPILOT_SCOPE`

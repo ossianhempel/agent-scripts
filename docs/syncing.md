@@ -89,6 +89,10 @@ Copilot locations:
   directory.
 - Copilot skills are repository-scoped; the script only syncs skills when you
   set `--copilot-skills-dir` or `COPILOT_SKILLS_DIR`.
+- Codex skips the plugin-backed iOS skills by default: `ios-debugger-agent`,
+  `swiftui-liquid-glass`, `swiftui-performance-audit`, `swiftui-ui-patterns`,
+  and `swiftui-view-refactor`. Set `CODEX_SKIP_SKILLS` or pass
+  `--codex-skip-skills` to add more skipped skills.
 - Gemini also supports project-local commands in `./.gemini/commands`. If you
   want that, run with `--gemini-home .gemini`.
 - `--dry-run` prints every file that would be created or updated.
