@@ -20,6 +20,41 @@ When a post goes viral, feed it back to the LLM and ask for more posts in the sa
 
 Every caption should be tied to one specific audience. "Fitness" is invisible. "Postpartum recovery" or "Hypertrophy for lifters stuck at intermediate" tells the algorithm and the reader exactly who the post is for. Specificity in the first line does more work than any adjective.
 
+## Profile Copy
+
+The profile is the conversion layer. Great captions waste their reach if the profile doesn't close. Write this copy *before* the first post.
+
+### Display Name
+
+Instagram indexes the bold display name at the top of the profile for search, not the @handle. The niche keyword has to live here.
+
+- Bad: `Jessica`
+- Good: `Jessica | Postpartum Fitness Coach`
+- Good: `Mark | Hypertrophy Coach for Lifters`
+
+Format: `[First name] | [Niche keyword + role]`
+
+### Bio
+
+Three lines, nothing else. No life story.
+
+1. **What you do.** One line, specific.
+2. **Who it's for.** One line, the exact audience.
+3. **CTA.** One line, with the link.
+
+Example:
+```
+Helping new moms track their pregnancy journey
+For first-time moms who hate overthinking it
+→ Download the app below 👇
+```
+
+### Highlights
+
+5 highlight covers before the first post. First impressions decide follows, and a bare profile kills them.
+
+Name highlights for the app, not the algorithm: `Tips`, `Reviews`, `Features`, `FAQ`, `How it works`. Skip generic `About` or `Story`.
+
 ## Structure (standard mode)
 
 ```
