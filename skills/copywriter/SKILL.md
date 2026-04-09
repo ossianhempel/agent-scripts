@@ -88,6 +88,19 @@ Ossian whether to add a new reference file.
 8. **Specificity > superlatives.** "The best workout app" is noise. "Log a set
    in two taps" is a fact you can picture.
 
+9. **Mine what converts. Don't invent.** Strong copy rarely starts from a
+   blank page. Save headlines, hooks, and structures that already work in your
+   space, then translate them into your voice and your specifics. Pattern
+   recognition beats originality. The goal isn't to sound new, it's to sound
+   like the reader's next click. When you find a pattern that converts, repeat
+   it before you refresh it.
+
+10. **The first few words carry the weight.** Headlines, subject lines, App
+    Store names, push previews, button labels. The reader decides whether to
+    keep reading in the first two or three words. Obsess over the opener before
+    you touch anything else. When an opener works, reuse it. Don't refresh copy
+    just to avoid repetition.
+
 ## Sell to a Core Human Desire
 
 The most important question before writing a single word: what desire or fear
@@ -131,6 +144,32 @@ isn't clear in the first two seconds, it's dead. The reader's first thought
 should be "that's me" or "I want that" - not "what is this?"
 
 Trigger the desire. Then show the product as the relief.
+
+### Pain Beats Aspiration
+
+Readers click, scroll, and download to avoid pain more than to chase
+inspiration. Negative framings consistently outperform positive ones across
+every channel. Ads, App Store subtitles, hero headlines, push notifications,
+email subject lines. Same pattern everywhere.
+
+| Instead of... | Write... |
+|--------------|----------|
+| "5 signs you're doing it right" | "5 signs something is wrong" |
+| "Get the most out of your workouts" | "Why your workouts have stopped working" |
+| "Make your budget better" | "Stop wondering where your money went" |
+| "Hit your goals faster" | "The reason you keep missing your goals" |
+| "Sleep smarter" | "Stop waking up exhausted" |
+
+This isn't manipulation, it's how attention works. Loss aversion is older than
+marketing.
+
+The other framing that travels just as far is **reassurance**. Tell an anxious
+audience the exact thing they're desperate to hear. "It's normal if...",
+"You're not behind because...", "You don't need X to Y." If you can't write
+from pain, write from relief.
+
+Default to pain or reassurance. Switch to pure aspiration only when the
+audience is clearly past the pain stage and just wants to picture the win.
 
 ## The Rewrite Mindset
 
