@@ -17,35 +17,35 @@ Use this skill to fetch, analyze, and summarize TestFlight crash reports, beta f
 
 List recent crashes (newest first):
 
-- `asc crashes --app "APP_ID" --sort -createdDate --limit 10`
-- Filter by build: `asc crashes --app "APP_ID" --build "BUILD_ID" --sort -createdDate --limit 10`
-- Filter by device/OS: `asc crashes --app "APP_ID" --device-model "iPhone16,2" --os-version "18.0"`
-- All crashes: `asc crashes --app "APP_ID" --paginate`
-- Table view: `asc crashes --app "APP_ID" --sort -createdDate --limit 10 --output table`
+- `asc testflight crashes list --app "APP_ID" --sort -createdDate --limit 10`
+- Filter by build: `asc testflight crashes list --app "APP_ID" --build "BUILD_ID" --sort -createdDate --limit 10`
+- Filter by device/OS: `asc testflight crashes list --app "APP_ID" --device-model "iPhone16,2" --os-version "18.0"`
+- All crashes: `asc testflight crashes list --app "APP_ID" --paginate`
+- Table view: `asc testflight crashes list --app "APP_ID" --sort -createdDate --limit 10 --output table`
 
 ## TestFlight beta feedback
 
 List recent feedback (newest first):
 
-- `asc feedback --app "APP_ID" --sort -createdDate --limit 10`
-- With screenshots: `asc feedback --app "APP_ID" --sort -createdDate --limit 10 --include-screenshots`
-- Filter by build: `asc feedback --app "APP_ID" --build "BUILD_ID" --sort -createdDate`
-- All feedback: `asc feedback --app "APP_ID" --paginate`
+- `asc testflight feedback list --app "APP_ID" --sort -createdDate --limit 10`
+- With screenshots: `asc testflight feedback list --app "APP_ID" --sort -createdDate --limit 10 --include-screenshots`
+- Filter by build: `asc testflight feedback list --app "APP_ID" --build "BUILD_ID" --sort -createdDate`
+- All feedback: `asc testflight feedback list --app "APP_ID" --paginate`
 
 ## Performance diagnostics (hangs, disk writes, launches)
 
-Requires a build ID. Resolve via `asc builds latest --app "APP_ID" --platform IOS` or `asc builds list --app "APP_ID" --sort -uploadedDate --limit 5`.
+Requires a build ID. Resolve via `asc builds info --app "APP_ID" --latest --platform IOS` or `asc builds list --app "APP_ID" --sort -uploadedDate --limit 5`.
 
 - List diagnostic signatures: `asc performance diagnostics list --build "BUILD_ID"`
 - Filter by type: `asc performance diagnostics list --build "BUILD_ID" --diagnostic-type "HANGS"`
   - Types: `HANGS`, `DISK_WRITES`, `LAUNCHES`
-- Get logs for a signature: `asc performance diagnostics get --id "SIGNATURE_ID"`
+- View logs for a signature: `asc performance diagnostics view --id "SIGNATURE_ID"`
 - Download all metrics: `asc performance download --build "BUILD_ID" --output ./metrics.json`
 
 ## Resolving IDs
 
 - App ID from name: `asc apps list --name "AppName"` or `asc apps list --bundle-id "com.example.app"`
-- Latest build ID: `asc builds latest --app "APP_ID" --platform IOS`
+- Latest build ID: `asc builds info --app "APP_ID" --latest --platform IOS`
 - Recent builds: `asc builds list --app "APP_ID" --sort -uploadedDate --limit 5`
 - Set default: `export ASC_APP_ID="APP_ID"`
 

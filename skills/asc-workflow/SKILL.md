@@ -176,12 +176,12 @@ Sub-workflow call step (`"workflow": "...", "with": {...}`):
         },
         {
           "name": "list_groups",
-          "run": "asc testflight beta-groups list --app $APP_ID --limit 20"
+          "run": "asc testflight groups list --app $APP_ID --limit 20"
         },
         {
           "name": "add_build_to_group",
           "if": "BUILD_ID",
-          "run": "asc builds add-groups --build $BUILD_ID --group $GROUP_ID"
+          "run": "asc builds add-groups --build-id $BUILD_ID --group $GROUP_ID"
         },
         {
           "name": "notify",

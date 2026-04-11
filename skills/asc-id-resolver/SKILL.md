@@ -18,7 +18,7 @@ Use this skill to map names to IDs needed by other commands.
 
 ## Build ID
 - Latest build:
-  - `asc builds latest --app "APP_ID" --version "1.2.3" --platform IOS`
+  - `asc builds info --app "APP_ID" --latest --version "1.2.3" --platform IOS`
 - Recent builds:
   - `asc builds list --app "APP_ID" --sort -uploadedDate --limit 5`
 
@@ -27,12 +27,12 @@ Use this skill to map names to IDs needed by other commands.
 
 ## TestFlight IDs
 - Groups:
-  - `asc beta-groups list --app "APP_ID" --paginate`
+  - `asc testflight groups list --app "APP_ID" --paginate`
 - Testers:
-  - `asc beta-testers list --app "APP_ID" --paginate`
+  - `asc testflight testers list --app "APP_ID" --paginate`
 
 ## Pre-release version IDs
-- `asc pre-release-versions list --app "APP_ID" --platform IOS --paginate`
+- `asc testflight pre-release list --app "APP_ID" --platform IOS --paginate`
 
 ## Review submission IDs
 - `asc review submissions-list --app "APP_ID" --paginate`

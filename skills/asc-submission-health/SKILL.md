@@ -16,7 +16,7 @@ Use this skill to reduce review submission failures and monitor status.
 
 ### 1. Verify Build Status
 ```bash
-asc builds info --build "BUILD_ID"
+asc builds info --build-id "BUILD_ID"
 ```
 Check:
 - `processingState` is `VALID`
@@ -25,6 +25,9 @@ Check:
 ### 2. Encryption Compliance
 If `usesNonExemptEncryption: true`:
 ```bash
+# If the app should be exempt, patch the local plist helper, rebuild, and re-upload
+asc encryption declarations exempt-declare --plist "./Info.plist"
+
 # List existing declarations
 asc encryption declarations list --app "APP_ID"
 
@@ -42,16 +45,16 @@ asc encryption declarations assign-builds \
   --build "BUILD_ID"
 ```
 
-**Better approach:** Add `ITSAppUsesNonExemptEncryption = NO` to Info.plist and rebuild.
+If the app truly uses only exempt transport encryption, prefer `asc encryption declarations exempt-declare --plist "./Info.plist"` and rebuild instead of creating a declaration that does not match the binary.
 
 ### 3. Content Rights Declaration
 Required for all App Store submissions:
 ```bash
 # Check current status
-asc apps get --id "APP_ID" --output json | jq '.data.attributes.contentRightsDeclaration'
+asc apps content-rights view --app "APP_ID"
 
-# Set if missing
-asc apps update --id "APP_ID" --content-rights "DOES_NOT_USE_THIRD_PARTY_CONTENT"
+# Set it for most apps
+asc apps content-rights edit --app "APP_ID" --uses-third-party-content=false
 ```
 Valid values:
 - `DOES_NOT_USE_THIRD_PARTY_CONTENT`
@@ -60,7 +63,7 @@ Valid values:
 ### 4. Version Metadata
 ```bash
 # Check version details
-asc versions get --version-id "VERSION_ID" --include-build
+asc versions view --version-id "VERSION_ID" --include-build
 
 # Verify copyright is set
 asc versions update --version-id "VERSION_ID" --copyright "2026 Your Company"
@@ -80,11 +83,51 @@ Each locale needs screenshots for the target platform.
 ### 7. App Info Localizations (Privacy Policy)
 ```bash
 # List app info IDs (if multiple exist)
-asc app-infos list --app "APP_ID"
+asc apps info list --app "APP_ID"
 
 # Check privacy policy URL
 asc localizations list --app "APP_ID" --type app-info --app-info "APP_INFO_ID"
 ```
+
+### 8. App Privacy readiness advisory
+`asc` can warn about App Privacy readiness, but the public App Store Connect API
+cannot verify whether App Privacy is fully published. Before final submission:
+
+```bash
+asc submit preflight --app "APP_ID" --version "1.2.3" --platform IOS
+asc validate --app "APP_ID" --version "1.2.3" --platform IOS
+```
+
+Prefer the version string form for top-level readiness checks in this skill so it stays aligned with `asc submit preflight`. Lower-level commands later in this guide still use `VERSION_ID` where the API requires it.
+
+If either command reports an App Privacy advisory, the public API cannot verify
+publish state. Use the web-session privacy workflow if you rely on those endpoints:
+
+```bash
+asc web privacy pull --app "APP_ID" --out "./privacy.json"
+asc web privacy plan --app "APP_ID" --file "./privacy.json"
+asc web privacy apply --app "APP_ID" --file "./privacy.json"
+asc web privacy publish --app "APP_ID" --confirm
+```
+
+If you do not want to use the experimental `asc web privacy ...` commands,
+confirm App Privacy manually in App Store Connect:
+
+```text
+https://appstoreconnect.apple.com/apps/APP_ID/appPrivacy
+```
+
+### 9. Digital goods readiness (IAPs / subscriptions)
+If the app sells subscriptions or in-app purchases, validate those separately before submit:
+
+```bash
+asc validate iap --app "APP_ID" --output table
+asc validate subscriptions --app "APP_ID" --output table
+```
+
+In current asc, `asc validate subscriptions` expands `MISSING_METADATA` into a per-subscription diagnostics matrix. Use it to identify missing review screenshots, promotional images, pricing or availability coverage gaps, offer readiness, and app/build evidence before retrying submit or first-review attach.
+
+Use `--output json --pretty` when you want exact territory gaps in machine-readable form.
 
 ## Submit
 
@@ -105,6 +148,7 @@ asc review submissions-submit --id "SUBMISSION_ID" --confirm
 
 ### Using Submit Command
 ```bash
+asc submit preflight --app "APP_ID" --version "1.2.3" --platform IOS
 asc submit create --app "APP_ID" --version "1.2.3" --build "BUILD_ID" --confirm
 ```
 Use `--platform` when multiple platforms exist.
@@ -138,6 +182,7 @@ Check:
 3. Content rights declaration set
 4. All localizations complete
 5. Screenshots present for all locales
+6. App Privacy has been reviewed and published in App Store Connect
 
 ### "Export compliance must be approved"
 The build has `usesNonExemptEncryption: true`. Either:
@@ -147,10 +192,16 @@ The build has `usesNonExemptEncryption: true`. Either:
 ### "Multiple app infos found"
 Use `--app-info` flag with the correct app info ID:
 ```bash
-asc app-infos list --app "APP_ID"
+asc apps info list --app "APP_ID"
 ```
 
 ## Notes
 - `asc submit create` uses the new reviewSubmissions API automatically.
+- `asc submit preflight` can return non-blocking advisories; review them before submitting.
+- App Privacy publish state is not verifiable via the public API.
+- Prefer `asc apps content-rights view/edit` over ad-hoc app JSON inspection.
+- `asc validate subscriptions` now provides much richer per-subscription diagnostics for `MISSING_METADATA` cases.
+- If you use ASC web-session flows, `asc web privacy pull|plan|apply|publish` is the CLI path for App Privacy.
+- If you avoid the experimental web-session commands, confirm App Privacy manually in App Store Connect.
 - Use `--output table` when you want human-readable status.
 - macOS submissions follow the same process but use `--platform MAC_OS`.
