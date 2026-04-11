@@ -139,6 +139,7 @@ Run: `pre-commit run --all-files`
 Skills
 - `agent-food-admin`
 - `agent-readiness`
+- `aso-appstore-screenshots`
 - `convex-auth-setup`
 - `convex-components-guide`
 - `convex-function-creator`
@@ -148,6 +149,7 @@ Skills
 - `convex-schema-builder`
 - `create-cli`
 - `frontend-design`
+- `ios-marketing-capture`
 - `ios-simulator`
 - `markdown-converter`
 - `notion`
