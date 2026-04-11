@@ -268,6 +268,8 @@ The flow uses 11 screen archetypes. You MUST include screens marked [REQUIRED]. 
 
 **Key principle:** The output is gated behind the next screen (account creation or paywall). The user has invested time and created something — now they need to sign up to keep it. This is ethical because the app genuinely delivers this value; the onboarding just gave them a preview.
 
+**Critical:** Whatever the user creates here MUST persist into the real app. If they made a workout, it's waiting for them in the workouts tab. If they picked recipes, their shopping list is already populated. Breaking this continuity — making them re-do the work, or landing them on an empty screen — is the single most jarring moment in most onboarding flows. See Phase 6 for the handoff.
+
 #### Screen 13: ACCOUNT CREATION [OPTIONAL — based on user preference]
 **Objective:** Soft gate — "Create a free account to unlock [the thing you just made]"
 - Show thumbnails of what they created/selected
@@ -370,6 +372,74 @@ This is the hardest screen. Approach:
 - Add logic so the onboarding only shows on first launch (or when reset)
 - Store completion state appropriately for the platform (UserDefaults, SharedPreferences, AsyncStorage, etc.)
 - Ensure the app launches into onboarding when state is fresh, and into the main app when complete
+
+### Step 6: Implement the First-Session Handoff
+
+Onboarding isn't done when the paywall closes — it's done when the user completes their first real action inside the app. Implement the handoff strategy chosen in Phase 6 before calling the flow complete. See Phase 6 for details.
+
+---
+
+## PHASE 6: FIRST SESSION HANDOFF
+
+The onboarding flow ends at the paywall (or account screen). But the job isn't done — the very next thing the user sees is the real app, and that first real-app moment is still part of the onboarding experience from the user's perspective. If you let them land on an empty screen, every conversion you just won is at risk.
+
+### The empty-state trap
+
+Most apps drop new users into a blank screen:
+- "No workouts yet"
+- "No projects yet"
+- "No data yet"
+- …plus a button the user has to discover and tap
+
+This adds friction at the worst possible moment. The user just paid (or committed to a trial) and now has to:
+1. Figure out what they're looking at
+2. Find the right button
+3. Decide to tap it
+
+Every extra decision is a drop-off. The fix is to remove the empty state entirely and put the user *into* the core action immediately — no hunting, no interpreting, no discovery.
+
+### Step 1: Audit the empty states
+
+Scan the app's main screens for "No X yet" / "Get started" / "Create your first [thing]" states. These are what a fresh user would see. For each one:
+- Does the user NEED to see this screen on first launch, or can it be bypassed?
+- What is the single primary action this screen exists to prompt?
+- Can that action be auto-started instead of shown as a button?
+
+### Step 2: Pick a handoff strategy
+
+Choose ONE based on the app. They're listed in order of preference.
+
+**A. Persist the onboarding demo output (STRONGLY PREFERRED)**
+If the APP DEMO (Screen 11) produced real data — a workout, a shopping list, a task plan, a habit — persist it into the real app's data model. When the user lands in the main screen, their demo output is already there waiting. No empty state, and the continuity between onboarding and real app is preserved.
+
+This is the strongest option because the user already did the work during onboarding; the app just has to honour it.
+
+**B. Auto-launch the core flow**
+If there's no demo output to persist, launch the core creation flow automatically on first real-app open. Example: a workout app opens directly into "Create your first workout" full-screen — no tab bar, no home screen in between. The user is in the action before they can ask what to do.
+
+**C. Prefilled first template**
+Seed the account with one sensible default — a starter workout, a first project, a welcome habit. The home screen is no longer empty; it has one item the user can tap into, edit, or complete immediately.
+
+**D. Guided first-use wizard**
+For more complex apps, run a short in-app wizard on first load with coach marks or a focused overlay walking through the core action. Only use this when A/B/C don't fit.
+
+If nothing else is possible, at minimum the empty screen should auto-open the creation flow after landing — never leave the user staring at a blank list waiting to find the button.
+
+### Step 3: Implement the handoff
+
+1. **Detect first session** — after onboarding completes, set both `hasCompletedOnboarding = true` and `hasSeenFirstSession = false`
+2. **Branch on first real-app launch** — check the flag and route to the chosen handoff strategy before the main screen mounts
+3. **Persist demo output** (strategy A) — write the data from Screens 11/12 into the real data store during the paywall/account transition so it's present when the main screen first renders
+4. **Auto-navigate** (strategy B) — push the creation flow on top of the root view on first launch
+5. **Mark complete** once the user finishes one core action in the real app — not just when they land on the screen
+
+### Key principles
+
+- Never show a blank empty state to a user on their first session
+- The first action should be the CORE action of the app — not a settings screen, not a dashboard tour, not a feed browse
+- Reduce decision-making to zero in the first 30 seconds
+- If the user completed the app demo during onboarding, that output MUST land in the real app — breaking that continuity is the most jarring part of most onboarding flows
+- The handoff is over when the user has completed ONE real action in the real app, not when they've seen the home screen
 
 ---
 
