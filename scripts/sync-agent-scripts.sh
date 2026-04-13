@@ -10,13 +10,10 @@ SECTION_STARTED=0
 RUN_DIR="$(pwd)"
 COPILOT_PROMPTS_DIR="${COPILOT_PROMPTS_DIR:-}"
 COPILOT_USER_PROMPTS_DIR="${COPILOT_USER_PROMPTS_DIR:-}"
-COPILOT_SKILLS_DIR="${COPILOT_SKILLS_DIR:-}"
-CODEX_SKIP_SKILLS="${CODEX_SKIP_SKILLS:-}"
-CODEX_SKIP_SKILLS_DEFAULT="ios-debugger-agent,swiftui-liquid-glass,swiftui-performance-audit,swiftui-ui-patterns,swiftui-view-refactor"
 CURSOR_COMMANDS_DIR="${CURSOR_COMMANDS_DIR:-}"
-CURSOR_SKILLS_DIR="${CURSOR_SKILLS_DIR:-}"
 CURSOR_SCOPE="${CURSOR_SCOPE:-global}"
 COPILOT_SCOPE="${COPILOT_SCOPE:-none}"
+AGENTS_SCOPE="${AGENTS_SCOPE:-global}"
 
 usage() {
   cat <<'USAGE'
@@ -24,32 +21,33 @@ Usage: scripts/sync-agent-scripts.sh [options]
 
 Sync skills/ and slash-commands/ from this repo into supported agent runtimes.
 
+Skills sync to ~/.agents/skills (cross-tool standard, read by Codex, Gemini,
+Cursor, Copilot, Windsurf) and ~/.claude/skills (Claude Code only).
+Commands/prompts sync to each tool's native location.
+
 Options:
-  --providers <list>          Comma-separated providers (codex,claude,gemini,cursor,copilot)
+  --providers <list>          Comma-separated providers (agents,codex,claude,gemini,cursor,copilot)
   --provider <name>           Add a single provider (repeatable)
-  --codex-home <path>         Override Codex home (default: ~/.codex)
-  --codex-skip-skills <list>   Comma-separated extra skill names to skip for Codex
+  --agents-home <path>        Override agents home (default: ~/.agents)
+  --agents-skills-dir <path>  Override agents skills directory (default: ~/.agents/skills)
+  --agents-scope <scope>      Agents scope: global, project, or both (default: global)
   --claude-home <path>        Override Claude home (default: ~/.claude)
   --claude-skills-dir <path>  Override Claude skills directory (default: ~/.claude/skills)
+  --codex-home <path>         Override Codex home (default: ~/.codex)
   --gemini-home <path>        Override Gemini home (default: ~/.gemini)
-  --gemini-skills-dir <path>  Override Gemini skills directory (default: ~/.gemini/skills)
   --cursor-commands-dir <path>Override Cursor project commands dir (default: ./.cursor/commands)
-  --cursor-skills-dir <path>  Override Cursor project skills dir (default: ./.cursor/skills)
   --cursor-scope <scope>      Cursor scope: project, global, or both (default: global)
   --copilot-prompts-dir <path>Override Copilot workspace prompts dir (default: ./.github/prompts)
   --copilot-user-prompts-dir <path>Override Copilot user prompts dir (required for user scope)
-  --copilot-skills-dir <path> Set Copilot skills dir (default: none)
   --copilot-scope <scope>     Copilot scope: workspace, user, both, or none (default: none)
   --dry-run                   Print actions without writing files
   -h, --help                  Show this help
 
 Examples:
   scripts/sync-agent-scripts.sh
-  scripts/sync-agent-scripts.sh --providers codex,claude
-  CODEX_SKIP_SKILLS=ios-debugger-agent,swiftui-ui-patterns scripts/sync-agent-scripts.sh --provider codex
-  COPILOT_PROMPTS_DIR=~/work/myrepo/.github/prompts scripts/sync-agent-scripts.sh --provider copilot
-  scripts/sync-agent-scripts.sh --provider cursor --cursor-scope global
-  scripts/sync-agent-scripts.sh --provider copilot --copilot-scope user --copilot-user-prompts-dir ~/Library/Application\\ Support/Code/User/profiles/Default
+  scripts/sync-agent-scripts.sh --providers agents,claude
+  scripts/sync-agent-scripts.sh --provider agents --agents-scope both
+  scripts/sync-agent-scripts.sh --provider copilot --copilot-scope workspace
 USAGE
 }
 
@@ -337,23 +335,6 @@ want_provider() {
   return 1
 }
 
-skill_is_skipped_for_codex() {
-  local skill_name="$1"
-  local skip_list="${CODEX_SKIP_SKILLS_DEFAULT},${CODEX_SKIP_SKILLS}"
-  skip_list="${skip_list#,}"
-  skip_list="${skip_list%,}"
-  skip_list="${skip_list//,/ }"
-  local skip
-
-  for skip in $skip_list; do
-    if [[ "$(to_lower "$skip")" == "$(to_lower "$skill_name")" ]]; then
-      return 0
-    fi
-  done
-
-  return 1
-}
-
 scope_has() {
   local scope="$1"
   local target="$2"
@@ -363,18 +344,33 @@ scope_has() {
   [[ "$scope" == "$target" ]]
 }
 
+sync_skills_to() {
+  local dest_dir="$1"
+  local label="$2"
+  log_sub "$label -> $dest_dir"
+  shopt -s nullglob
+  for skill_dir in "$ROOT/skills"/*; do
+    [[ -d "$skill_dir" ]] || continue
+    skill_name="$(basename "$skill_dir")"
+    run_sync_dir "$skill_dir" "$dest_dir/$skill_name" "$skill_name"
+  done
+  shopt -u nullglob
+}
+
+AGENTS_HOME_DEFAULT="$HOME/.agents"
 CODEX_HOME_DEFAULT="$HOME/.codex"
 CLAUDE_HOME_DEFAULT="$HOME/.claude"
 GEMINI_HOME_DEFAULT="$HOME/.gemini"
 GEMINI_CONTEXT_FILE_DEFAULT="AGENTS.md"
 
+AGENTS_HOME="$AGENTS_HOME_DEFAULT"
 CODEX_HOME="$CODEX_HOME_DEFAULT"
 CLAUDE_HOME="$CLAUDE_HOME_DEFAULT"
 GEMINI_HOME="$GEMINI_HOME_DEFAULT"
+AGENTS_SKILLS_DIR_DEFAULT="$HOME/.agents/skills"
+AGENTS_SKILLS_DIR="$AGENTS_SKILLS_DIR_DEFAULT"
 CLAUDE_SKILLS_DIR_DEFAULT="$HOME/.claude/skills"
 CLAUDE_SKILLS_DIR="$CLAUDE_SKILLS_DIR_DEFAULT"
-GEMINI_SKILLS_DIR_DEFAULT="$HOME/.gemini/skills"
-GEMINI_SKILLS_DIR="$GEMINI_SKILLS_DIR_DEFAULT"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -393,12 +389,20 @@ while [[ $# -gt 0 ]]; do
       PROVIDERS+=("$(to_lower "$2")")
       shift 2
       ;;
-    --codex-home)
-      CODEX_HOME="$2"
+    --agents-home)
+      AGENTS_HOME="$2"
       shift 2
       ;;
-    --codex-skip-skills)
-      CODEX_SKIP_SKILLS="$2"
+    --agents-skills-dir)
+      AGENTS_SKILLS_DIR="$2"
+      shift 2
+      ;;
+    --agents-scope)
+      AGENTS_SCOPE="$(to_lower "$2")"
+      shift 2
+      ;;
+    --codex-home)
+      CODEX_HOME="$2"
       shift 2
       ;;
     --claude-home)
@@ -413,16 +417,8 @@ while [[ $# -gt 0 ]]; do
       GEMINI_HOME="$2"
       shift 2
       ;;
-    --gemini-skills-dir)
-      GEMINI_SKILLS_DIR="$2"
-      shift 2
-      ;;
     --cursor-commands-dir)
       CURSOR_COMMANDS_DIR="$2"
-      shift 2
-      ;;
-    --cursor-skills-dir)
-      CURSOR_SKILLS_DIR="$2"
       shift 2
       ;;
     --cursor-scope)
@@ -435,10 +431,6 @@ while [[ $# -gt 0 ]]; do
       ;;
     --copilot-user-prompts-dir)
       COPILOT_USER_PROMPTS_DIR="$2"
-      shift 2
-      ;;
-    --copilot-skills-dir)
-      COPILOT_SKILLS_DIR="$2"
       shift 2
       ;;
     --copilot-scope)
@@ -458,8 +450,16 @@ while [[ $# -gt 0 ]]; do
 done
 
 if [[ ${#PROVIDERS[@]} -eq 0 ]]; then
-  PROVIDERS=(codex claude gemini cursor copilot)
+  PROVIDERS=(agents codex claude gemini cursor copilot)
 fi
+
+case "$AGENTS_SCOPE" in
+  global|project|both) ;;
+  *)
+    log "Invalid --agents-scope: $AGENTS_SCOPE (expected global, project, or both)"
+    exit 1
+    ;;
+esac
 
 case "$CURSOR_SCOPE" in
   project|global|both) ;;
@@ -477,62 +477,47 @@ case "$COPILOT_SCOPE" in
     ;;
 esac
 
+# --- Agents: cross-tool skills (read by Codex, Gemini, Cursor, Copilot, Windsurf) ---
+if want_provider "agents"; then
+  log_section "Agents"
+
+  if scope_has "$AGENTS_SCOPE" "global"; then
+    sync_skills_to "$AGENTS_SKILLS_DIR" "Global skills"
+  fi
+
+  if scope_has "$AGENTS_SCOPE" "project"; then
+    sync_skills_to "$RUN_DIR/.agents/skills" "Project skills"
+  fi
+fi
+
+# --- Codex: prompts only (skills handled by agents provider) ---
 if want_provider "codex"; then
-  local_skills_dir="$ROOT/skills"
-  local_prompts_dir="$ROOT/slash-commands"
-  codex_skills_dir="$CODEX_HOME/skills"
   codex_prompts_dir="$CODEX_HOME/prompts"
 
   log_section "Codex"
-  log_sub "Skills -> $codex_skills_dir"
-  log_sub "Skipping skills: $CODEX_SKIP_SKILLS_DEFAULT${CODEX_SKIP_SKILLS:+,$CODEX_SKIP_SKILLS}"
-  shopt -s nullglob
-  for skill_dir in "$local_skills_dir"/*; do
-    [[ -d "$skill_dir" ]] || continue
-    skill_name="$(basename "$skill_dir")"
-    if skill_is_skipped_for_codex "$skill_name"; then
-      log_action "skip" "$skill_name" "$codex_skills_dir/$skill_name"
-      continue
-    fi
-    run_sync_dir "$skill_dir" "$codex_skills_dir/$skill_name" "$skill_name"
-  done
-
   log_sub "Prompts -> $codex_prompts_dir"
-  for prompt in "$local_prompts_dir"/*.md; do
+  shopt -s nullglob
+  for prompt in "$ROOT/slash-commands"/*.md; do
     [[ -f "$prompt" ]] || continue
     run_copy_file "$prompt" "$codex_prompts_dir/$(basename "$prompt")"
   done
   shopt -u nullglob
 fi
 
+# --- Claude Code: skills + commands (does not support .agents/) ---
 if want_provider "claude"; then
   claude_commands_dir="$CLAUDE_HOME/commands"
   log_section "Claude"
-  log_sub "Skills -> $CLAUDE_SKILLS_DIR"
-  shopt -s nullglob
-  for skill_dir in "$ROOT/skills"/*; do
-    [[ -d "$skill_dir" ]] || continue
-    skill_name="$(basename "$skill_dir")"
-    run_sync_dir "$skill_dir" "$CLAUDE_SKILLS_DIR/$skill_name" "$skill_name"
-  done
-  shopt -u nullglob
+  sync_skills_to "$CLAUDE_SKILLS_DIR" "Skills"
 
   log_sub "Commands -> $claude_commands_dir"
   sync_markdown_tree "$ROOT/slash-commands" "$claude_commands_dir"
 fi
 
+# --- Gemini: commands + settings only (skills handled by agents provider) ---
 if want_provider "gemini"; then
   gemini_commands_dir="$GEMINI_HOME/commands"
   log_section "Gemini"
-
-  log_sub "Skills -> $GEMINI_SKILLS_DIR"
-  shopt -s nullglob
-  for skill_dir in "$ROOT/skills"/*; do
-    [[ -d "$skill_dir" ]] || continue
-    skill_name="$(basename "$skill_dir")"
-    run_sync_dir "$skill_dir" "$GEMINI_SKILLS_DIR/$skill_name" "$skill_name"
-  done
-  shopt -u nullglob
 
   log_sub "Commands -> $gemini_commands_dir"
 
@@ -552,62 +537,29 @@ if want_provider "gemini"; then
   update_gemini_settings "$GEMINI_HOME/settings.json" "$GEMINI_CONTEXT_FILE_DEFAULT"
 fi
 
+# --- Cursor: commands only (skills handled by agents provider) ---
 if want_provider "cursor"; then
   if [[ -z "$CURSOR_COMMANDS_DIR" ]]; then
     CURSOR_COMMANDS_DIR="$RUN_DIR/.cursor/commands"
-  fi
-  if [[ -z "$CURSOR_SKILLS_DIR" ]]; then
-    CURSOR_SKILLS_DIR="$RUN_DIR/.cursor/skills"
   fi
 
   log_section "Cursor"
 
   if scope_has "$CURSOR_SCOPE" "project"; then
-    log_sub "Project skills -> $CURSOR_SKILLS_DIR"
-    shopt -s nullglob
-    for skill_dir in "$ROOT/skills"/*; do
-      [[ -d "$skill_dir" ]] || continue
-      skill_name="$(basename "$skill_dir")"
-      run_sync_dir "$skill_dir" "$CURSOR_SKILLS_DIR/$skill_name" "$skill_name"
-    done
-    shopt -u nullglob
-
     log_sub "Project commands -> $CURSOR_COMMANDS_DIR"
     sync_markdown_tree "$ROOT/slash-commands" "$CURSOR_COMMANDS_DIR"
   fi
 
   if scope_has "$CURSOR_SCOPE" "global"; then
-    global_cursor_skills_dir="$HOME/.cursor/skills"
     global_cursor_commands_dir="$HOME/.cursor/commands"
-    log_sub "Global skills -> $global_cursor_skills_dir"
-    shopt -s nullglob
-    for skill_dir in "$ROOT/skills"/*; do
-      [[ -d "$skill_dir" ]] || continue
-      skill_name="$(basename "$skill_dir")"
-      run_sync_dir "$skill_dir" "$global_cursor_skills_dir/$skill_name" "$skill_name"
-    done
-    shopt -u nullglob
-
     log_sub "Global commands -> $global_cursor_commands_dir"
     sync_markdown_tree "$ROOT/slash-commands" "$global_cursor_commands_dir"
   fi
 fi
 
+# --- Copilot: prompts only (skills handled by agents provider) ---
 if want_provider "copilot"; then
   log_section "Copilot"
-
-  if [[ -z "$COPILOT_SKILLS_DIR" ]]; then
-    log_sub "Skipping skills: set COPILOT_SKILLS_DIR or --copilot-skills-dir."
-  else
-    log_sub "Skills -> $COPILOT_SKILLS_DIR"
-    shopt -s nullglob
-    for skill_dir in "$ROOT/skills"/*; do
-      [[ -d "$skill_dir" ]] || continue
-      skill_name="$(basename "$skill_dir")"
-      run_sync_dir "$skill_dir" "$COPILOT_SKILLS_DIR/$skill_name" "$skill_name"
-    done
-    shopt -u nullglob
-  fi
 
   if scope_has "$COPILOT_SCOPE" "workspace"; then
     if [[ -z "$COPILOT_PROMPTS_DIR" ]]; then

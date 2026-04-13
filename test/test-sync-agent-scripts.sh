@@ -18,7 +18,7 @@ OUTPUT_FILE="$TMP_DIR/output.txt"
 (
   cd "$WORKSPACE_DIR"
   HOME="$HOME_DIR" \
-  "$ROOT/scripts/sync-agent-scripts.sh" --dry-run --providers codex,claude,gemini,cursor,copilot
+  "$ROOT/scripts/sync-agent-scripts.sh" --dry-run --providers agents,codex,claude,gemini,cursor,copilot
 ) > "$OUTPUT_FILE"
 
 assert_contains() {
@@ -41,36 +41,37 @@ assert_not_contains() {
   fi
 }
 
-assert_contains "Skills -> $HOME_DIR/.codex/skills"
-assert_contains "Skipping skills: ios-debugger-agent,swiftui-liquid-glass,swiftui-performance-audit,swiftui-ui-patterns,swiftui-view-refactor"
-assert_contains "Skills -> $HOME_DIR/.claude/skills"
-assert_contains "Global skills -> $HOME_DIR/.cursor/skills"
+# Agents provider syncs skills to ~/.agents/skills
+assert_contains "Global skills -> $HOME_DIR/.agents/skills"
 assert_contains "- create skill ios-simulator ("
+
+# Claude provider syncs skills to ~/.claude/skills and commands
+assert_contains "Skills -> $HOME_DIR/.claude/skills"
 assert_contains "- create $ROOT/slash-commands/commit.md -> $HOME_DIR/.claude/commands/commit.md"
+
+# Codex provider syncs prompts only (no skills)
+assert_contains "Prompts -> $HOME_DIR/.codex/prompts"
+assert_not_contains "Skills -> $HOME_DIR/.codex/skills"
+
+# Gemini provider syncs commands only (no skills)
 assert_contains "- create $ROOT/slash-commands/commit.md -> $HOME_DIR/.gemini/commands/commit.toml"
 assert_contains "- create contextFileName -> $HOME_DIR/.gemini/settings.json"
+assert_not_contains "Skills -> $HOME_DIR/.gemini/skills"
+
+# Cursor provider syncs global commands only (no skills)
+assert_contains "Global commands -> $HOME_DIR/.cursor/commands"
 assert_contains "- create $ROOT/slash-commands/commit.md -> $HOME_DIR/.cursor/commands/commit.md"
+assert_not_contains "Global skills -> $HOME_DIR/.cursor/skills"
+
+# No project-scoped files in workspace
 assert_not_contains "$WORKSPACE_DIR/.cursor/commands"
-assert_not_contains "$WORKSPACE_DIR/.codex"
-assert_not_contains "$WORKSPACE_DIR/.claude"
-assert_not_contains "$WORKSPACE_DIR/.gemini"
-assert_not_contains "$WORKSPACE_DIR/.cursor"
-assert_contains "Skipping skills: set COPILOT_SKILLS_DIR"
+assert_not_contains "$WORKSPACE_DIR/.agents/skills"
+
+# Copilot defaults to no prompts
 assert_contains "Skipping prompts: set --copilot-scope and a prompts dir."
-assert_not_contains "$WORKSPACE_DIR/.github/skills"
 assert_not_contains "$WORKSPACE_DIR/.github/prompts"
 
-OUTPUT_FILE="$TMP_DIR/output-skills.txt"
-
-(
-  cd "$WORKSPACE_DIR"
-  HOME="$HOME_DIR" \
-  COPILOT_SKILLS_DIR="$WORKSPACE_DIR/.github/skills" \
-  "$ROOT/scripts/sync-agent-scripts.sh" --dry-run --providers copilot
-) > "$OUTPUT_FILE"
-
-assert_contains "- create skill ios-simulator ("
-
+# --- Copilot prompts ---
 OUTPUT_FILE="$TMP_DIR/output-prompts.txt"
 
 (
@@ -82,6 +83,19 @@ OUTPUT_FILE="$TMP_DIR/output-prompts.txt"
 
 assert_contains "- create $ROOT/slash-commands/commit.md -> $WORKSPACE_DIR/.github/prompts/commit.prompt.md"
 
+# --- Agents project scope ---
+OUTPUT_FILE="$TMP_DIR/output-project.txt"
+
+(
+  cd "$WORKSPACE_DIR"
+  HOME="$HOME_DIR" \
+  "$ROOT/scripts/sync-agent-scripts.sh" --dry-run --providers agents --agents-scope project
+) > "$OUTPUT_FILE"
+
+assert_contains "Project skills -> $WORKSPACE_DIR/.agents/skills"
+assert_contains "- create skill ios-simulator ("
+
+# --- Copilot default scope ---
 OUTPUT_FILE="$TMP_DIR/output-copilot-default.txt"
 
 (
@@ -93,20 +107,20 @@ OUTPUT_FILE="$TMP_DIR/output-copilot-default.txt"
 assert_contains "Skipping prompts: set --copilot-scope and a prompts dir."
 assert_not_contains "Workspace prompts -> $ROOT/.github/prompts"
 assert_not_contains "-> $ROOT/.github/prompts/"
-assert_not_contains "-> $ROOT/.github/skills/"
 
+# --- Idempotency: second sync produces no changes ---
 OUTPUT_FILE="$TMP_DIR/output-skip-identical.txt"
 
 (
   cd "$WORKSPACE_DIR"
   HOME="$HOME_DIR" \
-  "$ROOT/scripts/sync-agent-scripts.sh" --providers codex,claude,gemini,cursor
+  "$ROOT/scripts/sync-agent-scripts.sh" --providers agents,codex,claude,gemini,cursor
 ) >/dev/null
 
 (
   cd "$WORKSPACE_DIR"
   HOME="$HOME_DIR" \
-  "$ROOT/scripts/sync-agent-scripts.sh" --dry-run --providers codex,claude,gemini,cursor
+  "$ROOT/scripts/sync-agent-scripts.sh" --dry-run --providers agents,codex,claude,gemini,cursor
 ) > "$OUTPUT_FILE"
 
 assert_not_contains "- create skill"
@@ -117,18 +131,5 @@ assert_not_contains "- create $ROOT/slash-commands/commit.md -> $HOME_DIR/.gemin
 assert_not_contains "- update $ROOT/slash-commands/commit.md -> $HOME_DIR/.gemini/commands/commit.toml"
 assert_not_contains "- create $ROOT/slash-commands/commit.md -> $HOME_DIR/.cursor/commands/commit.md"
 assert_not_contains "- update $ROOT/slash-commands/commit.md -> $HOME_DIR/.cursor/commands/commit.md"
-
-OUTPUT_FILE="$TMP_DIR/output-codex-skip.txt"
-
-(
-  cd "$WORKSPACE_DIR"
-  HOME="$HOME_DIR" \
-  CODEX_SKIP_SKILLS="ios-simulator" \
-  "$ROOT/scripts/sync-agent-scripts.sh" --dry-run --providers codex
-) > "$OUTPUT_FILE"
-
-assert_contains "Skipping skills: ios-debugger-agent,swiftui-liquid-glass,swiftui-performance-audit,swiftui-ui-patterns,swiftui-view-refactor,ios-simulator"
-assert_contains "skip ios-simulator -> $HOME_DIR/.codex/skills/ios-simulator"
-assert_not_contains "- create skill ios-simulator ("
 
 echo "ok"

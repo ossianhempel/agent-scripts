@@ -12,6 +12,16 @@ read_when:
 Use `scripts/sync-agent-scripts.sh` to copy the skills and slash commands in this
 repo into each agent runtime's standard locations.
 
+## Architecture
+
+Skills sync to two locations:
+
+- **`~/.agents/skills`** — cross-tool standard read by Codex, Gemini CLI, Cursor,
+  Copilot, Windsurf, and others. One copy serves all these tools.
+- **`~/.claude/skills`** — Claude Code only (does not yet support `.agents/`).
+
+Commands and prompts sync to each tool's native location since formats differ.
+
 ## Quickstart
 
 From the repo you want to receive project-local commands (Cursor/Copilot):
@@ -29,7 +39,7 @@ Preview changes only:
 Limit providers:
 
 ```sh
-/path/to/agent-scripts/scripts/sync-agent-scripts.sh --providers codex,claude
+/path/to/agent-scripts/scripts/sync-agent-scripts.sh --providers agents,claude
 ```
 
 ## Auto-sync via Git hooks (local only)
@@ -52,47 +62,39 @@ git config --unset core.hooksPath
 
 ## Default destinations
 
-Global (user) locations:
-- Codex: `~/.codex/skills` and `~/.codex/prompts`
-- Claude Code: `~/.claude/skills` and `~/.claude/commands`
-- Gemini CLI: `~/.gemini/skills` and `~/.gemini/commands` (slash commands are converted to `.toml`)
+Skills:
 
-Cursor locations:
-- Global skills: `~/.cursor/skills`
-- Global commands: `~/.cursor/commands`
-- Project skills (optional): `./.cursor/skills`
-- Project commands (optional): `./.cursor/commands`
+- Cross-tool: `~/.agents/skills` (Codex, Gemini, Cursor, Copilot, Windsurf)
+- Claude Code: `~/.claude/skills`
 
-Copilot locations:
-- Workspace skills: `./.github/skills`
-- Workspace prompts: `./.github/prompts`
-- User prompts: stored in the current VS Code profile folder (path varies)
+Commands/prompts:
+
+- Codex: `~/.codex/prompts`
+- Claude Code: `~/.claude/commands`
+- Gemini CLI: `~/.gemini/commands` (slash commands converted to `.toml`)
+- Cursor: `~/.cursor/commands` (global) or `./.cursor/commands` (project)
+- Copilot: `./.github/prompts` (workspace) or VS Code profile folder (user)
 
 ## Overrides
 
-- `--codex-home`, `--claude-home`, `--gemini-home`
-- `--claude-skills-dir`
-- `--cursor-commands-dir`, `--cursor-skills-dir`, `--cursor-scope`
-- `--copilot-skills-dir`, `--copilot-prompts-dir`, `--copilot-user-prompts-dir`, `--copilot-scope`
-- `--gemini-skills-dir`
-- Or set `CODEX_HOME`, `CLAUDE_HOME`, `GEMINI_HOME`, `GEMINI_SKILLS_DIR`, `CURSOR_COMMANDS_DIR`,
-  `COPILOT_PROMPTS_DIR`, `COPILOT_USER_PROMPTS_DIR`, `CURSOR_SCOPE`,
-  `COPILOT_SCOPE`
+- `--agents-home`, `--agents-skills-dir`, `--agents-scope`
+- `--claude-home`, `--claude-skills-dir`
+- `--codex-home`, `--gemini-home`
+- `--cursor-commands-dir`, `--cursor-scope`
+- `--copilot-prompts-dir`, `--copilot-user-prompts-dir`, `--copilot-scope`
+- Or set env vars: `AGENTS_SCOPE`, `CURSOR_COMMANDS_DIR`, `CURSOR_SCOPE`,
+  `COPILOT_PROMPTS_DIR`, `COPILOT_USER_PROMPTS_DIR`, `COPILOT_SCOPE`
 
 ## Notes
 
-- Cursor supports both project and global skills/commands; the script defaults
-  to global-only. Use `--cursor-scope project` or `--cursor-scope both` to
-  include project targets.
-- Copilot supports workspace and user prompt scopes; the script defaults to
-  none and only syncs prompts when you pass `--copilot-scope` and a prompts
-  directory.
-- Copilot skills are repository-scoped; the script only syncs skills when you
-  set `--copilot-skills-dir` or `COPILOT_SKILLS_DIR`.
-- Codex skips the plugin-backed iOS skills by default: `ios-debugger-agent`,
-  `swiftui-liquid-glass`, `swiftui-performance-audit`, `swiftui-ui-patterns`,
-  and `swiftui-view-refactor`. Set `CODEX_SKIP_SKILLS` or pass
-  `--codex-skip-skills` to add more skipped skills.
+- The `agents` provider handles skills for all tools except Claude Code, syncing
+  once to `~/.agents/skills` instead of separate per-tool directories.
+- Use `--agents-scope project` or `--agents-scope both` to also sync skills to
+  `./.agents/skills` in the current directory (for project-local skills).
+- Cursor commands support both project and global scopes; the script defaults to
+  global-only. Use `--cursor-scope project` or `--cursor-scope both`.
+- Copilot supports workspace and user prompt scopes; the script defaults to none
+  and only syncs prompts when you pass `--copilot-scope` and a prompts directory.
 - Gemini also supports project-local commands in `./.gemini/commands`. If you
   want that, run with `--gemini-home .gemini`.
 - `--dry-run` prints every file that would be created or updated.

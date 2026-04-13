@@ -57,10 +57,9 @@ Examples:
 ```sh
 ./scripts/sync-agent-scripts.sh --dry-run
 ./scripts/sync-agent-scripts.sh
-./scripts/sync-agent-scripts.sh --providers codex,claude
-CODEX_SKIP_SKILLS=some-extra-skill ./scripts/sync-agent-scripts.sh --provider codex
+./scripts/sync-agent-scripts.sh --providers agents,claude
+./scripts/sync-agent-scripts.sh --provider agents --agents-scope both
 COPILOT_PROMPTS_DIR=~/my-repo/.github/prompts ./scripts/sync-agent-scripts.sh --provider copilot --copilot-scope workspace
-COPILOT_SKILLS_DIR=~/my-repo/.github/skills ./scripts/sync-agent-scripts.sh --provider copilot
 ```
 
 ## Sync Agent Instructions to Repos
@@ -82,19 +81,17 @@ Pointer target:
 - `AGENTS.md` (shared cross-repo instructions)
 
 Defaults:
-- Codex: `~/.codex/skills` and `~/.codex/prompts`
+- Cross-tool skills: `~/.agents/skills` (Codex, Gemini, Cursor, Copilot, Windsurf)
 - Claude Code: `~/.claude/skills` and `~/.claude/commands`
+- Codex: `~/.codex/prompts`
 - Gemini CLI: `~/.gemini/commands` (converted to `.toml`)
-- Cursor: `~/.cursor/skills` and `~/.cursor/commands` (global)
-- Copilot: prompts and skills are repo-scoped and require explicit paths
+- Cursor: `~/.cursor/commands` (global)
+- Copilot: prompts are repo-scoped and require explicit paths
 
 Overrides:
-- `CODEX_HOME`, `CLAUDE_HOME`, `CLAUDE_SKILLS_DIR`, `GEMINI_HOME`
-- `CODEX_SKIP_SKILLS` adds more Codex skip entries on top of the built-in iOS
-  plugin defaults
-- `CURSOR_COMMANDS_DIR`, `CURSOR_SKILLS_DIR`, `CURSOR_SCOPE`
-- `COPILOT_SKILLS_DIR`, `COPILOT_PROMPTS_DIR`, `COPILOT_USER_PROMPTS_DIR`,
-  `COPILOT_SCOPE`
+- `AGENTS_SCOPE`, `CODEX_HOME`, `CLAUDE_HOME`, `CLAUDE_SKILLS_DIR`, `GEMINI_HOME`
+- `CURSOR_COMMANDS_DIR`, `CURSOR_SCOPE`
+- `COPILOT_PROMPTS_DIR`, `COPILOT_USER_PROMPTS_DIR`, `COPILOT_SCOPE`
 
 ## Provider Slash Command Docs
 - Codex CLI: https://developers.openai.com/codex/guides/slash-commands
