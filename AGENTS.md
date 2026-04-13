@@ -27,15 +27,6 @@ Define finishing criteria for yourself before you start: what does "done" look l
 - Don't use `any` in TypeScript.
 - Bug fixes (non-trivial): reproduce in a failing test first, then fix, then verify the test passes. Not required for trivial/UI bugs.
 
-### React-Specific
-
-- Don't reach for `useEffect` by default; many things can be handled in render or via keys.
-  - Before adding an effect: "Is this about synchronizing with something external?"
-  - Shared logic → event handlers, not effects.
-  - Effects that fetch/subscribe: manage cleanup and race conditions.
-  - Use key or controlled remounting to reset state.
-  - Abstract complex effect logic into custom hooks.
-
 ## Important Locations
 - Personal Website repo: ~/Developer/ossianhempel_com
 - Obsidian vault: /Users/ossianhempel/ossians-second-brain-sync
