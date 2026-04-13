@@ -1,8 +1,6 @@
 ---
 name: convex-migration-helper
-description: Plan and execute Convex schema migrations safely, including adding fields, creating tables, and data transformations. Use when schema changes affect existing data.
-homepage: https://github.com/get-convex/convex-agent-plugins
-license: MIT
+description: Plans and executes safe Convex schema and data migrations using the widen-migrate-narrow workflow and the @convex-dev/migrations component. Use this skill when a deployment fails schema validation, existing documents need backfilling, fields need adding or removing or changing type, tables need splitting or merging, or a zero-downtime migration strategy is needed. Also use when the user mentions breaking schema changes, multi-deploy rollouts, or data transformations on existing Convex tables.
 ---
 
 # Convex Migration Helper
@@ -14,15 +12,40 @@ Safely migrate Convex schemas and data when making breaking changes.
 - Adding new required fields to existing tables
 - Changing field types or structure
 - Splitting or merging tables
-- Renaming fields
+- Renaming or deleting fields
 - Migrating from nested to relational data
 
-## Migration Principles
+## When Not to Use
 
-1. **No Automatic Migrations**: Convex doesn't automatically migrate data
-2. **Additive Changes are Safe**: Adding optional fields or new tables is safe
-3. **Breaking Changes Need Code**: Required fields, type changes need migration code
-4. **Zero-Downtime**: Write migrations to keep app running during migration
+- Greenfield schema with no existing data in production or dev
+- Adding optional fields that do not need backfilling
+- Adding new tables with no existing data to migrate
+- Adding or removing indexes with no correctness concern
+- Questions about Convex schema design without a migration need
+
+## Key Concepts
+
+### Schema Validation Drives the Workflow
+
+Convex will not let you deploy a schema that does not match the data at rest. This is the fundamental constraint that shapes every migration:
+
+- You cannot add a required field if existing documents don't have it
+- You cannot change a field's type if existing documents have the old type
+- You cannot remove a field from the schema if existing documents still have it
+
+This means migrations follow a predictable pattern: **widen the schema, migrate the data, narrow the schema**.
+
+### Online Migrations
+
+Convex migrations run online, meaning the app continues serving requests while data is updated asynchronously in batches. During the migration window, your code must handle both old and new data formats.
+
+### Prefer New Fields Over Changing Types
+
+When changing the shape of data, create a new field rather than modifying an existing one. This makes the transition safer and easier to roll back.
+
+### Don't Delete Data
+
+Unless you are certain, prefer deprecating fields over deleting them. Mark the field as `v.optional` and add a code comment explaining it is deprecated and why it existed.
 
 ## Safe Changes (No Migration Needed)
 
@@ -34,7 +57,7 @@ users: defineTable({
   name: v.string(),
 })
 
-// After - Safe! New field is optional
+// After - safe, new field is optional
 users: defineTable({
   name: v.string(),
   bio: v.optional(v.string()),
@@ -44,7 +67,6 @@ users: defineTable({
 ### Adding New Table
 
 ```typescript
-// Safe to add completely new tables
 posts: defineTable({
   userId: v.id("users"),
   title: v.string(),
@@ -54,297 +76,75 @@ posts: defineTable({
 ### Adding Index
 
 ```typescript
-// Safe to add indexes at any time
 users: defineTable({
   name: v.string(),
   email: v.string(),
 })
-  .index("by_email", ["email"]) // New index
+  .index("by_email", ["email"])
 ```
 
-## Breaking Changes (Migration Required)
+## Breaking Changes: The Deployment Workflow
 
-### Adding Required Field
+Every breaking migration follows the same multi-deploy pattern:
 
-**Problem**: Existing documents won't have the new field.
+**Deploy 1 - Widen the schema:**
 
-**Solution**: Add as optional first, backfill data, then make required.
+1. Update schema to allow both old and new formats (e.g., add optional new field)
+2. Update code to handle both formats when reading
+3. Update code to write the new format for new documents
+4. Deploy
 
-```typescript
-// Step 1: Add as optional
-users: defineTable({
-  name: v.string(),
-  email: v.optional(v.string()), // Start optional
-})
+**Between deploys - Migrate data:**
 
-// Step 2: Create migration
-import { internalMutation } from "./_generated/server";
-import { v } from "convex/values";
+5. Run migration to backfill existing documents
+6. Verify all documents are migrated
 
-export const backfillEmails = internalMutation({
-  args: {},
-  handler: async (ctx) => {
-    const users = await ctx.db.query("users").collect();
+**Deploy 2 - Narrow the schema:**
 
-    for (const user of users) {
-      if (!user.email) {
-        await ctx.db.patch(user._id, {
-          email: `user-${user._id}@example.com`, // Default value
-        });
-      }
-    }
-  },
-});
+7. Update schema to require the new format only
+8. Remove code that handles the old format
+9. Deploy
 
-// Step 3: Run migration via dashboard or CLI
-// npx convex run migrations:backfillEmails
+## Using the Migrations Component
 
-// Step 4: Make field required (after all data migrated)
-users: defineTable({
-  name: v.string(),
-  email: v.string(), // Now required
-})
-```
+For any non-trivial migration, use the [`@convex-dev/migrations`](https://www.convex.dev/components/migrations) component. It handles batching, cursor-based pagination, state tracking, resume from failure, dry runs, and progress monitoring.
 
-### Changing Field Type
+See `references/migrations-component.md` for installation, setup, defining and running migrations, dry runs, status monitoring, and configuration options.
 
-**Example**: Change `tags: v.array(v.string())` to separate table
+## Common Migration Patterns
 
-```typescript
-// Step 1: Create new structure (additive)
-tags: defineTable({
-  name: v.string(),
-}).index("by_name", ["name"]),
+See `references/migration-patterns.md` for complete patterns with code examples covering:
 
-postTags: defineTable({
-  postId: v.id("posts"),
-  tagId: v.id("tags"),
-})
-  .index("by_post", ["postId"])
-  .index("by_tag", ["tagId"]),
-
-// Keep old field as optional during migration
-posts: defineTable({
-  title: v.string(),
-  tags: v.optional(v.array(v.string())), // Keep temporarily
-})
-
-// Step 2: Write migration
-export const migrateTags = internalMutation({
-  args: { batchSize: v.optional(v.number()) },
-  handler: async (ctx, args) => {
-    const batchSize = args.batchSize ?? 100;
-
-    const posts = await ctx.db
-      .query("posts")
-      .filter(q => q.neq(q.field("tags"), undefined))
-      .take(batchSize);
-
-    for (const post of posts) {
-      if (!post.tags || post.tags.length === 0) {
-        await ctx.db.patch(post._id, { tags: undefined });
-        continue;
-      }
-
-      for (const tagName of post.tags) {
-        let tag = await ctx.db
-          .query("tags")
-          .withIndex("by_name", q => q.eq("name", tagName))
-          .unique();
-
-        if (!tag) {
-          const tagId = await ctx.db.insert("tags", { name: tagName });
-          tag = { _id: tagId, name: tagName };
-        }
-
-        const existing = await ctx.db
-          .query("postTags")
-          .withIndex("by_post", q => q.eq("postId", post._id))
-          .filter(q => q.eq(q.field("tagId"), tag._id))
-          .unique();
-
-        if (!existing) {
-          await ctx.db.insert("postTags", {
-            postId: post._id,
-            tagId: tag._id,
-          });
-        }
-      }
-
-      await ctx.db.patch(post._id, { tags: undefined });
-    }
-
-    return { migrated: posts.length };
-  },
-});
-
-// Step 3: Run in batches until all migrated
-// Step 4: Remove old field from schema
-```
-
-### Renaming Field
-
-```typescript
-// Step 1: Add new field (optional)
-users: defineTable({
-  name: v.string(),
-  displayName: v.optional(v.string()), // New name
-})
-
-// Step 2: Copy data
-export const renameField = internalMutation({
-  handler: async (ctx) => {
-    const users = await ctx.db.query("users").collect();
-
-    for (const user of users) {
-      await ctx.db.patch(user._id, {
-        displayName: user.name,
-      });
-    }
-  },
-});
-
-// Step 3: Update schema (remove old field)
-// Step 4: Update all code to use new field name
-```
-
-## Migration Patterns
-
-### Batch Processing
-
-For large tables, process in batches:
-
-```typescript
-export const migrateBatch = internalMutation({
-  args: {
-    cursor: v.optional(v.string()),
-    batchSize: v.number(),
-  },
-  handler: async (ctx, args) => {
-    const batchSize = args.batchSize;
-    let query = ctx.db.query("largeTable");
-
-    const items = await query.take(batchSize);
-
-    for (const item of items) {
-      await ctx.db.patch(item._id, {
-        // migration logic
-      });
-    }
-
-    return {
-      processed: items.length,
-      hasMore: items.length === batchSize,
-    };
-  },
-});
-```
-
-### Scheduled Migration
-
-Use cron jobs for gradual migration:
-
-```typescript
-// convex/crons.ts
-import { cronJobs } from "convex/server";
-import { internal } from "./_generated/api";
-
-const crons = cronJobs();
-
-crons.interval(
-  "migrate-batch",
-  { minutes: 5 },
-  internal.migrations.migrateBatch,
-  { batchSize: 100 }
-);
-
-export default crons;
-```
-
-### Dual-Write Pattern
-
-For zero-downtime migrations, write to both old and new structure during transition:
-
-```typescript
-export const createPost = mutation({
-  args: { title: v.string(), tags: v.array(v.string()) },
-  handler: async (ctx, args) => {
-    const user = await getCurrentUser(ctx);
-
-    // Create post with old field (during migration)
-    const postId = await ctx.db.insert("posts", {
-      userId: user._id,
-      title: args.title,
-      tags: args.tags,
-    });
-
-    // ALSO write to new structure
-    for (const tagName of args.tags) {
-      let tag = await ctx.db
-        .query("tags")
-        .withIndex("by_name", q => q.eq("name", tagName))
-        .unique();
-
-      if (!tag) {
-        const tagId = await ctx.db.insert("tags", { name: tagName });
-        tag = { _id: tagId };
-      }
-
-      await ctx.db.insert("postTags", {
-        postId,
-        tagId: tag._id,
-      });
-    }
-
-    return postId;
-  },
-});
-
-// After migration complete, remove old writes
-```
-
-## Testing Migrations
-
-### Verify Migration Success
-
-```typescript
-export const verifyMigration = query({
-  args: {},
-  handler: async (ctx) => {
-    const total = (await ctx.db.query("users").collect()).length;
-    const migrated = (await ctx.db
-      .query("users")
-      .filter(q => q.neq(q.field("newField"), undefined))
-      .collect()
-    ).length;
-
-    return {
-      total,
-      migrated,
-      remaining: total - migrated,
-      percentComplete: (migrated / total) * 100,
-    };
-  },
-});
-```
-
-## Migration Checklist
-
-- [ ] Identify breaking change
-- [ ] Add new structure as optional/additive
-- [ ] Write migration function (internal mutation)
-- [ ] Test migration on sample data
-- [ ] Run migration in batches if large dataset
-- [ ] Verify migration completed (all records updated)
-- [ ] Update application code to use new structure
-- [ ] Deploy new code
-- [ ] Remove old fields from schema
-- [ ] Clean up migration code
+- Adding a required field
+- Deleting a field
+- Changing a field type
+- Splitting nested data into a separate table
+- Cleaning up orphaned documents
+- Zero-downtime strategies (dual write, dual read)
+- Small table shortcut (single internalMutation without the component)
+- Verifying a migration is complete
 
 ## Common Pitfalls
 
-1. **Don't make field required immediately**: Always add as optional first
-2. **Don't migrate in a single transaction**: Batch large migrations
-3. **Don't forget to update queries**: Update all code using old field
-4. **Don't delete old field too soon**: Wait until all data migrated
-5. **Test thoroughly**: Verify migration on dev environment first
+1. **Making a field required before migrating data**: Convex rejects the deploy because existing documents lack the field. Always widen the schema first.
+2. **Using `.collect()` on large tables**: Hits transaction limits or causes timeouts. Use the migrations component for proper batched pagination. `.collect()` is only safe for tables you know are small.
+3. **Not writing the new format before migrating**: Documents created during the migration window will be missed, leaving unmigrated data after the migration "completes."
+4. **Skipping the dry run**: Use `dryRun: true` to validate migration logic before committing changes to production data. Catches bugs before they touch real documents.
+5. **Deleting fields prematurely**: Prefer deprecating with `v.optional` and a comment. Only delete after you are confident the data is no longer needed and no code references it.
+6. **Using crons for migration batches**: The migrations component handles batching via recursive scheduling internally. Crons require manual cleanup and an extra deploy to remove.
+
+## Migration Checklist
+
+- [ ] Identify the breaking change and plan the multi-deploy workflow
+- [ ] Update schema to allow both old and new formats
+- [ ] Update code to handle both formats when reading
+- [ ] Update code to write the new format for new documents
+- [ ] Deploy widened schema and updated code
+- [ ] Define migration using the `@convex-dev/migrations` component
+- [ ] Test with `dryRun: true`
+- [ ] Run migration and monitor status
+- [ ] Verify all documents are migrated
+- [ ] Update schema to require new format only
+- [ ] Clean up code that handled old format
+- [ ] Deploy final schema and code
+- [ ] Remove migration code once confirmed stable
