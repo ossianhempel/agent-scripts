@@ -22,38 +22,13 @@ Every caption should be tied to one specific audience. "Fitness" is invisible. "
 
 ## Profile Copy
 
-The profile is the conversion layer. Great captions waste their reach if the profile doesn't close. Write this copy *before* the first post.
+See `references/social-profiles.md` for the full cross-platform profile guide
+(display name, bio structure, what to cut, platform-specific notes). That
+reference covers IG, X, TikTok, and LinkedIn.
 
-### Display Name
-
-Instagram indexes the bold display name at the top of the profile for search, not the @handle. The niche keyword has to live here.
-
-- Bad: `Jessica`
-- Good: `Jessica | Postpartum Fitness Coach`
-- Good: `Mark | Hypertrophy Coach for Lifters`
-
-Format: `[First name] | [Niche keyword + role]`
-
-### Bio
-
-Three lines, nothing else. No life story.
-
-1. **What you do.** One line, specific.
-2. **Who it's for.** One line, the exact audience.
-3. **CTA.** One line, with the link.
-
-Example:
-```
-Helping new moms track their pregnancy journey
-For first-time moms who hate overthinking it
-→ Download the app below 👇
-```
-
-### Highlights
-
-5 highlight covers before the first post. First impressions decide follows, and a bare profile kills them.
-
-Name highlights for the app, not the algorithm: `Tips`, `Reviews`, `Features`, `FAQ`, `How it works`. Skip generic `About` or `Story`.
+**IG-specific reminder:** set up 5 highlight covers before the first post.
+Name them for the viewer: `Tips`, `Reviews`, `Features`, `FAQ`, `How it works`.
+Skip generic `About` or `Story`.
 
 ## Structure (standard mode)
 

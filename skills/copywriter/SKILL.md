@@ -50,6 +50,9 @@ contains format rules, character limits, structural patterns, and examples.
   social proof, CTAs, above-the-fold structure.
 - `references/ig-captions.md` - Instagram captions for Reels, carousels, and
   static posts. Hook structure, body, closing line, CTA, hashtags.
+- `references/social-profiles.md` - Profile copy across platforms (IG, X,
+  TikTok, LinkedIn). Display name, bio structure, what to cut, before/after
+  examples.
 
 If the medium isn't covered, fall back to the core principles below and ask
 Ossian whether to add a new reference file.
