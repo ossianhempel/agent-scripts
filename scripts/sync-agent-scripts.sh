@@ -606,4 +606,99 @@ if want_provider "copilot"; then
   fi
 fi
 
+# --- Symlink: ensure CLAUDE.md <-> AGENTS.md in git repos ---
+ensure_claude_agents_symlink() {
+  local dir="$1"
+
+  # Skip non-git directories
+  [[ -d "$dir/.git" ]] || return 0
+
+  # Skip agent-scripts itself
+  [[ "$(cd "$dir" && pwd)" == "$ROOT" ]] && return 0
+
+  local has_claude=0
+  local has_agents=0
+  local claude_is_symlink=0
+  local agents_is_symlink=0
+
+  # Check all case variants
+  for f in "$dir"/CLAUDE.md "$dir"/claude.md; do
+    if [[ -e "$f" || -L "$f" ]]; then
+      has_claude=1
+      [[ -L "$f" ]] && claude_is_symlink=1
+    fi
+  done
+  for f in "$dir"/AGENTS.md "$dir"/agents.md; do
+    if [[ -e "$f" || -L "$f" ]]; then
+      has_agents=1
+      [[ -L "$f" ]] && agents_is_symlink=1
+    fi
+  done
+
+  # Both present - check if CLAUDE.md is already a symlink, or if identical files
+  if [[ "$has_claude" -eq 1 && "$has_agents" -eq 1 ]]; then
+    # Already a symlink - nothing to do
+    [[ "$claude_is_symlink" -eq 1 ]] && return 0
+
+    # Both are real files - if identical, replace CLAUDE.md with symlink
+    local claude_file agents_file
+    for f in "$dir"/CLAUDE.md "$dir"/claude.md; do
+      [[ -e "$f" ]] && claude_file="$f" && break
+    done
+    for f in "$dir"/AGENTS.md "$dir"/agents.md; do
+      [[ -e "$f" ]] && agents_file="$f" && break
+    done
+
+    if cmp -s "$claude_file" "$agents_file"; then
+      log_sub "$(basename "$dir"): CLAUDE.md identical to AGENTS.md, replacing with symlink"
+      if [[ "$DRY_RUN" -eq 0 ]]; then
+        rm -f "$claude_file"
+        ln -s AGENTS.md "$claude_file"
+      fi
+    fi
+    return 0
+  fi
+
+  # Neither exists - nothing to do
+  if [[ "$has_claude" -eq 0 && "$has_agents" -eq 0 ]]; then
+    return 0
+  fi
+
+  local repo_name
+  repo_name=$(basename "$dir")
+
+  # Scenario 1: only CLAUDE.md exists -> copy to AGENTS.md, replace CLAUDE.md with symlink
+  if [[ "$has_claude" -eq 1 && "$has_agents" -eq 0 ]]; then
+    local claude_file
+    for f in "$dir"/CLAUDE.md "$dir"/claude.md; do
+      [[ -e "$f" ]] && claude_file="$f" && break
+    done
+    local agents_file="$dir/AGENTS.md"
+
+    log_sub "$repo_name: CLAUDE.md -> copy to AGENTS.md, replace with symlink"
+    if [[ "$DRY_RUN" -eq 0 ]]; then
+      cp -f "$claude_file" "$agents_file"
+      rm -f "$claude_file"
+      ln -s AGENTS.md "$claude_file"
+    fi
+  fi
+
+  # Scenario 2: only AGENTS.md exists -> create CLAUDE.md as symlink
+  if [[ "$has_agents" -eq 1 && "$has_claude" -eq 0 ]]; then
+    log_sub "$repo_name: create CLAUDE.md -> symlink to AGENTS.md"
+    if [[ "$DRY_RUN" -eq 0 ]]; then
+      ln -s AGENTS.md "$dir/CLAUDE.md"
+    fi
+  fi
+}
+
+# Scan ~/Developer for git repos
+log_section "Symlinks"
+log_sub "CLAUDE.md <-> AGENTS.md in ~/Developer repos"
+shopt -s nullglob
+for repo_dir in "$HOME/Developer"/*/; do
+  ensure_claude_agents_symlink "${repo_dir%/}"
+done
+shopt -u nullglob
+
 log "Done."
