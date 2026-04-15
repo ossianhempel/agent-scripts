@@ -404,8 +404,43 @@ Aspect ratio: [as needed]
   "I should probably address the counterargument here", "This connects to the
   thing about progressive overload", "Need a concrete example."
 - **Title options, not one title.** Give 2-3 options so the writer can feel out
-  the voice.
+  the voice. At least one title should be **search-intent driven** (see below).
 - **Thesis is one sentence.** If it takes more, the angle isn't sharp enough.
+
+### Title Strategy
+
+Titles serve two jobs: getting clicks from social/newsletters (voice-driven)
+and ranking in search (intent-driven). The outline should offer both kinds.
+
+**Search-intent title**: Write it like the reader would type it into Google.
+Think about the actual query someone has before they find this article. "How
+many sets per week for hypertrophy" beats "More isn't better." The search
+title doesn't need to be clever, it needs to match what people search for.
+
+**Voice-driven title**: The punchy, opinionated, or curiosity-driven version.
+This is what works on social, newsletters, and direct traffic. "Why you're
+probably doing too many sets" or "The volume myth that won't die."
+
+**Format in the outline:**
+
+```
+# [Search-intent title] (SEO)
+# [Voice-driven title A]
+# [Voice-driven title B] (optional)
+```
+
+The writer picks which to use as the `<title>` tag (SEO) vs the visible `<h1>`
+(voice). Or uses the search-intent title for both if the topic is informational
+and the audience is searching, not browsing.
+
+**How to find the search-intent title:**
+
+- Ask: "What would someone Google right before they need this article?"
+- Use natural phrasing, not keyword-stuffed. "How many sets per muscle group"
+  not "optimal training volume sets hypertrophy guide 2025."
+- Questions work well: "Is high volume training better for hypertrophy?"
+- Include the core term the article targets. If the article is about training
+  volume, "volume" or "sets" must be in the search title.
 
 ---
 
@@ -525,6 +560,7 @@ formatted references for the reader.
 For a request like "Jag vill skriva om varfor folk overskattar traningsvolym":
 
 ```
+# Hur manga set per muskelgrupp per vecka? (SEO)
 # Mer ar inte battre: varfor volym ar overskattad
 # Varfor du formodligen gor for manga set
 
