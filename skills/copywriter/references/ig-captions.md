@@ -108,7 +108,9 @@ The CTA should never be the emotional close.
 
 Bracketed by `-` separators. Keep it short and clear.
 
-For app marketing, the CTA should live in three places at once:
+The job of organic content is to build an audience around the exact problem
+your app solves, then hand them the solution. The CTA is the handoff. For
+app marketing, it should live in three places at once:
 1. The caption (bracketed)
 2. A small text overlay in the corner of the video
 3. The bio, with a direct download link
@@ -197,6 +199,20 @@ The caption is the value delivery. The video only sold the click.
 
 #niche1 #niche2 #niche3 #niche4
 ```
+
+### Workflow
+
+When the user gives you a hook, expand it into the caption yourself in one
+pass. Don't ask them to write bullets, don't hand it off — the hook is the
+input, the full caption is the output.
+
+- Match the caption structure to the hook's promise exactly. "5 signs..." = 5
+  bullets. "3 reasons..." = 3 bullets. Never more, never fewer.
+- Each bullet should feel like a real insight in the niche, not a paraphrase
+  of the hook. If you can't think of five specific points, push back and
+  suggest a tighter number rather than padding.
+- Once a post hits, reuse the same hook pattern with new angles. Generating
+  the next 5-10 variations is part of the job.
 
 ### Posting Cadence
 

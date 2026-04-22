@@ -7,7 +7,8 @@ description: >-
   outcome-first, user language, hand test). Triggers: "write copy", "improve
   this copy", "rewrite this", "screenshot headlines", "landing page copy", "ad
   copy", "marketing text", "app description", "what should this button say",
-  "empty state copy", "push notification copy", "what should I write".
+  "empty state copy", "push notification copy", "what should I write",
+  "TikTok slideshow", "slideshow hook", "slideshow copy", "carousel post".
 ---
 
 # Copywriter
@@ -50,6 +51,9 @@ contains format rules, character limits, structural patterns, and examples.
   social proof, CTAs, above-the-fold structure.
 - `references/ig-captions.md` - Instagram captions for Reels, carousels, and
   static posts. Hook structure, body, closing line, CTA, hashtags.
+- `references/tiktok-slideshow.md` - TikTok/Reels slideshow on-slide copy.
+  Slide-by-slide structure, hook rules for slide 1, payload slides, close
+  slide, Pinterest image sourcing, viral-slideshow mining workflow.
 - `references/social-profiles.md` - Profile copy across platforms (IG, X,
   TikTok, LinkedIn). Display name, bio structure, what to cut, before/after
   examples.

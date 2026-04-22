@@ -15,6 +15,7 @@ Quick start (read)
 - `things tasks --search "query" --json`
 - `things tasks --query 'tag:work AND title:/review/i' --format jsonl`
 - `things show --project "Project Name"`
+- `things show --id <TODO_UUID> --recursive --json`
 
 Write (URL scheme)
 - `things add "Task title" --notes "..." --list "Project or Area"`
@@ -23,6 +24,8 @@ Write (URL scheme)
 - `things update --id <uuid> --notes "Updated notes"`
 - Bulk update (preview then apply): `things update --query 'tag:work' --dry-run` then `things update --query 'tag:work' --yes --tags "Work"`
 - `things update-project --id <uuid> "New project title"`
+- `things rename-project --id <uuid> --title "New project title"`
+- `things list-project-tasks --id <project_uuid>`
 - `things delete --id <uuid>` or `things delete "Todo title"`
 - Bulk delete (preview then apply): `things delete --query 'notes:/deprecated/i' --dry-run` then `things delete --query 'notes:/deprecated/i' --yes`
 - Undo last bulk action: `things undo --dry-run` then `things undo --yes`
@@ -41,7 +44,7 @@ Repeating (database writes)
  - Repeating adds launch Things in the background first to ensure the item hits the database before the repeat rule is applied.
 
 Filters + DB
-- Use `--db` or `THINGSDB` to point to a specific Things.sqlite.
+- Use `--db` or `THINGSDB` to point to a specific Things database. Accepted forms: the `main.sqlite` file, the `Things Database.thingsdatabase` directory, or the parent `ThingsData-*` directory.
 - Common filters: `--filter-project`, `--filter-area`, `--filter-tag`, `--status`, `--search`, `--limit`, `--offset`.
 - Rich query: `--query` supports boolean ops, field predicates, and regex (e.g. `title:/regex/ AND tag:work`).
 - Repeating tasks: `things repeating` or `--query 'repeating:true'`.
