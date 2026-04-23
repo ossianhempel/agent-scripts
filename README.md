@@ -48,6 +48,9 @@ Source of truth on this machine: `~/Developer/agent-scripts`.
 - `scripts/docs-list.ts`: docs indexer enforcing `summary`/`read_when` front matter.
 - `scripts/browser-tools.ts`: Chrome DevTools helper (see `tools.md`).
 - `scripts/update-clawdbot.sh`: update + rebuild + restart Clawdbot app (macOS).
+- `scripts/skills-audit.py`: audit skills across repo + global installs.
+  - `scan` — list orphans (global but not in repo), duplicates/drift, and local repo shadows.
+  - `prune` — delete global orphans (dry-run by default; `--execute` to apply). Never touches repo-scoped skills.
 
 ## Sync to Global Agent Settings
 Run `scripts/sync-agent-scripts.sh` to copy/update skills and slash commands into
