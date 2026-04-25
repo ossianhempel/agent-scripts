@@ -178,6 +178,34 @@ from pain, write from relief.
 Default to pain or reassurance. Switch to pure aspiration only when the
 audience is clearly past the pain stage and just wants to picture the win.
 
+### The Myth Hook (controversial without commitment)
+
+Open with a widely-believed claim you don't agree with. Then correct it.
+This lets you use a controversial, attention-grabbing statement without
+actually endorsing it.
+
+Structure:
+1. State the false/misleading claim as if it's conventional wisdom
+2. Immediately signal it's wrong ("This is one of the most repeated myths in...")
+3. Deliver the correction as the actual value
+
+Examples:
+- "Your body can only absorb 25-30g of protein per meal. Anything above that
+  gets wasted." One of the most repeated claims in fitness nutrition. It's wrong.
+- "The best time to post on Instagram is 9am on Tuesdays." Every social media
+  article says so. Here's what the data actually shows.
+- "You need to drink 8 glasses of water a day." You've heard this your whole
+  life. There's no study behind it.
+
+The hook earns the controversial framing because you're correcting the myth,
+not spreading it. Use this when you want strong scroll-stopping energy on a
+topic where there's real misinformation worth debunking.
+
+Variant (self-aware): state the false/controversial claim first, then follow
+with "...is what I would say if I was an idiot." Then give your actual take.
+The wrong claim lands as the hook, the self-dismissal signals you know better,
+the correction is the payload. Works well in video scripts and TikTok slides.
+
 ## The Rewrite Mindset
 
 When improving existing copy, the move is almost always the same: stop
