@@ -8,7 +8,8 @@ description: >-
   this copy", "rewrite this", "screenshot headlines", "landing page copy", "ad
   copy", "marketing text", "app description", "what should this button say",
   "empty state copy", "push notification copy", "what should I write",
-  "TikTok slideshow", "slideshow hook", "slideshow copy", "carousel post".
+  "TikTok slideshow", "slideshow hook", "slideshow copy", "carousel post",
+  "Reels script", "TikTok video", "UGC video", "short-form video", "video hook".
 ---
 
 # Copywriter
@@ -49,11 +50,16 @@ contains format rules, character limits, structural patterns, and examples.
   onboarding strings, permission prompts, push notifications, confirmations.
 - `references/landing-pages.md` - Hero, headline + subhead, feature sections,
   social proof, CTAs, above-the-fold structure.
-- `references/ig-captions.md` - Instagram captions for Reels, carousels, and
-  static posts. Hook structure, body, closing line, CTA, hashtags.
-- `references/tiktok-slideshow.md` - TikTok/Reels slideshow on-slide copy.
-  Slide-by-slide structure, hook rules for slide 1, payload slides, close
-  slide, Pinterest image sourcing, viral-slideshow mining workflow.
+- `references/ig-captions.md` - Caption / post description copy for IG and
+  TikTok posts. Hook structure, body, closing line, CTA, hashtags. Pairs
+  with either short-form video or slideshow/carousel.
+- `references/short-form-video.md` - Reels and TikTok video. Two modes:
+  UGC/native ("the tool, not the pitch") and 7-second hook-overlay loop.
+  Native moment structure, anti-pitch checklist, mode selection.
+- `references/slideshow-carousel.md` - TikTok slideshows and IG carousels
+  (same format on both platforms). Slide-by-slide structure, hook rules
+  for slide 1, payload slides, close slide, Pinterest sourcing, mining
+  workflow.
 - `references/social-profiles.md` - Profile copy across platforms (IG, X,
   TikTok, LinkedIn). Display name, bio structure, what to cut, before/after
   examples.
@@ -107,6 +113,17 @@ Ossian whether to add a new reference file.
     keep reading in the first two or three words. Obsess over the opener before
     you touch anything else. When an opener works, reuse it. Don't refresh copy
     just to avoid repetition.
+
+11. **The tool, not the pitch.** For organic short-form content (Reels,
+    TikTok, UGC ads), the highest-converting frame is showing the product
+    being *used* inside a real moment, not pitching it. The best calorie
+    tracker content isn't "download this amazing app" — it's a creator
+    filming their lunch and saying "let me see how many calories are in
+    this." The app is the tool that solves the moment. The viewer's
+    download intent comes from self-projection ("I want to do that too"),
+    not from being told to download. Whenever the medium is short-form
+    video and the goal is conversion, default to this frame. See
+    `references/short-form-video.md` for the full pattern.
 
 ## Sell to a Core Human Desire
 

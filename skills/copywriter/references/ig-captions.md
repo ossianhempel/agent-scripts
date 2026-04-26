@@ -1,14 +1,26 @@
 # IG Caption Reference
 
-Instagram captions for Reels, carousels, and static posts.
+Captions / post descriptions for Instagram and TikTok posts (Reels,
+carousels, slideshows, video). This file is about the caption only —
+the text under the post that pairs with the asset above.
+
+For the asset itself, see:
+- [short-form-video.md](./short-form-video.md) — Reels and TikTok video
+- [slideshow-carousel.md](./slideshow-carousel.md) — IG carousels and TikTok slideshows
 
 ## Two Caption Modes
 
 Pick the mode before you write:
 
-1. **Standard.** Educational, opinion, or story-driven. The video or carousel itself carries most of the value. Short hook, short body, closing line, CTA.
+1. **Standard.** Educational, opinion, or story-driven. The video or
+   stack itself carries most of the value. Short hook, short body,
+   closing line, CTA.
 
-2. **Viral-growth (7s video + long caption).** Paired with a 7-second looping video where the on-screen text *is* the hook and the caption *is* the value. Used to grow a new account and drive app downloads with near-zero production effort. See the section at the bottom.
+2. **Long caption (paired with hook-overlay video).** Used with the
+   7-second hook-overlay video format documented in
+   [short-form-video.md](./short-form-video.md). The video sells the
+   click; the caption is where the value gets delivered. See the
+   long-caption template at the bottom of this file.
 
 ## Pattern Over Originality
 
@@ -152,31 +164,20 @@ One small adjustment. Big difference over time.
 
 ---
 
-## Viral-Growth Mode: 7-Second Video + Long Caption
+## Long Caption (Pairs With Hook-Overlay Video)
 
-The playbook for growing a new account or pushing app downloads with minimal production effort. Built for Reels, not carousels.
+The caption format for the 7-second hook-overlay video documented in
+[short-form-video.md](./short-form-video.md). The video sold the click —
+the caption is the value delivery.
 
-### The Video
+### Rules
 
-- 7 seconds, looping. No voiceover needed. No face-cam needed.
-- Stock B-roll from Pexels, Canva, or any free short-clip library in your niche.
-- Hook text on screen for the entire 7 seconds. Not a flash. The whole clip.
-- Final 3 seconds: add a second line of text saying `read description below...`
-- The goal is not to entertain. The goal is to make people replay the video and read the caption. Replays and time-on-post are the strongest signals you can send the algorithm.
-
-### Why it works
-
-- 7 seconds is intentional. The reader cannot finish the hook before the clip ends, so it auto-replays. Two views in one session.
-- "read description below..." pulls them into a long caption. A long caption they actually read stretches time-on-post even further.
-- Replays + time-on-post = reach.
-
-### The Caption
-
-The caption is the value delivery. The video only sold the click.
-
-- Repeat the hook in the first line so it matches the on-screen text.
-- Deliver what the hook promised. If the hook is "5 signs X", write 5 specific bullets. Each bullet should feel like something the reader didn't already know.
-- Keep the bullets concrete. No filler, no "stay consistent and trust the process".
+- Repeat the on-screen hook in the first line so it matches the video.
+- Deliver what the hook promised. If the hook is "5 signs X", write 5
+  specific bullets. Each bullet should feel like something the reader
+  didn't already know.
+- Keep the bullets concrete. No filler, no "stay consistent and trust
+  the process".
 - Close with one line of validation or a next step.
 - End with the CTA and 4-6 niche hashtags.
 
@@ -214,14 +215,9 @@ input, the full caption is the output.
 - Once a post hits, reuse the same hook pattern with new angles. Generating
   the next 5-10 variations is part of the job.
 
-### Posting Cadence
-
-Start at 1-2 posts per day using the same format, only changing the hook theme. When a post hits, feed it back to the LLM and ask for more variations in the same format. Drop to 1/day once growth is compounding.
-
-Same structure, new hook theme, repeat.
-
 ### Don't
 
-- Don't change the format post to post. Lock it in.
-- Don't skip the "read description below..." overlay. It's the move.
-- Don't waste the caption on a life story. The reader came for the promise the hook made. Deliver it.
+- Don't waste the caption on a life story. The reader came for the
+  promise the hook made. Deliver it.
+- Don't pad to 5 bullets if the topic only has 3 real points. Match the
+  count to the hook, then tighten the hook.

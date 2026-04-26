@@ -1,25 +1,31 @@
-# TikTok Slideshow
+# Slideshow / Carousel
 
-Guide for writing TikTok (and Reels / IG carousel) slideshow copy. A
-slideshow is a stack of static images with text overlays that auto-advance.
-No voiceover, no face-cam, no editing skill required — which is why it's
-one of the highest-leverage organic formats.
+Guide for writing static-stack copy: TikTok slideshows and Instagram
+carousels. Functionally the same format — a stack of static images with
+text, swiped or auto-advanced. Same rules apply on both platforms, so
+this reference covers them together.
 
-For caption copy that pairs with the slideshow (the post description), see
-[ig-captions.md](./ig-captions.md). For hook formulas and emotional
-framing, see that file too — the rules are the same. This file is about
-the on-slide copy itself.
+A static stack is one of the highest-leverage organic formats: zero
+production cost, the reader controls pace (so dwell time is high), and
+replays/swipe-backs are automatic when the hook is strong.
 
-## Why Slideshows Win
+For caption / post description copy that pairs with the stack, see
+[ig-captions.md](./ig-captions.md). For short-form video (Reels and
+TikTok video), see [short-form-video.md](./short-form-video.md).
 
-- Zero production cost. Images from Pinterest, text overlaid in any editor.
+## Why Static Stacks Win
+
+- Zero production cost. Images from Pinterest or stock libraries, text
+  overlaid in any editor.
 - Readers control the pace, so they dwell longer than on video.
-- Replays are automatic — if the hook is strong, viewers tap back to slide 1.
-- Time-on-post and replays are the two strongest signals to the algorithm.
+- Replays / swipe-backs are automatic — if the hook is strong, viewers
+  go back to slide 1.
+- Time-on-post and replays are the two strongest signals to the
+  algorithm on both TikTok and Instagram.
 
 ## Slide Structure
 
-A slideshow has three jobs across three slide groups. Lock this structure.
+A stack has three jobs across three slide groups. Lock this structure.
 
 ```
 Slide 1         → Hook. Stop the scroll.
@@ -105,6 +111,23 @@ For app marketing, the CTA lives in three places at once
 
 Don't cram the CTA onto every slide. It trains the reader to ignore it.
 
+## Platform Notes
+
+The format is identical on both platforms, but a few small differences
+matter:
+
+- **Slide count.** TikTok caps at 35 images, IG carousels at 20. Both
+  formats land best at 5-8 regardless of cap.
+- **Auto-advance vs swipe.** TikTok slideshows auto-advance with timing
+  per slide; IG carousels are user-swiped. Keep slide text short enough
+  to read in 2-3 seconds either way — the auto-advance pace sets the
+  ceiling.
+- **Cover frame.** IG lets you set a cover image separate from slide 1;
+  TikTok shows slide 1 as the cover. Treat slide 1 as the cover for both
+  to keep the same asset working cross-platform.
+- **Aspect ratio.** Use 1080×1350 (4:5) — works on both, doesn't crop
+  the hook on either.
+
 ## Images
 
 The text carries the message. The image carries the aesthetic. Match
@@ -124,24 +147,25 @@ the niche, don't overthink it.
 
 ## The Mining Workflow
 
-Never invent slideshow formats from scratch. Mine what's already working.
+Never invent stack formats from scratch. Mine what's already working.
 
-1. **Find viral slideshows in the niche.** Search TikTok for niche
-   keywords, filter by Most Liked or Most Recent.
+1. **Find viral stacks in the niche.** Search TikTok and Instagram for
+   niche keywords, filter by Most Liked or Most Recent.
 2. **Save the hooks that repeat.** If you see the same format three
    times from different accounts, it's a pattern worth copying.
-3. **Analyze one winner in depth.** For a slideshow that's clearly
-   viral, break down: what's the hook, why does it work (curiosity /
-   FOMO / empathy), what's the structural pattern.
+3. **Analyze one winner in depth.** For a stack that's clearly viral,
+   break down: what's the hook, why does it work (curiosity / FOMO /
+   empathy), what's the structural pattern.
 4. **Generate 5-10 variations of the hook** for your niche, same
    structure, different angle. This is the agent's job when running
    this skill — don't hand it back to the user.
 5. **Build a hook library.** Save winners to a running file so future
    posts start from proven patterns instead of a blank page.
 
-## Analyzing a Viral Slideshow
+## Analyzing a Viral Stack
 
-When the user shares a slideshow to learn from, run this analysis:
+When the user shares a slideshow or carousel to learn from, run this
+analysis:
 
 1. **The hook.** Quote the first-slide text verbatim.
 2. **Why it works.** Pick one: curiosity / FOMO / empathy / warning /
@@ -151,7 +175,7 @@ When the user shares a slideshow to learn from, run this analysis:
 4. **Variations.** Generate 5-7 hooks in the same structure, different
    angles, tuned to the user's niche. Under 10 words each.
 5. **Pinterest search terms.** Suggest 5-10 short phrases that match
-   the visual style of the reference slideshow — aesthetic keywords,
+   the visual style of the reference stack — aesthetic keywords,
    composition notes, niche-specific visuals.
 
 ## Cadence
