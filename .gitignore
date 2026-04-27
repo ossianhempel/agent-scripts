@@ -1,4 +1,6 @@
 .claude/settings.local.json
+.claude/worktrees/
+.playwright-mcp/
 /.agent-readiness/
 /tools/agent-readiness/node_modules/
 /tools/agent-readiness/dist/
