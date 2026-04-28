@@ -80,6 +80,45 @@ The structure is always the same: a real-life trigger that makes the app
 the obvious next move. The creator never says "I love this app." They
 just *use it*.
 
+### Secondhand Discovery (Borrowed Trust)
+
+A variant where the creator isn't the user — they're the messenger. The
+app gets introduced through someone *they* know, not through their own
+discovery. Underrated because it sidesteps the "why are you telling me
+about this" suspicion that direct first-person discovery triggers.
+
+> "I found this app" → reads as promo.
+> "my sister uses this every night" → reads as a friend telling you something.
+
+Borrowed trust converts harder than self-promotion because the viewer's
+brain pattern-matches it as peer recommendation, not advertising. The
+creator is doing what the viewer would do — passing on something that
+worked for someone close to them.
+
+Patterns:
+
+- `"my sister has been using this every night and her skin is insane now"`
+- `"this girl in my class put me on to this and I haven't stopped"`
+- `"my friend showed me this app last week, I'm obsessed"`
+- `"my roommate uses this every morning, finally tried it"`
+- `"my coworker won't shut up about this so I caved"`
+
+Rules for this variant:
+
+- **The relationship has to feel specific.** "My friend" with no detail
+  reads as fake. "My sister", "this girl in my class", "my roommate" —
+  named roles with implied proximity work better than generic "a friend".
+- **Don't claim the source said something they wouldn't say.** "My
+  sister told me this app changed her life" sounds scripted. "My sister
+  uses this every night" is a behavior observation, which is harder to
+  fake-detect.
+- **The creator's reaction sells it, not the source's endorsement.**
+  End on *the creator* trying it and reacting, not on a quote from the
+  source. Self-projection still does the work.
+- **Avoid if the relationship is implausible.** A 19-year-old saying
+  "my CFO friend uses this for budgeting" breaks the frame. The named
+  source has to fit the creator's life.
+
 ### Rules
 
 - **No CTA on the video itself.** No "download now", no logo flash, no
