@@ -9,8 +9,9 @@ Subcommands:
   prune  - Remove global skills that are not in the repo's skills/ folder.
            Dry-run by default; pass --execute to actually delete.
 
-Repo scope (authoritative source):
-  <repo>/skills/*
+Repo scopes (authoritative source):
+  <repo>/skills/*        - synced to all global installs
+  <repo>/local-skills/*  - kept in this repo only, never synced
 
 Global scopes (managed — `prune` may delete orphans here):
   ~/.agents/skills/*   ~/.claude/skills/*
@@ -33,6 +34,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 REPO_SKILLS = REPO_ROOT / "skills"
+LOCAL_REPO_SKILLS = REPO_ROOT / "local-skills"
 
 HOME = Path.home()
 GLOBAL_SCOPES = [
@@ -93,13 +95,31 @@ def discover_local_scopes() -> list[Path]:
 
 def cmd_scan(args: argparse.Namespace) -> int:
     repo_skills = set(list_skills(REPO_SKILLS))
+    local_only = set(list_skills(LOCAL_REPO_SKILLS))
+    known_repo = repo_skills | local_only
     print(f"Repo skills ({REPO_SKILLS}): {len(repo_skills)}")
+    print(f"Local-only skills ({LOCAL_REPO_SKILLS}): {len(local_only)}")
+
+    # Surface local-only skills that leaked into global installs — they should
+    # never be synced. Always informational; not counted as drift.
+    leaked: dict[str, list[Path]] = {}
+    for scope in GLOBAL_SCOPES:
+        for name in list_skills(scope):
+            if name in local_only:
+                leaked.setdefault(name, []).append(scope / name)
+    if leaked:
+        print()
+        print("== Local-only skills present in global installs (should be removed) ==")
+        for name in sorted(leaked):
+            print(f"  {name}")
+            for path in leaked[name]:
+                print(f"    - {path}")
 
     # 1. Orphans: global skills not in repo
     orphans: dict[str, list[Path]] = {}
     for scope in GLOBAL_SCOPES:
         for name in list_skills(scope):
-            if name not in repo_skills:
+            if name not in known_repo:
                 orphans.setdefault(name, []).append(scope / name)
 
     print()
@@ -173,6 +193,8 @@ def cmd_scan(args: argparse.Namespace) -> int:
 
 def cmd_prune(args: argparse.Namespace) -> int:
     repo_skills = set(list_skills(REPO_SKILLS))
+    local_only = set(list_skills(LOCAL_REPO_SKILLS))
+    known_repo = repo_skills | local_only
     if not repo_skills:
         print(f"Refusing to prune: repo skills dir {REPO_SKILLS} is empty or missing.", file=sys.stderr)
         return 2
@@ -180,7 +202,7 @@ def cmd_prune(args: argparse.Namespace) -> int:
     targets: list[Path] = []
     for scope in GLOBAL_SCOPES:
         for name in list_skills(scope):
-            if name not in repo_skills:
+            if name not in known_repo:
                 targets.append(scope / name)
 
     if not targets:

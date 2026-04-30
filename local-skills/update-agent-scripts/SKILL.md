@@ -13,6 +13,11 @@ description: >
 
 Two workflows live here: **sync** (push repo → installs) and **audit** (compare installs ↔ repo, clean up).
 
+## Repo layout
+
+- `skills/` — synced to all global installs (`~/.agents`, `~/.claude`, Codex, Gemini, Cursor, Copilot).
+- `local-skills/` — kept in this repo only. Never synced. Use this for skills only relevant when working inside agent-scripts itself (e.g. this skill). The audit treats both roots as "in repo" so local-only skills are never flagged as orphans. If a local-only skill is detected inside a global install, the audit surfaces it under "Local-only skills present in global installs" so it can be cleaned up.
+
 ## Workflow: Sync
 
 When asked to update or sync agent-scripts:
