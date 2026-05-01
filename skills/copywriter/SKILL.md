@@ -169,6 +169,47 @@ should be "that's me" or "I want that" - not "what is this?"
 
 Trigger the desire. Then show the product as the relief.
 
+### Hook Gut Check
+
+A hook's only job is to provoke an involuntary emotional reaction *before*
+the reader decides whether to keep going. Recognition, fear, indignation,
+curiosity, "wait, what?", "that's me" — something has to fire. If the first
+line could be read out loud at a dinner party and get zero reaction, it is
+not a hook. It is a sentence.
+
+Doesn't matter how good the rest of the piece is. If the hook doesn't catch,
+nothing after it gets consumed.
+
+**The cold-stranger test.** Read only the hook to someone who has no context.
+Do they lean in, raise an eyebrow, ask a follow-up, or feel personally
+called out? If they nod politely, kill it and rewrite.
+
+**Passive hook anti-patterns** (rewrite immediately if you catch yourself
+writing one):
+
+- **Topic announcements**: "Here's how to...", "Let's talk about...",
+  "A quick note on...", "Today I want to share..." — these announce that
+  content is coming instead of being the content.
+- **Soft observations**: "It's interesting that...", "A lot of people
+  don't realize...", "Something I've been thinking about..." — no stakes,
+  no friction, no reason to care.
+- **Neutral descriptions of the product/topic**: "This app helps you...",
+  "An easy way to...", "A guide to..." — describing, not provoking.
+- **Throat-clearing openers**: "So,", "Okay,", "Alright,", "Look," — the
+  first word is doing nothing.
+- **Vague stakes**: "This could change everything", "You need to know
+  this" — claims a reaction instead of triggering one.
+- **Setup without payoff in view**: hooks that promise the interesting
+  thing is coming later. The interesting thing is the hook.
+
+If the hook isn't doing one of these, it's probably passive: naming a
+specific fear, contradicting a belief the reader holds, calling out a
+mistake by name, stating a number that sounds wrong, diagnosing the
+reader, or showing a result that shouldn't be possible.
+
+Strong hook = the reader could not have scrolled past it without feeling
+something. That's the bar. Nothing softer counts.
+
 ### Pain Beats Aspiration
 
 Readers click, scroll, and download to avoid pain more than to chase
