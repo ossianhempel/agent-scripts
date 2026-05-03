@@ -1,27 +1,29 @@
 ---
 name: clerk-setup
-description: Add Clerk authentication to any project by following the official quickstart guides.
+description: Add Clerk authentication to any project. Fallback for frameworks the Clerk CLI doesn't cover (iOS Swift, Android, Chrome ext, vanilla JS, Expo) and for migrations from other auth providers.
 license: MIT
 allowed-tools: WebFetch
 metadata:
   author: clerk
-  version: "2.1.0"
+  version: "3.0.0"
 ---
 
 # Adding Clerk
 
-> **Version**: Check `package.json` for the SDK version — see `clerk` skill for the version table. Core 2 differences are noted inline with `> **Core 2 ONLY (skip if current SDK):**` callouts.
+> **First, check whether you should be in `clerk-cli` instead.** The Clerk CLI (`clerk init`) handles full setup for **Next.js, React, Vue, Nuxt, Astro, React Router, TanStack Start, Remix**. If the project is on one of those, switch to `clerk-cli` — it does everything below faster and with less manual work.
+>
+> **This skill is for the cases the CLI does NOT cover:** iOS Swift, Android, Chrome extension, vanilla JavaScript, Expo (only partial CLI support today). It's also where the **migration-from-another-auth-provider** plan lives, regardless of framework, and the shadcn/ui theme step.
 
-This skill sets up Clerk for authentication by following the official quickstart documentation.
+> **Version**: Check `package.json` for the SDK version — see `clerk` skill for the version table. Core 2 differences are noted inline with `> **Core 2 ONLY (skip if current SDK):**` callouts.
 
 ## Quick Reference
 
 | Step | Action |
 |------|--------|
-| 1. Detect framework | Check `package.json` dependencies |
+| 1. Detect framework / platform | Check `package.json` and project files |
 | 2. Fetch quickstart | Use WebFetch on the appropriate docs URL |
 | 3. Follow instructions | Execute steps; create `proxy.ts` (Next.js <=15: `middleware.ts`) |
-| 4. Get API keys | From [dashboard.clerk.com](https://dashboard.clerk.com/last-active?path=api-keys) |
+| 4. Get API keys | From [dashboard.clerk.com](https://dashboard.clerk.com/last-active?path=api-keys) — or use `clerk env pull` from `clerk-cli` if applicable |
 
 > If the project has `components.json` (shadcn/ui), apply the shadcn theme after setup. See `custom-ui/` → shadcn Theme.
 
@@ -54,14 +56,14 @@ For other platforms:
 ```
 User Request: "Add Clerk" / "Add authentication"
     │
-    ├─ Read package.json
+    ├─ Read package.json + project files
+    │
+    ├─ CLI supports the framework? (Next.js, React, Vue, Nuxt, Astro, React Router, TanStack Start, Remix)
+    │   └─ YES → Stop. Use the `clerk-cli` skill instead.
     │
     ├─ Existing auth detected?
-    │   ├─ YES → Audit → Migration plan
-    │   └─ NO → Fresh install
-    │
-    ├─ Identify framework → WebFetch quickstart → Follow instructions
-    │   └─ Next.js? → Create proxy.ts (Next.js <=15: middleware.ts)
+    │   ├─ YES → Audit → Migration plan (this skill)
+    │   └─ NO → Fresh install via WebFetch quickstart
     │
     └─ components.json exists? → YES → Apply shadcn theme (see custom-ui/)
 ```

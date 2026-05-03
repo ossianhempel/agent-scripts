@@ -25,10 +25,17 @@ All skills are written for the current SDK. When something differs in Core 2, it
 
 ## By Task
 
+**Operating the Clerk CLI** → Use `clerk-cli`
+- `clerk init`, `clerk env pull`, `clerk apps create/list`, `clerk config patch/put`, `clerk doctor`
+- `clerk api` for any Backend or Platform API call (users, orgs, sessions, JWT templates, webhooks, instance config)
+- Auth, project linking, agent-mode/sandbox handling
+- **Prefer this for any Clerk management or backend-data task** — it replaces dashboard clicking and raw HTTP
+
 **Adding Clerk to your project** → Use `clerk-setup`
-- Framework detection and quickstart
-- Environment setup, API keys, Keyless flow
-- Migration from other auth providers
+- Fallback for frameworks the CLI doesn't cover: iOS Swift, Android, Chrome extension, vanilla JS, Expo
+- Migration plans from other auth providers (NextAuth, Supabase, Firebase, Auth0, etc.)
+- shadcn/ui theme application
+- For CLI-supported frameworks (Next.js, React, Vue, Nuxt, Astro, React Router, TanStack Start, Remix), defer to `clerk-cli`
 
 **Custom sign-in/sign-up UI** → Use `clerk-custom-ui`
 - Custom authentication flows with `useSignIn` / `useSignUp` hooks
@@ -57,20 +64,20 @@ All skills are written for the current SDK. When something differs in Core 2, it
 - Source-driven patterns from `clerk-ios`
 - Do not use for Expo or React Native projects
 
-**Backend REST API** → Use `clerk-backend-api`
-- Browse API tags and endpoints
-- Inspect endpoint schemas
-- Execute API requests with scope enforcement
+**Backend REST API** → Use `clerk-cli`
+- `clerk api ls <keyword>` to discover endpoints
+- `clerk api <path>` for authenticated calls with auto key resolution and `--dry-run` safety
+- Replaces the previous `clerk-backend-api` skill
 
 ## Quick Navigation
 
 If you know your task, you can directly access:
-- `/clerk-setup` - Framework setup
+- `/clerk-cli` - Clerk CLI operations + Backend/Platform API
+- `/clerk-setup` - Fallback framework setup (iOS, Android, Chrome ext, vanilla JS, Expo) + migrations
 - `/clerk-custom-ui` - Custom flows & appearance
 - `/clerk-nextjs-patterns` - Next.js patterns
 - `/clerk-webhooks` - Webhooks
 - `/clerk-testing` - Testing
 - `/clerk-swift` - Swift/native iOS
-- `/clerk-backend-api` - Backend REST API
 
 Or describe what you need and I'll recommend the right one.
