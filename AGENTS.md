@@ -51,6 +51,7 @@ Define finishing criteria for yourself before you start: what does "done" look l
 - Avoid manual git stash; if Git auto-stashes during pull/rebase, that's fine (hint, not hard guardrail).
 - If user types a command ("pull and push"), that's consent for that command.
 - No amend unless asked.
+- Auth fail (gh/git/ssh)? Likely on work account — try `gh auth switch` (to ossianhempel) before debugging further.
 - Big review: `git --no-pager diff --color=never`.
 - Multi-agent: check `git` status/diff before edits; ship small commits.
 
