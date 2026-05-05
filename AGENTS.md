@@ -54,7 +54,6 @@ Define finishing criteria for yourself before you start: what does "done" look l
 - Auth fail (gh/git/ssh)? Likely on work account — try `gh auth switch` (to ossianhempel) before debugging further.
 - Big review: `git --no-pager diff --color=never`.
 - Multi-agent: check `git` status/diff before edits; ship small commits.
-- `gh` "Repository not found" / 404 on a repo you know exists → wrong GitHub account is active. Run `gh auth status` to see accounts, then `gh auth switch` to flip to the right one (personal vs work). Don't give up after one 404.
 
 ## Critical Thinking
 - Conflicts: call out; pick safer path.
