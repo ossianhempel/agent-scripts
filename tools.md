@@ -101,19 +101,6 @@ gh pr view <url> --comments --files
 gh run list / gh run view <id>
 ```
 
-### Multiple accounts
-
-Two accounts are configured: `ossianhempel` (personal) and `ossian-hempel_hmgroup` (work). Only one is active at a time. If `gh` returns **"Repository not found"** or 404 on a repo you know exists, the wrong account is active.
-
-```bash
-gh auth status        # see which account is active
-gh auth switch        # interactively switch
-gh auth switch --user ossianhempel              # force personal
-gh auth switch --user ossian-hempel_hmgroup     # force work
-```
-
-Personal repos (e.g. `ossianhempel/agent-scripts`) need the personal account; H&M repos need the work account. Switch, then retry the failed command — don't give up after one 404.
-
 ---
 
 ## gog (gogcli)
