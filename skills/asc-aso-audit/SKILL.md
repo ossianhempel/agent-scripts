@@ -1,17 +1,17 @@
 ---
 name: asc-aso-audit
-description: Run an offline ASO audit on canonical App Store metadata under `./metadata` and surface keyword gaps using Astro MCP. Use after pulling metadata with `asc metadata pull`.
+description: Run an offline ASO audit on canonical App Store metadata under `./metadata` and surface keyword gaps, competitor signals, and review themes using OpenASO MCP. Use after pulling metadata with `asc metadata pull`.
 ---
 
 # asc ASO audit
 
-Run a two-phase ASO audit: offline checks against local metadata files, then keyword gap analysis via Astro MCP.
+Run a two-phase ASO audit: offline checks against local metadata files, then live keyword, competitor, and review research via OpenASO MCP.
 
 ## Preconditions
 
 - Metadata pulled locally into canonical files via `asc metadata pull --app "APP_ID" --version "1.2.3" --dir "./metadata"`.
 - If metadata came from `asc migrate export` or `asc localizations download`, normalize it into the canonical `./metadata` layout before running this skill.
-- For Astro gap analysis: app tracked in Astro MCP (optional — offline checks run without it).
+- For Phase 2 research: OpenASO running locally with the target app added, and OpenASO MCP connected to this AI client (optional — offline checks run without it). Setup docs: https://openaso.thirdtechapps.com/docs/mcp/setup
 
 ## Before You Start
 
@@ -115,25 +115,49 @@ How to check:
 4. Report missing keywords per locale — recommend weaving them naturally into existing sentences
 5. Do NOT flag: Latin-script keywords in non-Latin descriptions (e.g., "quran" in Cyrillic text) — these target separate search paths
 
-## Phase 2: Astro MCP Keyword Gap Analysis
+## Phase 2: OpenASO MCP Keyword & Competitor Research
 
-If Astro MCP is available and the app is tracked, run keyword gap analysis. **Run this per store/locale, not just for the US store** — keyword popularity varies dramatically across markets.
+If OpenASO MCP is connected and the app is added in OpenASO, run live keyword, competitor, and review research. **Cover the relevant store countries, not just the US store** — keyword popularity, competitors, and review themes vary dramatically across markets.
+
+OpenASO is driven primarily by **natural-language asks**: the assistant chooses the right OpenASO tools (Apps, Keywords, Rankings, Reviews, Competitors, Screenshots, Websites, Localization) and may invoke OpenASO's built-in research prompts (review themes, keyword brief, competitor landscape, localization analysis, ASO action plan). Use the prompts below as starting points and adapt to the audit context.
 
 ### Steps
 
-1. **Get current keywords**: Call `get_app_keywords` with the app ID to retrieve tracked keywords and their current rankings.
+1. **Verify the app is tracked.** Ask: *"List my tracked OpenASO apps."* If the target app isn't present, ask the user to add it in OpenASO (search by name or App Store ID) and re-run. Don't try to invent app IDs or track on the user's behalf.
 
-2. **Ensure multi-store tracking**: For each locale with a corresponding App Store territory (e.g., `ar-SA` → Saudi Arabia, `fr-FR` → France, `tr` → Turkey), use `add_keywords` to add keyword tracking in that store. Without this, `search_rankings` returns empty for non-US stores.
+2. **Cover the relevant storefronts.** For every locale present in `./metadata` that corresponds to a real App Store territory (e.g., `ar-SA` → Saudi Arabia, `fr-FR` → France, `tr` → Turkey, `de-DE` → Germany), ask: *"Refresh rankings and reviews for [app] in [country list]."* OpenASO refreshes stale data before computing gaps. If countries aren't tracked yet, ask: *"Add tracking for [app] in [country list]."*
 
-3. **Extract competitor keywords**: Call `extract_competitors_keywords` with 3-5 top competitor app IDs to find keyword gaps. This is the highest-value Astro tool — it reveals keywords competitors rank for that you don't. Run this per store when possible.
+3. **Keyword gap research (per country).** Trigger OpenASO's built-in keyword brief:
+   > *"Review my tracked keywords for [app] in [country], find weak or noisy terms, score keyword quality, and suggest 10 keywords worth testing next. Use shared-keyword competitor evidence."*
 
-4. **Get suggestions**: Call `get_keyword_suggestions` with the app ID for additional recommendations based on category analysis.
+   This is the highest-value pass — OpenASO scores keyword quality, checks ranking evidence, and uses shared rankings to surface terms competitors hold that you don't.
 
-5. **Check current rankings**: Call `search_rankings` to see where the app currently ranks for tracked keywords in each store.
+4. **Competitor landscape.** Trigger the competitor landscape prompt:
+   > *"Find competitors that rank on the same keywords as [app] in [country], then compare their ratings, review themes, screenshots, and positioning."*
 
-6. **Diff against metadata**: Compare suggested and competitor keywords against the tokens present in `subtitle`, `name` (if available), and `keywords` fields from the local metadata.
+   Useful for separating real competitors (recurring across many keywords) from one-offs, and for spotting positioning angles you can mirror or counter.
 
-7. **Surface gaps**: Report all gaps ranked by popularity score (highest first). Include the source (competitor analysis vs. suggestion).
+5. **Optional — review theme pass.** When refreshing description, promotional text, or what's-new copy, trigger the review theme prompt:
+   > *"Summarize the main praise, complaints, feature requests, and pricing objections for [app] in [country list]. Don't quote individual reviewers."*
+
+   The vocabulary users repeat in reviews is the vocabulary that converts in copy. Feed it back into Phase 1's description-coverage check.
+
+6. **Optional — localization opportunities.** When the audit spans multiple locales:
+   > *"Compare [app] and competitors across [list of locales]. Recommend where metadata-only localization is enough and where screenshots should be localized too."*
+
+   Pairs naturally with Phase 1 Check #5 (cross-locale keyword gaps).
+
+7. **Diff against local metadata.** For every keyword OpenASO suggests, check whether it already appears as a token in `subtitle`, `name` (if available), or `keywords` from the local metadata files — apply the same tokenization rules as Phase 1 Check #1 (CJK character split, Arabic prefix-stripping, etc.). Surface only the genuine gaps.
+
+8. **Surface gaps.** Report results ranked by OpenASO's quality/popularity score (highest first), grouped by country. Always include the source (competitor evidence vs. keyword suggestion vs. review-vocabulary insight).
+
+### Prompt discipline
+
+OpenASO works best with focused asks. When invoking it:
+- Name the app and the countries explicitly. ("Use US and UK only" beats "use the main markets".)
+- State the outcome you want. ("10 keywords worth testing this week" beats "any keyword ideas".)
+- Start narrow on the first pass (1–2 countries), widen after the first result lands.
+- Tell OpenASO when small live refreshes are okay vs. when to use only stored data — refreshes cost API time.
 
 ### Cross-Field Combo Strategy
 
@@ -145,9 +169,10 @@ Flag high-value combos in recommendations.
 
 ### Skip Conditions
 
-- Astro MCP not connected → skip with note: "Connect Astro MCP for keyword gap analysis"
-- App not tracked in Astro → skip with note: "Add app to Astro with `mcp__astro__add_app` for gap analysis"
-- Store not tracked for a locale → add tracking with `add_keywords` before querying
+- OpenASO MCP not connected → skip Phase 2 with note: *"Connect OpenASO MCP to run keyword and competitor research. Setup: https://openaso.thirdtechapps.com/docs/mcp/setup"*
+- OpenASO not running (HTTP transport) → ask the user to launch OpenASO and start the MCP server, then retry
+- App not added in OpenASO → skip with note: *"Add [app] to OpenASO (search or App Store ID), then re-run the audit"*
+- Country not tracked for a locale → ask OpenASO to add tracking before querying that store
 
 ## Output Format
 
@@ -177,11 +202,12 @@ Present results as a single audit report. The report covers only the latest vers
 
 **Summary:** X errors, Y warnings across Z locales
 
-#### Keyword Gap Analysis (Astro MCP)
+#### Keyword Gap Analysis (OpenASO MCP)
 
-| Keyword | Popularity | In Metadata? | Suggested Action |
-|---------|-----------|--------------|-----------------|
-| quran recitation | 72 | ❌ | Add to keywords |
+| Keyword | Country | Score | Source | In Metadata? | Suggested Action |
+|---------|---------|-------|--------|--------------|------------------|
+| quran recitation | US | 72 | competitor evidence | ❌ | Add to keywords |
+| namaz vakti | TR | 66 | suggestion (combo with subtitle) | partial | Add "namaz" to keywords |
 
 #### Recommendations
 
@@ -194,7 +220,7 @@ Present results as a single audit report. The report covers only the latest vers
 ## Notes
 
 - Offline checks work without any network access — they read local files only.
-- Astro gap analysis is additive — the audit is useful even without it.
+- OpenASO research is additive — the audit is useful even without it.
 - Run this skill after `asc metadata pull` to ensure canonical metadata files are current.
 - For keyword-only follow-up after the audit, prefer the canonical keyword workflow:
   - `asc metadata keywords diff --app "APP_ID" --version "1.2.3" --dir "./metadata"`

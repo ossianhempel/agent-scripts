@@ -18,7 +18,7 @@ Rules enforced by the asc-aso-audit skill. Each rule links to the check that tes
 - **Do not use the app name in keywords.** It is already indexed.
 - **Avoid plurals if the singular is already present** — Apple handles stemming.
 - **Prefer single words over multi-word phrases** — single words enable more cross-field combinations and use fewer characters.
-- **Always validate with popularity data** — never guess keyword value. Use Astro MCP or similar tools to check popularity scores before making swaps.
+- **Always validate with popularity data** — never guess keyword value. Use OpenASO MCP (or a similar ASO tool) to check popularity scores and competitor ranking evidence before making swaps.
 
 ## Character Limits
 
@@ -36,8 +36,8 @@ Rules enforced by the asc-aso-audit skill. Each rule links to the check that tes
 - **Localize keywords per market** — do not just translate your primary keywords. Research what users in each locale actually search for.
 - **English (US) keywords may carry into other English-speaking storefronts** but dedicated localization always outperforms.
 - **Identical keyword fields across locales** usually indicates untranslated/unlocalized metadata.
-- **Track keywords in each locale's store** — keyword popularity varies dramatically across territories. A keyword with 70 popularity in the US store may have 5 popularity in France. Use Astro `add_keywords` to set up tracking per store before analyzing.
-- **Use competitor analysis per store** — top competitors differ by market. Run `extract_competitors_keywords` with locale-relevant competitor apps.
+- **Track keywords in each locale's store** — keyword popularity varies dramatically across territories. A keyword with 70 popularity in the US store may have 5 popularity in France. Ask OpenASO to add tracking for the relevant App Store countries before analyzing (e.g., *"Add tracking for [app] in Saudi Arabia, France, and Turkey"*).
+- **Use competitor analysis per store** — top competitors differ by market. In OpenASO, ask for the per-country competitor landscape (*"Find competitors that rank on the same keywords as [app] in [country]"*) before pulling competitor keywords.
 
 ## Non-Latin Script Rules
 
