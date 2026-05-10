@@ -63,6 +63,14 @@ contains format rules, character limits, structural patterns, and examples.
 - `references/social-profiles.md` - Profile copy across platforms (IG, X,
   TikTok, LinkedIn). Display name, bio structure, what to cut, before/after
   examples.
+- `references/obsidian-staging.md` - Where finished slideshow / video /
+  single-image copy gets written so Ossian can copy-paste it into
+  TikTok and Instagram. Open this whenever the deliverable is a
+  ready-to-post entry for PlateSnap, GainsLog, or Walkmon.
+- `references/b2c-mobile.md` - Consumer mobile apps. The "dumb it down"
+  principle: 3-second value, 3rd-grader language, can't-get-lost buttons.
+  Open this whenever the target is a B2C mobile app (App Store, ads,
+  paywalls, onboarding).
 
 If the medium isn't covered, fall back to the core principles below and ask
 Ossian whether to add a new reference file.
@@ -293,6 +301,13 @@ describing features, show what changes for the user.
 7. **Offer 2–3 variants** when there's a clear creative choice (tone, angle,
    length). Don't drown Ossian in 10 options - give the strongest 2–3 with a
    one-line note on what each is optimizing for.
+8. **Stage finished social copy in Obsidian.** When the deliverable is a
+   ready-to-post slideshow, video, or single-image post for one of
+   Ossian's apps (PlateSnap, GainsLog, Walkmon), append the final
+   version to that app's `Posts - Staging.md` file in the vault using
+   the locked entry format. See
+   [references/obsidian-staging.md](references/obsidian-staging.md).
+   Drafts stay in chat; greenlit copy goes to staging.
 
 ## Output Format
 

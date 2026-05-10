@@ -5,7 +5,9 @@ platforms are functionally the same surface — same formats win on both, so
 this reference covers them together. For the post description that pairs
 with the video, see [ig-captions.md](./ig-captions.md). For static stacks
 (carousels and TikTok slideshows), see
-[slideshow-carousel.md](./slideshow-carousel.md).
+[slideshow-carousel.md](./slideshow-carousel.md). For where finished
+video copy (hook overlay, per-beat overlays, caption) lands in
+Obsidian for copy-paste, see [obsidian-staging.md](./obsidian-staging.md).
 
 ## Two Modes
 

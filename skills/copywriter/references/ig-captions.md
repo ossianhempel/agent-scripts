@@ -7,6 +7,7 @@ the text under the post that pairs with the asset above.
 For the asset itself, see:
 - [short-form-video.md](./short-form-video.md) — Reels and TikTok video
 - [slideshow-carousel.md](./slideshow-carousel.md) — IG carousels and TikTok slideshows
+- [obsidian-staging.md](./obsidian-staging.md) — where the finished caption + asset overlays go in the vault for copy-paste
 
 ## Two Caption Modes
 

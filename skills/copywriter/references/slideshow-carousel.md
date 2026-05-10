@@ -11,7 +11,9 @@ replays/swipe-backs are automatic when the hook is strong.
 
 For caption / post description copy that pairs with the stack, see
 [ig-captions.md](./ig-captions.md). For short-form video (Reels and
-TikTok video), see [short-form-video.md](./short-form-video.md).
+TikTok video), see [short-form-video.md](./short-form-video.md). For
+where the finished, copy-paste-ready stack lands in Obsidian, see
+[obsidian-staging.md](./obsidian-staging.md).
 
 ## Why Static Stacks Win
 
