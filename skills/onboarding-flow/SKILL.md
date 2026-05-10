@@ -16,6 +16,17 @@ This is a multi-phase process. Follow each phase in order — but ALWAYS check t
 
 ---
 
+## Companion Skills
+
+Onboarding works best when it combines static screens, **short motion videos** demonstrating core value, and **interactive demos** the user can touch. Two sibling skills handle the heavy lifting; reach for them at the right phase instead of reinventing the work here.
+
+- **`create-onboarding-video`** — produces short (3–8s per beat), punchy Remotion videos that show a single feature in action by animating cropped UI pieces (a button being tapped, a row reordering, a sheet sliding up). Use this whenever an onboarding screen needs a video instead of (or above) a static screenshot — the Welcome hook, a feature-spotlight beat, the processing-to-result reveal, or a paywall preview. The output renders to MP4 and drops cleanly into a SwiftUI/React Native video player. Hand it 2–4 stills per screen plus a one-line "what should this beat communicate" brief and let it produce the asset. **Don't try to design those videos in this skill — invoke `create-onboarding-video` instead.**
+- **`copywriter`** (with `references/in-app-copy.md` and `references/short-form-video.md`) — for headlines, button labels, video on-screen overlay text, and CTA copy on every screen. Invoke it when drafting screen content in Phase 4.
+
+The pattern: this skill owns the **flow architecture** (which screens, in what order, with what psychological purpose). The companion skills own the **assets** that go inside each screen.
+
+---
+
 ## Feedback Log (DO THIS FIRST)
 
 **At the start of every session, before doing anything else**, read the file
@@ -126,12 +137,14 @@ The flow uses 11 screen archetypes. You MUST include screens marked [REQUIRED]. 
 #### Screen 1: WELCOME [REQUIRED]
 **Objective:** Hook — show the end state, create desire.
 - Bold headline stating the transformation outcome (not the app name)
-- Show a preview/mockup of the app in use (reference an actual app screen from the codebase)
+- Show the app in use — **strongly prefer a short looping motion video over a static screenshot**. A 3–6 second clip of the core feature actually working (a workout being logged, a recipe being swiped, a meal being scanned) outperforms any still image. Static fallback only if video isn't feasible yet.
 - "Get Started" primary CTA
 - "Log in" text link (only if user wants sign-in)
 - Progress bar at top (shows throughout entire flow)
 
-**Pattern:** "Welcome to your new [transformation outcome]" + device preview showing the app's best screen.
+**Pattern:** "Welcome to your new [transformation outcome]" + autoplaying muted loop of the app's core action.
+
+**Producing the video:** Don't design or storyboard the clip here — invoke the `create-onboarding-video` skill with a one-line brief ("show the calorie-scan flow: photo → result card") and 2–4 stills of the relevant screen. It will return an MP4 (and a portrait variant) ready to embed.
 
 #### Screen 2: GOAL QUESTION [REQUIRED]
 **Objective:** Get the user to self-identify their primary goal. This creates psychological investment — they've now told the app what they want, which makes them feel the app owes them a solution.
@@ -179,6 +192,29 @@ The flow uses 11 screen archetypes. You MUST include screens marked [REQUIRED]. 
 - Each item has a relevant icon/illustration
 
 **Key principle:** The stats should be specific and credible. "Users save an average of 25% on X" is better than "Save money." If the app is new and has no stats, use industry benchmarks or logical projections.
+
+#### Screen 6b: FEATURE VIDEO BEATS [OPTIONAL — INSERT WHERE A SCREEN NEEDS PROOF, NOT JUST A CLAIM]
+**Objective:** Show, don't describe. After the personalised solution screen makes a claim ("we re-plan your week automatically"), follow it with a 4–8 second video proving it. Motion video raises both completion and conversion, because the user *sees* the feature working before they're asked to commit.
+
+**When to insert a feature-video beat:**
+- Any time the personalised solution screen (Screen 6) lists a feature whose value isn't obvious from text
+- Between the comparison table and preference configuration, to make the "with us vs. without" contrast visceral
+- Right before the processing moment, to set expectations for what the demo will produce
+- As a polish layer on top of static screens that test as "fine but flat"
+
+**Screen layout:**
+- One headline naming the outcome ("Re-plans your week in 2 seconds")
+- Autoplaying muted looping video — 4–8 seconds, single feature, no narration text on top of UI
+- Optional one-line caption under the video for accessibility / sound-off viewers
+- "Continue" CTA below
+
+**Producing the video:** Hand the brief to the `create-onboarding-video` skill. One feature = one video. Keep it focused on cropped UI pieces in motion — never a full screen recording, never a tutorial. See that skill's intake checklist for what stills to provide.
+
+**Don't:**
+- Stack three feature videos in a row — pick the one feature most worth proving
+- Use long videos (>10s) — completion drops sharply
+- Add voiceover or background music — onboarding videos play with sound off
+- Skip the static fallback for users on slow connections
 
 #### Screen 7: COMPARISON TABLE [OPTIONAL]
 **Objective:** Make the with/without contrast visceral and obvious.
@@ -258,6 +294,8 @@ The flow uses 11 screen archetypes. You MUST include screens marked [REQUIRED]. 
 - The output screen after the demo is the **viral moment** — design it to be shareable
 
 **Key principle:** The user must DO something, not just watch. And they must get something back — a result, a list, a plan, a score. This creates the sunk cost that drives conversion at the paywall.
+
+**Persist what they make.** Whatever the user creates in this demo (the picked recipes, the logged workout, the categorised transactions, the chosen goals, the selected exercises) MUST be written into the real app's data store before the paywall closes. This is what kills blank-page syndrome on first real-app launch — the user lands inside a populated app, not an empty one. See Phase 6 Strategy A for the implementation pattern. If you can't persist it for some reason, **say so explicitly to the user during Phase 3** so they can choose a different demo that produces persistable output.
 
 #### Screen 12: VALUE DELIVERY + VIRAL MOMENT [REQUIRED]
 **Objective:** Show the tangible output from their demo interaction. This is the thing they created, and it should be impressive enough that they'd want to share it or keep it.
@@ -412,7 +450,19 @@ Choose ONE based on the app. They're listed in order of preference.
 **A. Persist the onboarding demo output (STRONGLY PREFERRED)**
 If the APP DEMO (Screen 11) produced real data — a workout, a shopping list, a task plan, a habit — persist it into the real app's data model. When the user lands in the main screen, their demo output is already there waiting. No empty state, and the continuity between onboarding and real app is preserved.
 
-This is the strongest option because the user already did the work during onboarding; the app just has to honour it.
+This is the strongest option because the user already did the work during onboarding; the app just has to honour it. **It also turns the entire interactive demo into setup-for-the-real-app at zero perceived cost** — the user thought they were "trying it out", and now their first real session opens with their own data already in place.
+
+**Concrete examples of what to persist:**
+| Onboarding demo output | What lands in the real app |
+|---|---|
+| Picked 3 recipes for the week | Shopping list pre-populated with combined ingredients; meal plan tab shows those 3 slotted into the next 3 days |
+| Selected fitness goal + 3 starter exercises | Today's workout screen shows those 3 as round 1, ready to log |
+| Categorised 5 transactions | Spending dashboard shows the categorised history; categorisation rules saved so future imports auto-tag |
+| Chose preferred meditation themes | Today's recommended session is one of those themes; library is filtered to match |
+| Answered skill-level questions | Lessons start at the matched difficulty; review queue is seeded with relevant cards |
+| Set a daily step / calorie / habit target | Today's progress ring is already showing the target; first entry slot is unlocked |
+
+If the demo's output **can't** be persisted (e.g. the demo is purely informational, or uses a sandbox separate from real models), pick strategy B or C — never let the gap show up as a blank screen.
 
 **B. Auto-launch the core flow**
 If there's no demo output to persist, launch the core creation flow automatically on first real-app open. Example: a workout app opens directly into "Create your first workout" full-screen — no tab bar, no home screen in between. The user is in the action before they can ask what to do.
