@@ -174,6 +174,24 @@ Flag high-value combos in recommendations.
 - App not added in OpenASO → skip with note: *"Add [app] to OpenASO (search or App Store ID), then re-run the audit"*
 - Country not tracked for a locale → ask OpenASO to add tracking before querying that store
 
+## Phase 3: Experiment Tracking (optional)
+
+When the user is making ASO changes they want to measure — new keywords, localized metadata, rewritten subtitle, swapped screenshots — open an experiment in `./metadata/experiments/` so the impact is observable later instead of relying on memory.
+
+This phase is **opt-in per audit**. Trigger it when the user says things like *"track this change"*, *"I want to see if this works"*, *"start an experiment"*, or after recommending a non-trivial metadata change they accept.
+
+Three actions:
+
+- **`start`** — capture a baseline OpenASO snapshot (rankings + review themes for the target keywords/countries), record the metadata diff, write `experiment.json` with `status: running`.
+- **`check`** — re-snapshot via OpenASO, diff against baseline, report rank/score/theme deltas. **Refuses to conclude before `min_observation_days` (default 14)** — ranking changes are too noisy earlier than that.
+- **`conclude`** — user-triggered. Set status to concluded; ask the user to write the conclusion (they know the confounders — competitor launches, algorithm shifts, paid campaigns).
+
+Read `references/experiments.md` for the file layout, JSON schemas, and interpretation rules (noise bands, confounder flagging, one-experiment-per-field-per-locale).
+
+Honest scope: OpenASO measures **visibility and sentiment**, not installs or conversion rate. If the user wants install lift, they paste ASC analytics numbers into the experiment file manually. Do not invent these metrics.
+
+If OpenASO MCP isn't connected, `start` and `check` fail loudly — don't fake baselines.
+
 ## Output Format
 
 Present results as a single audit report. The report covers only the latest version directory.
