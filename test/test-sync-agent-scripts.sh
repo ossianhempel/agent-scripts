@@ -45,23 +45,25 @@ assert_not_contains() {
 assert_contains "Global skills -> $HOME_DIR/.agents/skills"
 assert_contains "- create skill ios-simulator ("
 
-# Claude provider syncs skills to ~/.claude/skills and commands
+# Claude provider syncs skills to ~/.claude/skills
 assert_contains "Skills -> $HOME_DIR/.claude/skills"
-assert_contains "- create $ROOT/slash-commands/commit.md -> $HOME_DIR/.claude/commands/commit.md"
 
 # Codex provider syncs prompts only (no skills)
 assert_contains "Prompts -> $HOME_DIR/.codex/prompts"
 assert_not_contains "Skills -> $HOME_DIR/.codex/skills"
 
-# Gemini provider syncs commands only (no skills)
-assert_contains "- create $ROOT/slash-commands/commit.md -> $HOME_DIR/.gemini/commands/commit.toml"
+# Gemini provider sets contextFileName (slash-commands dir is empty, so command sync is skipped)
 assert_contains "- create contextFileName -> $HOME_DIR/.gemini/settings.json"
 assert_not_contains "Skills -> $HOME_DIR/.gemini/skills"
 
-# Cursor provider syncs global commands only (no skills)
+# Cursor provider configured for global commands (no skills)
 assert_contains "Global commands -> $HOME_DIR/.cursor/commands"
-assert_contains "- create $ROOT/slash-commands/commit.md -> $HOME_DIR/.cursor/commands/commit.md"
 assert_not_contains "Global skills -> $HOME_DIR/.cursor/skills"
+
+# slash-commands/ is empty (or missing on CI) — no command files should be created
+assert_not_contains "-> $HOME_DIR/.claude/commands/"
+assert_not_contains "-> $HOME_DIR/.gemini/commands/"
+assert_not_contains "-> $HOME_DIR/.cursor/commands/"
 
 # No project-scoped files in workspace
 assert_not_contains "$WORKSPACE_DIR/.cursor/commands"
@@ -81,7 +83,8 @@ OUTPUT_FILE="$TMP_DIR/output-prompts.txt"
   "$ROOT/scripts/sync-agent-scripts.sh" --dry-run --providers copilot --copilot-scope workspace
 ) > "$OUTPUT_FILE"
 
-assert_contains "- create $ROOT/slash-commands/commit.md -> $WORKSPACE_DIR/.github/prompts/commit.prompt.md"
+# slash-commands/ is empty (or missing on CI) — no copilot prompts should be created
+assert_not_contains "-> $WORKSPACE_DIR/.github/prompts/"
 
 # --- Agents project scope ---
 OUTPUT_FILE="$TMP_DIR/output-project.txt"
@@ -125,11 +128,5 @@ OUTPUT_FILE="$TMP_DIR/output-skip-identical.txt"
 
 assert_not_contains "- create skill"
 assert_not_contains "- update skill"
-assert_not_contains "- create $ROOT/slash-commands/commit.md -> $HOME_DIR/.claude/commands/commit.md"
-assert_not_contains "- update $ROOT/slash-commands/commit.md -> $HOME_DIR/.claude/commands/commit.md"
-assert_not_contains "- create $ROOT/slash-commands/commit.md -> $HOME_DIR/.gemini/commands/commit.toml"
-assert_not_contains "- update $ROOT/slash-commands/commit.md -> $HOME_DIR/.gemini/commands/commit.toml"
-assert_not_contains "- create $ROOT/slash-commands/commit.md -> $HOME_DIR/.cursor/commands/commit.md"
-assert_not_contains "- update $ROOT/slash-commands/commit.md -> $HOME_DIR/.cursor/commands/commit.md"
 
 echo "ok"
