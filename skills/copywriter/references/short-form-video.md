@@ -9,6 +9,58 @@ with the video, see [ig-captions.md](./ig-captions.md). For static stacks
 video copy (hook overlay, per-beat overlays, caption) lands in
 Obsidian for copy-paste, see [obsidian-staging.md](./obsidian-staging.md).
 
+## The 3-Second Reality
+
+Average watch time on Ossian's TikToks is **3-5 seconds**. That is the
+window. If the first 3 seconds don't trigger an involuntary emotional
+reaction — curiosity, recognition, "wait, what?", "that's me", indignation
+— the viewer is already gone. Doesn't matter how good seconds 4-15 are;
+they don't get watched.
+
+This applies to both modes below. Every script, hook overlay, and opening
+visual must be judged against one question: *does this trigger emotion
+before 3 seconds?* Either the copy does it (hook text on screen from
+frame 1) or the visual does it (a surprising image, a face mid-reaction,
+something that shouldn't be possible). Usually both.
+
+A "setup" that pays off at second 5 is a dead post. Move the payoff to
+second 1 and build from there.
+
+---
+
+## Hook Angles That Work for Apps
+
+Seven proven angles for app marketing on short-form video. Pick the one
+that fits the app's category — they're not interchangeable. Each can be
+executed in UGC or hook-overlay mode (see below).
+
+| Angle | Pattern | Best for |
+|-------|---------|----------|
+| **POV** | `"POV: you discover an app that..."` | Discovery / consumer apps |
+| **Day in life** | Creator uses app naturally during routine | Fitness, productivity, wellness |
+| **Before / after** | Result transformation | Photo, fitness, finance |
+| **"Things I wish I knew"** | Listicle of features | Utilities, niche apps |
+| **Reaction** | Creator's first time using | Surprising or novel apps |
+| **Tutorial / how-to** | Solves a problem with the app | Productivity, creative tools |
+| **Trend-jacking** | App in a trending sound/format | All — ride the algo |
+
+Notes:
+
+- **POV and reaction angles** are the most forgiving — the format itself
+  signals "watch this", which buys you a beat. Still has to trigger
+  emotion before 3s.
+- **Day in life** only works if the moment feels real. The instant it
+  reads as scripted, it dies. See "The Tool, Not the Pitch" below.
+- **Before / after** front-loads the after as the hook. Never open on
+  the "before" — that's the setup, and setup loses the viewer.
+- **Tutorial / how-to** must promise the payoff in slide 1 / second 1.
+  "Here's how to..." is a topic announcement and gets skipped.
+- **Trend-jacking** is the fastest growth lever but has a short
+  expiration window. Use trending sounds within ~5-7 days of them
+  breaking, not after.
+
+---
+
 ## Two Modes
 
 Short-form video for app marketing splits into two modes. Pick one before

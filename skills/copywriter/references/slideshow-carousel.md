@@ -40,7 +40,11 @@ slide + 5 payload slides + 1 close slide = 7 slides.
 
 ## Slide 1: The Hook
 
-The first slide decides reach. The first 3 seconds are all you get.
+The first slide decides reach. The first 3 seconds are all you get —
+Ossian's TikTok analytics show 3-5s average watch time, so slide 1 must
+trigger an involuntary emotional reaction (curiosity, recognition,
+"that's me", "wait, what?") before the viewer is gone. No setup,
+no warm-up — the payoff is the hook.
 
 **Rules:**
 - **Under 10 words.** If it doesn't fit, rewrite it.
