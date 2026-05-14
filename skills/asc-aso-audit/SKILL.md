@@ -115,6 +115,62 @@ How to check:
 4. Report missing keywords per locale — recommend weaving them naturally into existing sentences
 5. Do NOT flag: Latin-script keywords in non-Latin descriptions (e.g., "quran" in Cyrillic text) — these target separate search paths
 
+## Phase 1.5: Listing Health Checks
+
+The Phase 1 checks cover metadata text. These cover the qualitative dimensions that drive conversion: screenshots, video, icon, ratings, and conversion signals. Use OpenASO MCP where possible to pull real data; otherwise ask the user.
+
+### 7. Screenshots
+
+Fetch via OpenASO: *"List screenshots for [app] in [country]."* (`list_screenshots`). If unavailable, ask the user.
+
+| Check | What to look for |
+|-------|------------------|
+| Slot usage | All 10 slots filled? (iOS allows up to 10) |
+| First 3 | Strongest features / clearest value prop shown first? |
+| Text overlays | Benefit-driven captions, readable at thumbnail size? |
+| Consistency | Cohesive visual language across slots? |
+| Localization | Per-locale screenshots, not just one set? |
+| Device frames | Modern frames (or intentionally frameless)? |
+
+### 8. App Preview Video
+
+| Check | What to look for |
+|-------|------------------|
+| Exists | Has a preview video? (Apple allows up to 3) |
+| Hook | First 3 seconds carry the value prop? |
+| Length | 15–30 seconds? |
+| Sound-off | Works without audio (captions/UI text)? |
+
+### 9. Icon
+
+| Check | What to look for |
+|-------|------------------|
+| Distinctiveness | Stands out vs. category siblings (check via OpenASO competitor list)? |
+| Simplicity | Readable at small thumbnail size? |
+| Category fit | Matches user expectations for the category? |
+| No text | Avoids text — unreadable at small sizes? |
+
+### 10. Ratings & Reviews
+
+Fetch via OpenASO: app overview + reviews (`get_app_overview`, `list_reviews`).
+
+| Check | What to look for |
+|-------|------------------|
+| Average | 4.5+ stars? |
+| Volume | Sufficient count vs. category median? |
+| Recent trend | Last 30 days trending up or down? |
+| Developer responses | Replies to 1–3 star reviews? |
+| Themes | Recurring complaints flagged by OpenASO review prompt? |
+
+### 11. Conversion Signals
+
+| Check | What to look for |
+|-------|------------------|
+| Promotional text (170 chars) | Used for timely messaging? Editable without resubmission |
+| What's New | Informative, not "Bug fixes"? Recent enough? |
+| In-App Events | Active events for visibility? |
+| Custom Product Pages | Multiple variants by audience/channel? |
+
 ## Phase 2: OpenASO MCP Keyword & Competitor Research
 
 If OpenASO MCP is connected and the app is added in OpenASO, run live keyword, competitor, and review research. **Cover the relevant store countries, not just the US store** — keyword popularity, competitors, and review themes vary dramatically across markets.
@@ -212,6 +268,25 @@ Present results as a single audit report. The report covers only the latest vers
 | Promotional Text | ... | X | 170 | X% |
 | Description | (first 50 chars)... | X | 4000 | X% |
 
+#### ASO Score Card
+
+Score each dimension 0–10. Skip any factor you couldn't observe (don't guess). Weighted overall on observed factors only.
+
+```
+Overall ASO Score: [X]/100  (based on N observed factors)
+
+Title:              [X]/10   weight 15%
+Subtitle:           [X]/10   weight 10%
+Keyword Field:      [X]/10   weight 15%
+Description:        [X]/10   weight 5%
+Screenshots:        [X]/10   weight 15%
+Preview Video:      [X]/10   weight 5%
+Ratings & Reviews:  [X]/10   weight 15%
+Icon:               [X]/10   weight 5%
+Keyword Rankings:   [X]/10   weight 10%
+Conversion Signals: [X]/10   weight 5%
+```
+
 #### Offline Checks
 
 | # | Check | Severity | Field | Locale | Detail |
@@ -229,10 +304,16 @@ Present results as a single audit report. The report covers only the latest vers
 
 #### Recommendations
 
-1. [Highest priority action — errors first]
-2. [Next priority — keyword waste]
-3. [Utilization improvements]
-4. [Keyword gap opportunities]
+Group by effort tier:
+
+**Quick Wins (today)** — errors, keyword waste, separator fixes, underutilization
+1. ...
+
+**High-Impact (this week)** — screenshot/video reworks, keyword additions from OpenASO gaps, localization fills
+1. ...
+
+**Strategic (this month)** — rating recovery, custom product pages, in-app events, multi-locale screenshot localization
+1. ...
 ```
 
 ## Notes

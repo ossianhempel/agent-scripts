@@ -50,10 +50,7 @@ Discover and evaluate keywords that drive app store visibility.
    - Search volume (estimated monthly searches)
    - Competition (number and quality of ranking apps)
    - Relevance (alignment with app function)
-5. Score and prioritize keywords:
-   - Primary: Title and keyword field (iOS)
-   - Secondary: Subtitle and short description
-   - Tertiary: Full description only
+5. Score with Opportunity formula, then bucket into Primary / Secondary / Long-tail / Aspirational (see below)
 6. Map keywords to metadata locations
 7. Document keyword strategy for tracking
 8. **Validation:** Keywords scored; placement mapped; no competitor brand names included; no plurals in iOS keyword field
@@ -67,6 +64,27 @@ Discover and evaluate keywords that drive app store visibility.
 | Competition | 25% | Top 10 apps have <4.5 avg rating |
 | Conversion | 15% | Transactional intent ("best X app") |
 
+### Opportunity Score
+
+Combine the signals into a single score per keyword to rank candidates:
+
+```
+Opportunity = (Volume × 0.4) + ((100 − Difficulty) × 0.3) + (Relevance × 0.3)
+```
+
+All three inputs on a 0–100 scale. Difficulty is inverted so lower competition raises the score. Use this to sort the keyword list before bucketing.
+
+### Keyword Grouping (Strategic Buckets)
+
+Group candidates into four buckets — placement and priority flow from the bucket:
+
+| Bucket | Count | Where it lives | Notes |
+|--------|-------|----------------|-------|
+| **Primary** | 3–5 | Title or subtitle | Highest Opportunity Score; defines positioning |
+| **Secondary** | 5–10 | Subtitle + keyword field (iOS) / short description (Android) | Good opportunity; rotate based on performance |
+| **Long-tail** | 10–20 | Keyword field / full description | Lower volume, specific intent, easier to rank |
+| **Aspirational** | 3–5 | Tracked only — not in metadata yet | High volume + high difficulty; long-term targets, don't sacrifice primary for these |
+
 ### Keyword Placement Priority
 
 | Location | Search Weight |
@@ -76,6 +94,26 @@ Discover and evaluate keywords that drive app store visibility.
 | Keyword Field (iOS) | High |
 | Short Description (Android) | High |
 | Full Description | Medium |
+
+### Keyword Strategy Output
+
+When delivering a keyword research result, format as:
+
+```
+Top Keywords by Opportunity
+
+| Keyword | Volume | Difficulty | Relevance | Opportunity | Current Rank | Bucket |
+|---------|--------|------------|-----------|-------------|--------------|--------|
+| ...     | 0–100  | 0–100      | 0–100     | computed    | rank or —    | Primary/Secondary/Long-tail/Aspirational |
+
+Proposed placement:
+  Title (30):     [primary keywords]
+  Subtitle (30):  [secondary keywords]
+  Keyword field (100): [remaining keywords, comma-separated, no spaces]
+
+Tracking only:
+  [aspirational keywords]
+```
 
 See: [references/keyword-research-guide.md](references/keyword-research-guide.md)
 
@@ -155,54 +193,120 @@ See: [references/platform-requirements.md](references/platform-requirements.md)
 
 ## Competitor Analysis Workflow
 
-Analyze top competitors to identify keyword gaps and positioning opportunities.
+Analyze competitors to identify keyword gaps and positioning opportunities. Most data can be pulled via OpenASO MCP (`list_competitors`, `get_app_overview`, `list_reviews`, `list_screenshots`, rankings); fall back to manual lookup otherwise.
+
+### Identifying Competitors
+
+If the user doesn't already have a list, find them through:
+
+1. **Category chart** — top apps in the same category/country
+2. **Keyword overlap** — apps ranking for the same keywords (OpenASO's shared-keyword evidence)
+3. **Similar apps** — Apple's "You Might Also Like" section on the listing
+4. **User perception** — ask: "What would your users use if your app didn't exist?"
+
+Aim for a **3–5 app mix**: 2 direct competitors + 1–2 aspirational (larger, more mature) + 1 emerging (rising fast). Avoid analyzing only the category leader — their playbook may not apply at your stage.
 
 ### Workflow: Analyze Competitor ASO Strategy
 
-1. Identify top 10 competitors:
-   - Direct competitors (same core function)
-   - Indirect competitors (overlapping audience)
-   - Category leaders (top downloads)
-2. Extract competitor keywords from:
-   - App titles and subtitles
-   - First 100 words of descriptions
-   - Visible metadata patterns
-3. Build competitor keyword matrix:
-   - Map which keywords each competitor targets
-   - Calculate coverage percentage per keyword
+1. Build the competitor set using the mix above.
+2. Extract competitor keywords from titles, subtitles, the first 100 words of descriptions, and OpenASO keyword rankings.
+3. Build a competitor keyword matrix — which keywords each app targets, coverage % per keyword.
 4. Identify keyword gaps:
-   - Keywords with <40% competitor coverage
-   - High volume terms competitors miss
-   - Long-tail opportunities
-5. Analyze competitor visual assets:
-   - Icon design patterns
-   - Screenshot messaging and style
-   - Video presence and quality
-6. Compare ratings and review patterns:
-   - Average rating by competitor
-   - Common praise themes
-   - Common complaint themes
-7. Document positioning opportunities
-8. **Validation:** 10+ competitors analyzed; keyword matrix complete; gaps identified with volume estimates; visual audit documented
+   - Keywords competitors rank for that you don't
+   - Keywords you rank for that competitors don't (your moat — protect)
+   - Keywords where you're outranked (close the gap)
+5. Analyze visual assets: icon, screenshots (count, first-3 strategy, text overlays), preview video.
+6. Compare ratings and review patterns — themes, response practice.
+7. Compare growth signals and monetization (see tables below).
+8. Document positioning opportunities and threats.
+9. **Validation:** 3+ competitors analyzed; keyword matrix complete; visual + ratings + monetization compared; gaps surfaced with volume evidence.
 
-### Competitor Analysis Matrix
+### Side-by-Side Comparison Tables
 
-| Analysis Area | Data Points |
-|---------------|-------------|
-| Keywords | Title keywords, description frequency |
-| Metadata | Character utilization, keyword density |
-| Visuals | Icon style, screenshot count/style |
-| Ratings | Average rating, total count, velocity |
-| Reviews | Top praise, top complaints |
+**Metadata**
+
+| Element | You | Comp 1 | Comp 2 | Comp 3 |
+|---------|-----|--------|--------|--------|
+| Title | | | | |
+| Subtitle | | | | |
+| Title keywords | | | | |
+| Title char usage | /30 | /30 | /30 | /30 |
+| Subtitle char usage | /30 | /30 | /30 | /30 |
+| Description hook (first line) | | | | |
+
+**Keyword Gap**
+
+| Keyword | Volume | Difficulty | Your Rank | Comp 1 | Comp 2 | Comp 3 | Priority |
+|---------|--------|------------|-----------|--------|--------|--------|----------|
+
+**Ratings & Reviews**
+
+| Metric | You | Comp 1 | Comp 2 | Comp 3 |
+|--------|-----|--------|--------|--------|
+| Average rating | | | | |
+| Total reviews | | | | |
+| Recent trend (30d) | | | | |
+| Top complaint | | | | |
+| Top praise | | | | |
+| Dev responds to 1–3★? | | | | |
+
+**Growth Signals**
+
+| Signal | You | Comp 1 | Comp 2 | Comp 3 |
+|--------|-----|--------|--------|--------|
+| Chart position (category) | | | | |
+| Update frequency | | | | |
+| In-App Events active? | | | | |
+| Custom Product Pages? | | | | |
+| Apple Search Ads presence? | | | | |
+| Downloads / revenue (est) | | | | |
+
+Downloads and revenue estimates are unsupported by OpenASO — label as estimates from third-party tools or omit.
+
+**Monetization**
+
+| Aspect | You | Comp 1 | Comp 2 | Comp 3 |
+|--------|-----|--------|--------|--------|
+| Price model | | | | |
+| Subscription price | | | | |
+| Free trial length | | | | |
+| IAP count | | | | |
+| Paywall timing | | | | |
 
 ### Gap Analysis Template
 
 | Opportunity Type | Example | Action |
 |------------------|---------|--------|
-| Keyword gap | "habit tracker" (40% coverage) | Add to keyword field |
+| Keyword gap | "habit tracker" — comp ranks #3, you don't rank | Add to keyword field |
 | Feature gap | Competitor lacks widget | Highlight in screenshots |
 | Visual gap | No videos in top 5 | Create app preview |
 | Messaging gap | None mention "free" | Test free positioning |
+| Review pain | Top complaint: "ads too aggressive" | Position as ad-light |
+
+### Competitive Position Map
+
+Plot the user vs competitors on visibility (chart position / install velocity) × ratings:
+
+```
+                    HIGH VISIBILITY
+                         │
+            Comp 1 ●     │     ● Comp 2
+                         │
+   LOW ──────────────────┼────────────────── HIGH
+   RATINGS               │               RATINGS
+                         │
+                  You ●  │
+                         │
+                    LOW VISIBILITY
+```
+
+### Output Structure
+
+1. **Executive Summary** — 2–3 paragraphs: landscape, your position, biggest opportunities.
+2. **Comparison tables** — metadata / keyword gap / ratings / growth / monetization.
+3. **Position map** — ASCII 2×2.
+4. **Top Opportunities** — Quick Win, Keyword Gap, Creative Edge, Feature Gap, Market Gap.
+5. **Threats to Monitor** — competitor moves to watch, market trends.
 
 ---
 
@@ -413,6 +517,104 @@ professionals.
 
 ---
 
+## Google Play (Android) Specifics
+
+Google Play's algorithm differs fundamentally from iOS: the full description is indexed, there is no hidden keyword field, and ratings are continuous (never reset per version). Use this section whenever you're working on a Play Store listing.
+
+### Indexing Model
+
+| Field | Indexed | Notes |
+|-------|---------|-------|
+| Title (30 chars) | ✓ | Highest weight |
+| Short description (80 chars) | ✓ | High weight; first thing in search results |
+| Full description (4000 chars) | ✓ | Medium weight — keyword density matters |
+| Developer name | ✓ | Low weight |
+| Reviews and replies | ✓ | Common review words feed keyword signals |
+
+No equivalent to the iOS 100-char keyword field. Keywords live in the description itself.
+
+### Full Description Structure (Indexed)
+
+```
+[Hook — 2–3 sentences]
+Lead with the core value prop. Primary keyword in the first 167 chars (above the fold).
+
+[Feature bullets — 5–8 items]
+• [Feature]: [Benefit]
+Use keywords naturally. Vary phrasing — don't repeat exact phrases.
+
+[Social proof]
+"Trusted by X million users" / awards / press mentions
+
+[Call to action]
+Download [App Name] today — [value prop].
+
+[Keyword-rich closing paragraph]
+Variants, synonyms, and long-tail terms. Natural sentences, not lists.
+```
+
+**Keyword density rule:** Primary keyword 3–5 times across the full description (exact + variants). Never stuff.
+
+### Feature Graphic (1024×500px)
+
+Required for the Play Store. Appears at the top of the listing when no video is set.
+
+- Show the core use case in a single image
+- Legible text — no tiny copy
+- Brand-consistent with screenshots
+- Must work without text (text may be truncated on some surfaces)
+
+### Ratings Strategy (Continuous Model)
+
+Unlike iOS, Play ratings are **never reset** — every rating ever given counts toward your average.
+
+To improve a rating:
+1. Respond to every 1–3 star review (boosts the algorithmic signal)
+2. Replies invite re-rating — users can update their review
+3. Fix issues mentioned in low ratings, then reply: "Fixed in version X.X"
+4. Use the Play In-App Review API: `ReviewManager.requestReviewFlow()` — prompt after a clear success moment, not on cold open
+
+### Play Store Experiments (Native A/B)
+
+Access: Play Console → Store listing experiments. Supports up to 3 variants for:
+
+- Icon
+- Feature graphic
+- Screenshots
+- Short description
+- Full description
+
+Rules: test one element at a time; run for minimum 7 days or until ~1,000 impressions per variant.
+
+### Localization
+
+Google Play indexes descriptions per language. Every locale is a fresh keyword opportunity — translate and localize, don't just auto-translate.
+
+### Pre-Launch (Early Access)
+
+Use Early Access to collect reviews before public launch, get indexed by Google before launch, and get editorial consideration from Google Play.
+
+### Play Listing Audit Template
+
+Score each field 1–10:
+
+```
+Title:             [N]/10 — [note]
+Short description: [N]/10 — [note]
+Full description:  [N]/10 — [note]
+Screenshots:       [N]/10 — [note]
+Feature graphic:   [N]/10 — [note]
+Ratings:           [N]/10 — [note]
+Overall:           [N]/60
+
+Top 3 improvements:
+1. [specific change with expected impact]
+2. [specific change with expected impact]
+3. [specific change with expected impact]
+```
+
+---
+
 ## Tools and References
 
 ### References
@@ -432,7 +634,9 @@ professionals.
 | iOS keyword changes | Require app submission |
 | iOS promotional text | Editable without an app update |
 | Android metadata changes | Index in 1-2 hours |
-| Android keyword field | None — use description instead |
+| Android keyword field | None — use description instead (see Google Play Specifics) |
+| Android ratings | Continuous, never reset per version |
+| Android A/B testing | Play Store Experiments, up to 3 variants, 7-day min |
 | Keyword volume data | Estimates only; no official source |
 | Competitor data | Public listings only |
 

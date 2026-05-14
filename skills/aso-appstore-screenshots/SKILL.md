@@ -166,10 +166,13 @@ For any screenshot rated **Retake**, AND for any benefit that has no suitable sc
 
 Be opinionated. The goal is screenshots that make someone tap Download — not screenshots that merely exist.
 
-### Step 4: Pair Screenshots with Benefits
+### Step 4: Pair Screenshots with Benefits (and assign slot order)
 
-For each confirmed benefit, recommend the best simulator screenshot pairing. Only pair screenshots rated **Great** or **Usable**. Consider:
+Before pairing, consult `references/slot-strategy.md` — it covers the 10-slot framework (hook → core value → features → trust → CTA), Slot 1 hook patterns (benefit+UI, before/after, social proof, problem statement), text overlay rules, layout patterns, and the competitor screenshot audit. Slot order matters as much as the screenshots themselves: the first 3 slots drive ~80% of the conversion decision.
 
+For each confirmed benefit, recommend the best simulator screenshot pairing **and** the slot it should land in. Only pair screenshots rated **Great** or **Usable**. Consider:
+
+- **Slot fit**: Which slot does this benefit serve — hook (1), core value (2–3), feature showcase (4–7), trust (8–9), or CTA (10)?
 - **Relevance**: Does this screenshot directly demonstrate the benefit? A "TRACK PRICES" benefit needs a screen showing prices, not settings.
 - **Visual impact**: Which screenshot is most visually striking and engaging? Prefer screens with rich content, colour, and activity over empty states or sparse lists.
 - **Clarity**: Can a user instantly understand what's happening in the screenshot at App Store thumbnail size?

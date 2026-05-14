@@ -16,6 +16,14 @@ This is a multi-phase process. Follow each phase in order — but ALWAYS check t
 
 ---
 
+## When to Audit Instead of Rebuild
+
+If the user already has an onboarding flow and wants to diagnose drop-off rather than rebuild, switch to audit mode: read `references/audit-existing-flow.md`. It covers activation event identification, the screen-by-screen scorecard, permission timing matrix, sign-up friction patterns, funnel benchmarks (% targets per step), paywall placement timing, and the audit output format.
+
+Use audit mode when there's a measurable funnel and the user asks "why are users dropping at step X?" Switch to the full builder phases below if the audit surfaces structural problems (wrong activation event, paywall before value, mandatory sign-up before activation).
+
+---
+
 ## Companion Skills
 
 Onboarding works best when it combines static screens, **short motion videos** demonstrating core value, and **interactive demos** the user can touch. Two sibling skills handle the heavy lifting; reach for them at the right phase instead of reinventing the work here.
