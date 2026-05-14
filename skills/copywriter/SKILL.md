@@ -16,6 +16,9 @@ description: >-
 
 Write copy that sells - not describes.
 
+The most important thing for good copy is to trigger an emotional response. 
+The second is to sell an outcome rather than a product/feature/service.
+
 This is the general copywriting skill. It covers the philosophy and rules that
 apply everywhere. For format-specific guidance (length, structure, character
 limits, examples), open the matching reference file in `references/`.
@@ -46,8 +49,12 @@ contains format rules, character limits, structural patterns, and examples.
   pain → shift → proof → features sequence, the 8-word rule, the hand test.
 - `references/appstore-descriptions.md` - App Store name, subtitle, promotional
   text, full description, What's New, character limits, opening hooks.
-- `references/in-app-copy.md` - Buttons, empty states, error messages,
-  onboarding strings, permission prompts, push notifications, confirmations.
+- `references/in-app-copy.md` - Consumer mobile in-app copy. The "dumb it
+  down" principles (3-second value, 3rd-grader language, can't-get-lost
+  buttons), plus buttons, empty states, error messages, onboarding strings,
+  permission prompts, push notifications, confirmations, and the
+  hype-moment rewrite pattern (account creation, paywall reveal, plan
+  summary). Open whenever the target is a B2C mobile app surface.
 - `references/landing-pages.md` - Hero, headline + subhead, feature sections,
   social proof, CTAs, above-the-fold structure.
 - `references/ig-captions.md` - Caption / post description copy for IG and
@@ -67,11 +74,6 @@ contains format rules, character limits, structural patterns, and examples.
   single-image copy gets written so Ossian can copy-paste it into
   TikTok and Instagram. Open this whenever the deliverable is a
   ready-to-post entry for PlateSnap, GainsLog, or Walkmon.
-- `references/b2c-mobile.md` - Consumer mobile apps. The "dumb it down"
-  principle: 3-second value, 3rd-grader language, can't-get-lost buttons.
-  Open this whenever the target is a B2C mobile app (App Store, ads,
-  paywalls, onboarding).
-
 If the medium isn't covered, fall back to the core principles below and ask
 Ossian whether to add a new reference file.
 
