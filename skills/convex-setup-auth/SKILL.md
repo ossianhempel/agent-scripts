@@ -53,6 +53,7 @@ Read the provider's official guide and the matching local reference file:
 - Clerk: [official docs](https://docs.convex.dev/auth/clerk), then `references/clerk.md`
 - WorkOS AuthKit: [official docs](https://docs.convex.dev/auth/authkit/), then `references/workos-authkit.md`
 - Auth0: [official docs](https://docs.convex.dev/auth/auth0), then `references/auth0.md`
+- Sign in with Apple (native Swift/SwiftUI + Convex Custom JWT): `references/apple-sso-swift.md` — references in-production implementations in petalpal, skinlytix, shotly
 
 The local reference files contain the concrete workflow, expected files and env vars, gotchas, and validation checks.
 
@@ -133,6 +134,7 @@ If it does not, give the user a short manual validation checklist instead.
 - `references/clerk.md`
 - `references/workos-authkit.md`
 - `references/auth0.md`
+- `references/apple-sso-swift.md`
 
 ## Checklist
 

@@ -67,7 +67,13 @@ See `tools.md` for full CLI tool reference (oracle, gh, gog, committer, trash, d
 - Don't edit/touch source code; keep it vanilla for upstream updates.
 - Personal AI assistant on Mac Mini.
 - Set up with `clawdbot onboard`, configure with `clawdbot configure`.
-- Update: `scripts/update-clawdbot.sh`.
+
+### Skill Sync & Audit
+Skills live in `agent-scripts/skills/` and are mirrored into `~/.agents/skills/` (cross-tool) and `~/.claude/skills/` (Claude Code). Two scripts manage that:
+- `scripts/sync-agent-scripts.sh` — propagates repo skills + slash-commands to all agent runtimes. Run after creating, editing, moving, or deleting a skill. Does NOT prune.
+- `scripts/skills-audit.py scan` — reports orphans (global copies missing from repo), drift (global differs from repo), and local shadows. Run when in doubt about what's installed.
+- `scripts/skills-audit.py prune --execute` — deletes global skills that no longer exist in the repo. Default is dry-run; pass `--execute` to actually remove. Never touches project-local `.claude/skills` or `.agents/skills` inside repos.
+Use these instead of `rm -rf` on cached skill directories.
 
 ## Design Guidelines
 
