@@ -69,7 +69,11 @@ See `tools.md` for full CLI tool reference (oracle, gh, gog, committer, trash, d
 - Set up with `clawdbot onboard`, configure with `clawdbot configure`.
 
 ### Skill Sync & Audit
-Skills live in `agent-scripts/skills/` and are mirrored into `~/.agents/skills/` (cross-tool) and `~/.claude/skills/` (Claude Code). Two scripts manage that:
+Skills live in `agent-scripts/skills/` and are mirrored into `~/.agents/skills/` (cross-tool) and `~/.claude/skills/` (Claude Code).
+
+**Where to add a new skill — read this carefully:** When working in this repo (`agent-scripts/`) and the user asks to add, install, or vendor a new skill, the skill MUST be created inside `agent-scripts/skills/<name>/`. Never drop it directly into `~/.claude/skills/`, `~/.agents/skills/`, `~/.codex/skills/`, or any repo-local `.claude/skills` / `.agents/skills` / `.codex/skills` folder. The repo `skills/` directory is the single source of truth; the sync script fans it out everywhere else. Putting it in a global or project-local cache instead breaks that sync and the skill will get pruned or shadowed. If in doubt, ask — but the default is always `agent-scripts/skills/`.
+
+Two scripts manage sync:
 - `scripts/sync-agent-scripts.sh` — propagates repo skills + slash-commands to all agent runtimes. Run after creating, editing, moving, or deleting a skill. Does NOT prune.
 - `scripts/skills-audit.py scan` — reports orphans (global copies missing from repo), drift (global differs from repo), and local shadows. Run when in doubt about what's installed.
 - `scripts/skills-audit.py prune --execute` — deletes global skills that no longer exist in the repo. Default is dry-run; pass `--execute` to actually remove. Never touches project-local `.claude/skills` or `.agents/skills` inside repos.
