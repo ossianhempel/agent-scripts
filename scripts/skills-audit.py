@@ -204,6 +204,13 @@ def cmd_prune(args: argparse.Namespace) -> int:
         for name in list_skills(scope):
             if name not in known_repo:
                 targets.append(scope / name)
+        # Also pick up dangling symlinks — left over when a prune removed the
+        # target dir in one scope but not the symlink that pointed at it from
+        # another scope.
+        if scope.is_dir():
+            for entry in scope.iterdir():
+                if entry.is_symlink() and not entry.exists():
+                    targets.append(entry)
 
     if not targets:
         print("No orphans to prune.")
@@ -221,12 +228,26 @@ def cmd_prune(args: argparse.Namespace) -> int:
 
     for path in targets:
         # Hard safety: never touch anything outside the known global scope roots.
-        resolved = path.resolve()
-        if not any(resolved.is_relative_to(scope.resolve()) for scope in GLOBAL_SCOPES if scope.exists()):
+        # Compare parents, not the path itself — a dangling symlink's resolve()
+        # would point outside the scope and trip the guard.
+        parent_resolved = path.parent.resolve()
+        if not any(parent_resolved.is_relative_to(scope.resolve()) for scope in GLOBAL_SCOPES if scope.exists()):
             print(f"Skipping {path}: not inside a known global scope", file=sys.stderr)
             continue
-        shutil.rmtree(path)
-        print(f"  removed {path}")
+        try:
+            if path.is_symlink():
+                path.unlink()
+            else:
+                shutil.rmtree(path)
+            print(f"  removed {path}")
+        except FileNotFoundError:
+            # Likely a dangling symlink whose target we already removed earlier
+            # in this run. Unlink the symlink itself.
+            if path.is_symlink():
+                path.unlink()
+                print(f"  removed dangling symlink {path}")
+            else:
+                print(f"  already gone {path}")
 
     return 0
 
