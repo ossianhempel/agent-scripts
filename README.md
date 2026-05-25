@@ -88,6 +88,7 @@ Defaults:
 - Claude Code: `~/.claude/skills` and `~/.claude/commands`
 - Codex: `~/.codex/prompts`
 - Gemini CLI: `~/.gemini/commands` (converted to `.toml`)
+- Antigravity CLI: `~/.gemini/antigravity-cli/skills` (standard `SKILL.md` dirs)
 - Cursor: `~/.cursor/commands` (global)
 - Copilot: prompts are repo-scoped and require explicit paths
 

@@ -16,7 +16,7 @@ Repo scopes (authoritative source):
 Global scopes (managed — `prune` may delete orphans here):
   ~/.agents/skills/*   ~/.claude/skills/*
   ~/.codex/skills/*    ~/.gemini/skills/*
-  ~/.cursor/skills/*
+  ~/.cursor/skills/*   ~/.gemini/antigravity-cli/skills/*
 
 Local/project scopes (read-only — `prune` NEVER touches these):
   ~/Developer/*/.agents/skills/*
@@ -43,6 +43,7 @@ GLOBAL_SCOPES = [
     HOME / ".codex" / "skills",
     HOME / ".gemini" / "skills",
     HOME / ".cursor" / "skills",
+    HOME / ".gemini" / "antigravity-cli" / "skills",
 ]
 
 DEV_ROOT = HOME / "Developer"

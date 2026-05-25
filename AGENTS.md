@@ -69,7 +69,7 @@ See `tools.md` for full CLI tool reference (oracle, gh, gog, committer, trash, d
 - Set up with `clawdbot onboard`, configure with `clawdbot configure`.
 
 ### Skill Sync & Audit
-Skills live in `agent-scripts/skills/` and are mirrored into `~/.agents/skills/` (cross-tool) and `~/.claude/skills/` (Claude Code).
+Skills live in `agent-scripts/skills/` and are mirrored into `~/.agents/skills/` (cross-tool), `~/.claude/skills/` (Claude Code), and `~/.gemini/antigravity-cli/skills/` (Antigravity CLI).
 
 **Where to add a new skill — read this carefully:** When working in this repo (`agent-scripts/`) and the user asks to add, install, or vendor a new skill, the skill MUST be created inside `agent-scripts/skills/<name>/`. Never drop it directly into `~/.claude/skills/`, `~/.agents/skills/`, `~/.codex/skills/`, or any repo-local `.claude/skills` / `.agents/skills` / `.codex/skills` folder. The repo `skills/` directory is the single source of truth; the sync script fans it out everywhere else. Putting it in a global or project-local cache instead breaks that sync and the skill will get pruned or shadowed. If in doubt, ask — but the default is always `agent-scripts/skills/`.
 

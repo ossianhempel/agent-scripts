@@ -18,7 +18,7 @@ OUTPUT_FILE="$TMP_DIR/output.txt"
 (
   cd "$WORKSPACE_DIR"
   HOME="$HOME_DIR" \
-  "$ROOT/scripts/sync-agent-scripts.sh" --dry-run --providers agents,codex,claude,gemini,cursor,copilot
+  "$ROOT/scripts/sync-agent-scripts.sh" --dry-run --providers agents,codex,claude,gemini,cursor,copilot,antigravity
 ) > "$OUTPUT_FILE"
 
 assert_contains() {
@@ -43,10 +43,13 @@ assert_not_contains() {
 
 # Agents provider syncs skills to ~/.agents/skills
 assert_contains "Global skills -> $HOME_DIR/.agents/skills"
-assert_contains "- create skill ios-simulator ("
+assert_contains "- create skill copywriter ("
 
 # Claude provider syncs skills to ~/.claude/skills
 assert_contains "Skills -> $HOME_DIR/.claude/skills"
+
+# Antigravity provider syncs skills to ~/.gemini/antigravity-cli/skills
+assert_contains "Skills -> $HOME_DIR/.gemini/antigravity-cli/skills"
 
 # Codex provider syncs prompts only (no skills)
 assert_contains "Prompts -> $HOME_DIR/.codex/prompts"
@@ -96,7 +99,7 @@ OUTPUT_FILE="$TMP_DIR/output-project.txt"
 ) > "$OUTPUT_FILE"
 
 assert_contains "Project skills -> $WORKSPACE_DIR/.agents/skills"
-assert_contains "- create skill ios-simulator ("
+assert_contains "- create skill copywriter ("
 
 # --- Copilot default scope ---
 OUTPUT_FILE="$TMP_DIR/output-copilot-default.txt"

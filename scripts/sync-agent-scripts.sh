@@ -22,11 +22,12 @@ Usage: scripts/sync-agent-scripts.sh [options]
 Sync skills/ and slash-commands/ from this repo into supported agent runtimes.
 
 Skills sync to ~/.agents/skills (cross-tool standard, read by Codex, Gemini,
-Cursor, Copilot, Windsurf) and ~/.claude/skills (Claude Code only).
+Cursor, Copilot, Windsurf), ~/.claude/skills (Claude Code only), and
+~/.gemini/antigravity-cli/skills (Antigravity CLI).
 Commands/prompts sync to each tool's native location.
 
 Options:
-  --providers <list>          Comma-separated providers (agents,codex,claude,gemini,cursor,copilot)
+  --providers <list>          Comma-separated providers (agents,codex,claude,gemini,cursor,copilot,antigravity)
   --provider <name>           Add a single provider (repeatable)
   --agents-home <path>        Override agents home (default: ~/.agents)
   --agents-skills-dir <path>  Override agents skills directory (default: ~/.agents/skills)
@@ -35,6 +36,7 @@ Options:
   --claude-skills-dir <path>  Override Claude skills directory (default: ~/.claude/skills)
   --codex-home <path>         Override Codex home (default: ~/.codex)
   --gemini-home <path>        Override Gemini home (default: ~/.gemini)
+  --antigravity-skills-dir <path>Override Antigravity CLI skills dir (default: ~/.gemini/antigravity-cli/skills)
   --cursor-commands-dir <path>Override Cursor project commands dir (default: ./.cursor/commands)
   --cursor-scope <scope>      Cursor scope: project, global, or both (default: global)
   --copilot-prompts-dir <path>Override Copilot workspace prompts dir (default: ./.github/prompts)
@@ -371,6 +373,8 @@ AGENTS_SKILLS_DIR_DEFAULT="$HOME/.agents/skills"
 AGENTS_SKILLS_DIR="$AGENTS_SKILLS_DIR_DEFAULT"
 CLAUDE_SKILLS_DIR_DEFAULT="$HOME/.claude/skills"
 CLAUDE_SKILLS_DIR="$CLAUDE_SKILLS_DIR_DEFAULT"
+ANTIGRAVITY_SKILLS_DIR_DEFAULT="$HOME/.gemini/antigravity-cli/skills"
+ANTIGRAVITY_SKILLS_DIR="$ANTIGRAVITY_SKILLS_DIR_DEFAULT"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -417,6 +421,10 @@ while [[ $# -gt 0 ]]; do
       GEMINI_HOME="$2"
       shift 2
       ;;
+    --antigravity-skills-dir)
+      ANTIGRAVITY_SKILLS_DIR="$2"
+      shift 2
+      ;;
     --cursor-commands-dir)
       CURSOR_COMMANDS_DIR="$2"
       shift 2
@@ -450,7 +458,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 if [[ ${#PROVIDERS[@]} -eq 0 ]]; then
-  PROVIDERS=(agents codex claude gemini cursor copilot)
+  PROVIDERS=(agents codex claude gemini cursor copilot antigravity)
 fi
 
 case "$AGENTS_SCOPE" in
@@ -535,6 +543,12 @@ if want_provider "gemini"; then
   done < <(find "$ROOT/slash-commands" -type f -name '*.md' -print0)
 
   update_gemini_settings "$GEMINI_HOME/settings.json" "$GEMINI_CONTEXT_FILE_DEFAULT"
+fi
+
+# --- Antigravity CLI: skills (standard SKILL.md dirs, own global skills location) ---
+if want_provider "antigravity"; then
+  log_section "Antigravity"
+  sync_skills_to "$ANTIGRAVITY_SKILLS_DIR" "Skills"
 fi
 
 # --- Cursor: commands only (skills handled by agents provider) ---
