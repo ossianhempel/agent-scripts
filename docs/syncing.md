@@ -1,7 +1,7 @@
 ---
-summary: Guide for syncing skills and commands to agent runtime locations
+summary: Guide for syncing skills, commands, and hooks to agent runtime locations
 read_when:
-  - Using sync-agent-scripts.sh to deploy skills/commands
+  - Using sync-agent-scripts.sh to deploy skills/commands/hooks
   - Setting up agent skills across Codex, Claude Code, Gemini, Cursor, or Copilot
 ---
 
@@ -9,8 +9,8 @@ read_when:
 
 > **Note:** Slash commands (in `slash-commands/`) are deprecated in Codex. Use skills instead. Claude Code still supports slash commands, but skills work everywhere and are the recommended approach.
 
-Use `scripts/sync-agent-scripts.sh` to copy the skills and slash commands in this
-repo into each agent runtime's standard locations.
+Use `scripts/sync-agent-scripts.sh` to copy the skills, slash commands, and
+agent hooks in this repo into each agent runtime's standard locations.
 
 ## Architecture
 
@@ -20,7 +20,14 @@ Skills sync to two locations:
   Copilot, Windsurf, and others. One copy serves all these tools.
 - **`~/.claude/skills`** — Claude Code only (does not yet support `.agents/`).
 
-Commands and prompts sync to each tool's native location since formats differ.
+Commands, prompts, and hooks sync to each tool's native location since formats
+differ.
+
+Hooks live under `hooks/`. The current shared hook installs a Claude Code and
+Codex `SessionStart` command that pulls the current Git branch from its upstream
+only when it is safe: the directory is a Git worktree, the branch has an
+upstream, the worktree is clean, there are no unpushed local commits, and the
+pull can fast-forward.
 
 ## Quickstart
 
@@ -75,6 +82,11 @@ Commands/prompts:
 - Cursor: `~/.cursor/commands` (global) or `./.cursor/commands` (project)
 - Copilot: `./.github/prompts` (workspace) or VS Code profile folder (user)
 
+Hooks:
+
+- Codex: `~/.codex/config.toml`
+- Claude Code: `~/.claude/settings.json`
+
 ## Overrides
 
 - `--agents-home`, `--agents-skills-dir`, `--agents-scope`
@@ -97,4 +109,6 @@ Commands/prompts:
   and only syncs prompts when you pass `--copilot-scope` and a prompts directory.
 - Gemini also supports project-local commands in `./.gemini/commands`. If you
   want that, run with `--gemini-home .gemini`.
+- Hook sync preserves unrelated existing hook entries and replaces only the
+  managed command that points at this repo's hook script.
 - `--dry-run` prints every file that would be created or updated.

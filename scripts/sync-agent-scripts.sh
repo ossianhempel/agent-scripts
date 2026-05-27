@@ -246,6 +246,264 @@ sync_markdown_tree() {
   done < <(find "$src_root" -type f -name '*.md' -print0)
 }
 
+sync_codex_hook() {
+  local codex_home="$1"
+  local hook_command="$2"
+  local config_path="$codex_home/config.toml"
+
+  log_sub "Hooks -> $config_path"
+  if [[ "$DRY_RUN" -eq 1 ]]; then
+    log_action "$(action_verb "$config_path")" "SessionStart auto-pull hook" "$config_path"
+    return 0
+  fi
+
+  mkdir -p "$codex_home"
+  CODEX_HOME="$codex_home" python3 - "$config_path" "$hook_command" <<'PY'
+import json
+import os
+import select
+import subprocess
+import sys
+import time
+
+path = sys.argv[1]
+command = sys.argv[2]
+hook = {
+    "type": "command",
+    "command": command,
+    "async": False,
+    "timeoutSec": 30,
+    "statusMessage": "Pulling latest remote branch when safe",
+}
+
+env = os.environ.copy()
+process = subprocess.Popen(
+    ["codex", "app-server", "--listen", "stdio://"],
+    stdin=subprocess.PIPE,
+    stdout=subprocess.PIPE,
+    stderr=subprocess.DEVNULL,
+    text=True,
+    env=env,
+)
+
+def request(message):
+    process.stdin.write(json.dumps(message) + "\n")
+    process.stdin.flush()
+
+def read_response(request_id, timeout=10):
+    deadline = time.time() + timeout
+    while time.time() < deadline:
+        ready, _, _ = select.select([process.stdout], [], [], 0.2)
+        if not ready:
+            continue
+        line = process.stdout.readline()
+        if not line:
+            break
+        try:
+            payload = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if payload.get("id") == request_id:
+            return payload
+    raise RuntimeError(f"timed out waiting for Codex config response {request_id}")
+
+request({
+    "jsonrpc": "2.0",
+    "id": 1,
+    "method": "initialize",
+    "params": {
+        "clientInfo": {"name": "agent-scripts-sync", "title": None, "version": "0"},
+        "capabilities": {"experimentalApi": True, "requestAttestation": False},
+    },
+})
+read_response(1)
+
+request({
+    "jsonrpc": "2.0",
+    "id": 2,
+    "method": "config/read",
+    "params": {"includeLayers": False},
+})
+read_payload = read_response(2)
+config = read_payload.get("result", {}).get("config", {})
+data = config.get("hooks") if isinstance(config, dict) else {}
+if not isinstance(data, dict):
+    data = {}
+
+session_start = data.get("SessionStart")
+if not isinstance(session_start, list):
+    session_start = []
+data["SessionStart"] = session_start
+
+for item in session_start:
+    if not isinstance(item, dict):
+        continue
+    existing_hooks = item.get("hooks")
+    if not isinstance(existing_hooks, list):
+        continue
+    item["hooks"] = [
+        existing_hook
+        for existing_hook in existing_hooks
+        if not (
+            isinstance(existing_hook, dict)
+            and existing_hook.get("command") == command
+        )
+    ]
+
+session_start[:] = [
+    item
+    for item in session_start
+    if not (
+        isinstance(item, dict)
+        and isinstance(item.get("hooks"), list)
+        and len(item["hooks"]) == 0
+    )
+]
+
+group = None
+for item in session_start:
+    if isinstance(item, dict) and "matcher" not in item:
+        group = item
+        break
+
+if group is None:
+    group = {"hooks": []}
+    session_start.append(group)
+
+hooks = group.setdefault("hooks", [])
+if not isinstance(hooks, list):
+    hooks = []
+    group["hooks"] = hooks
+
+hooks.append(hook)
+
+def strip_nulls(value):
+    if isinstance(value, dict):
+        return {
+            key: strip_nulls(item)
+            for key, item in value.items()
+            if item is not None
+        }
+    if isinstance(value, list):
+        return [strip_nulls(item) for item in value]
+    return value
+
+data = strip_nulls(data)
+
+request({
+    "jsonrpc": "2.0",
+    "id": 3,
+    "method": "config/value/write",
+    "params": {
+        "keyPath": "hooks",
+        "value": data,
+        "mergeStrategy": "replace",
+    },
+})
+write_payload = read_response(3)
+if "error" in write_payload:
+    raise RuntimeError(write_payload["error"])
+
+process.terminate()
+try:
+    process.wait(timeout=1)
+except subprocess.TimeoutExpired:
+    process.kill()
+PY
+}
+
+sync_claude_hook() {
+  local settings_path="$1"
+  local hook_command="$2"
+
+  log_sub "Hooks -> $settings_path"
+  if [[ "$DRY_RUN" -eq 1 ]]; then
+    log_action "$(action_verb "$settings_path")" "SessionStart auto-pull hook" "$settings_path"
+    return 0
+  fi
+
+  mkdir -p "$(dirname "$settings_path")"
+  python3 - "$settings_path" "$hook_command" <<'PY'
+import json
+import os
+import sys
+
+path = sys.argv[1]
+command = sys.argv[2]
+hook = {
+    "type": "command",
+    "command": command,
+    "timeout": 30,
+}
+
+data = {}
+if os.path.exists(path):
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            existing = json.load(f)
+        if isinstance(existing, dict):
+            data = existing
+    except json.JSONDecodeError:
+        data = {}
+
+hooks_root = data.setdefault("hooks", {})
+if not isinstance(hooks_root, dict):
+    hooks_root = {}
+    data["hooks"] = hooks_root
+
+session_start = hooks_root.setdefault("SessionStart", [])
+if not isinstance(session_start, list):
+    session_start = []
+    hooks_root["SessionStart"] = session_start
+
+for item in session_start:
+    if not isinstance(item, dict):
+        continue
+    existing_hooks = item.get("hooks")
+    if not isinstance(existing_hooks, list):
+        continue
+    item["hooks"] = [
+        existing_hook
+        for existing_hook in existing_hooks
+        if not (
+            isinstance(existing_hook, dict)
+            and existing_hook.get("command") == command
+        )
+    ]
+
+session_start[:] = [
+    item
+    for item in session_start
+    if not (
+        isinstance(item, dict)
+        and isinstance(item.get("hooks"), list)
+        and len(item["hooks"]) == 0
+    )
+]
+
+group = None
+for item in session_start:
+    if isinstance(item, dict) and "matcher" not in item:
+        group = item
+        break
+
+if group is None:
+    group = {"hooks": []}
+    session_start.append(group)
+
+hooks = group.setdefault("hooks", [])
+if not isinstance(hooks, list):
+    hooks = []
+    group["hooks"] = hooks
+
+hooks.append(hook)
+
+with open(path, "w", encoding="utf-8") as f:
+    json.dump(data, f, indent=2)
+    f.write("\n")
+PY
+}
+
 render_gemini_toml() {
   local src="$1"
   local dest="$2"
@@ -498,9 +756,10 @@ if want_provider "agents"; then
   fi
 fi
 
-# --- Codex: prompts only (skills handled by agents provider) ---
+# --- Codex: prompts + hooks (skills handled by agents provider) ---
 if want_provider "codex"; then
   codex_prompts_dir="$CODEX_HOME/prompts"
+  auto_pull_hook="$ROOT/hooks/scripts/git-auto-pull-current-branch.sh"
 
   log_section "Codex"
   log_sub "Prompts -> $codex_prompts_dir"
@@ -510,16 +769,29 @@ if want_provider "codex"; then
     run_copy_file "$prompt" "$codex_prompts_dir/$(basename "$prompt")"
   done
   shopt -u nullglob
+
+  if [[ -f "$auto_pull_hook" ]]; then
+    sync_codex_hook "$CODEX_HOME" "$auto_pull_hook"
+  else
+    log_sub "Skipping hooks: missing $auto_pull_hook"
+  fi
 fi
 
-# --- Claude Code: skills + commands (does not support .agents/) ---
+# --- Claude Code: skills + commands + hooks (does not support .agents/) ---
 if want_provider "claude"; then
   claude_commands_dir="$CLAUDE_HOME/commands"
+  auto_pull_hook="$ROOT/hooks/scripts/git-auto-pull-current-branch.sh"
   log_section "Claude"
   sync_skills_to "$CLAUDE_SKILLS_DIR" "Skills"
 
   log_sub "Commands -> $claude_commands_dir"
   sync_markdown_tree "$ROOT/slash-commands" "$claude_commands_dir"
+
+  if [[ -f "$auto_pull_hook" ]]; then
+    sync_claude_hook "$CLAUDE_HOME/settings.json" "$auto_pull_hook"
+  else
+    log_sub "Skipping hooks: missing $auto_pull_hook"
+  fi
 fi
 
 # --- Gemini: commands + settings only (skills handled by agents provider) ---

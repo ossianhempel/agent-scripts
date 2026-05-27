@@ -31,6 +31,7 @@ Source of truth on this machine: `~/Developer/agent-scripts`.
 ## Repository Layout
 - `skills/`: skill folders. Each skill lives in its own directory and includes
   a `SKILL.md` entry point plus optional `references/`, `assets/`, or `scripts/`.
+- `hooks/`: shared agent hook scripts and generated global hook wiring.
 - `slash-commands/`: markdown files that define reusable agent commands.
 - `scripts/`: utilities for syncing and maintenance.
 - `tools/`: standalone CLIs and evaluators used by agents.
@@ -53,8 +54,9 @@ Source of truth on this machine: `~/Developer/agent-scripts`.
   - `prune` — delete global orphans (dry-run by default; `--execute` to apply). Never touches repo-scoped skills.
 
 ## Sync to Global Agent Settings
-Run `scripts/sync-agent-scripts.sh` to copy/update skills and slash commands into
-local/global agent runtimes. See `docs/syncing.md` for details.
+Run `scripts/sync-agent-scripts.sh` to copy/update skills, slash commands, and
+global agent hooks into local/global agent runtimes. See `docs/syncing.md` for
+details.
 
 Examples:
 ```sh
@@ -86,7 +88,8 @@ Pointer target:
 Defaults:
 - Cross-tool skills: `~/.agents/skills` (Codex, Gemini, Cursor, Copilot, Windsurf)
 - Claude Code: `~/.claude/skills` and `~/.claude/commands`
-- Codex: `~/.codex/prompts`
+- Claude Code hooks: `~/.claude/settings.json`
+- Codex: `~/.codex/prompts` and `~/.codex/config.toml`
 - Gemini CLI: `~/.gemini/commands` (converted to `.toml`)
 - Antigravity CLI: `~/.gemini/antigravity-cli/skills` (standard `SKILL.md` dirs)
 - Cursor: `~/.cursor/commands` (global)

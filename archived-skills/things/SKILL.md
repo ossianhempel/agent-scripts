@@ -11,9 +11,11 @@ Quick start (read)
 - `things inbox`
 - `things today`
 - `things repeating`
+- `things templates`
 - `things projects` / `things areas` / `things tags`
 - `things tasks --search "query" --json`
 - `things tasks --query 'tag:work AND title:/review/i' --format jsonl`
+- `things search --query 'tag:PLAN' --select type,title` searches both todos and projects.
 - `things show --project "Project Name"`
 - `things show --id <TODO_UUID> --recursive --json`
 
@@ -22,6 +24,8 @@ Write (URL scheme)
 - Checklist items (repeat `--checklist-item` per item): `things add "My task" --checklist-item="Step 1" --checklist-item="Step 2" --checklist-item="Step 3"`
 - `things add-project "Project title" --area "Area Name"`
 - `things update --id <uuid> --notes "Updated notes"`
+- Clear notes by passing an explicit empty notes value: `things update --id <uuid> --notes ""`
+- Checklist status by exact title: `things update --id <uuid> --complete-checklist-item "Step 1"` or `things update --id <uuid> --incomplete-checklist-item "Step 1"`
 - Bulk update (preview then apply): `things update --query 'tag:work' --dry-run` then `things update --query 'tag:work' --yes --tags "Work"`
 - `things update-project --id <uuid> "New project title"`
 - `things rename-project --id <uuid> --title "New project title"`
@@ -48,6 +52,7 @@ Filters + DB
 - Common filters: `--filter-project`, `--filter-area`, `--filter-tag`, `--status`, `--search`, `--limit`, `--offset`.
 - Rich query: `--query` supports boolean ops, field predicates, and regex (e.g. `title:/regex/ AND tag:work`).
 - Repeating tasks: `things repeating` or `--query 'repeating:true'`.
+- Repeating templates: `things templates --area "Area Name"` lists hidden template rows that control future recurring instances.
 - Date filters: `--created-before/after`, `--modified-before/after`, `--due-before`, `--start-before`.
 - URL filter: `--has-url`.
 - Sorting: `--sort created,-deadline,title`.
@@ -62,6 +67,7 @@ Auth + permissions
 - Update `--when/--later` is verified against the database by default; use `--no-verify` to skip verification.
 - `--later` / `--when=evening` refuses to move tasks that are already scheduled for a non-today date; use `--allow-non-today` to override.
 - Titles that look like flag assignments (e.g. `tag=work`) are rejected; pass `--allow-unsafe-title` to keep them as the title.
+- For updates, an explicitly provided empty `--notes ""` clears notes; omitting `--notes` leaves notes unchanged.
 - Delete commands prompt for confirmation when interactive; pass `--confirm` for single deletes in non-interactive scripts. Query deletes require `--confirm=delete` or `--yes`.
 - Bulk update/delete write an action log; use `things undo` to revert the last bulk update or trash.
 
