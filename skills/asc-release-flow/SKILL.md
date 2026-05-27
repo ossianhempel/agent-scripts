@@ -7,6 +7,15 @@ description: Determine whether an app is ready to submit, then drive the App Sto
 
 Use this skill when the real question is "Can my app be ready to submit?" and then guide the user through the shortest path to a clean App Store submission, especially for first-time releases.
 
+## Version bump policy
+Before staging a release, decide which part of `MARKETING_VERSION` (`MAJOR.MINOR.PATCH`) to bump based on what the release contains:
+
+- **User-facing changes → bump MINOR** (`0.3.4` → `0.4.0`, reset PATCH to 0). Anything a user can see or feel: new features, UI changes, copy/wording changes, behavior changes, new screens, redesigns.
+- **Non-user-facing changes → bump PATCH** (`0.3.4` → `0.3.5`). Bug fixes, performance work, refactors, dependency bumps, App Store metadata-only updates, analytics, build/config tweaks — anything inside the app or its listing that a user wouldn't notice as a deliberate change.
+- **MAJOR** is reserved for the user to call explicitly; never bump it automatically.
+
+When a release mixes both, the presence of any user-facing change wins → bump MINOR. State the chosen bump and the reason ("user-facing: new X → minor") before editing the version source (`project.yml` / Xcode `MARKETING_VERSION`). `CURRENT_PROJECT_VERSION` (build number) always increases on every upload regardless of which part you bump.
+
 ## Preconditions
 - Ensure credentials are set (`asc auth login` or `ASC_*` env vars).
 - Resolve app ID, version string, and build ID up front.
