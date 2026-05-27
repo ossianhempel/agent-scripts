@@ -26,6 +26,12 @@ Group blockers like this:
 - Web-session-fixable: initial app availability bootstrap, first-review subscription attachment, App Privacy publish state.
 - Manual fallback: first-time IAP selection from the app-version screen when no CLI attach flow exists, or any flow the user does not want to run through experimental web-session commands.
 
+## Versioning Guidelines
+
+When determining the next App Store version number (`MARKETING_VERSION`), follow these rules based on the nature of the release changes:
+- **User-Facing Changes**: If the release contains user-facing changes (new features, UI updates, visual designs, or anything the user sees/interacts with), increment the **minor** version number: `x.y.0` (e.g., `1.2.0` -> `1.3.0`).
+- **Non-User-Facing / Internal Changes**: If the release contains only non-front-facing changes (bug fixes, performance optimizations, code refactoring, database migrations, documentation, metadata, translations, assets, etc.), increment the **patch** version number: `x.y.z` (e.g., `1.2.0` -> `1.2.1`).
+
 ## Canonical path
 
 ### 1. Fast readiness check
