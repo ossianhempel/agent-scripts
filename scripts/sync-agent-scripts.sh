@@ -257,6 +257,11 @@ sync_codex_hook() {
     return 0
   fi
 
+  if ! command -v codex >/dev/null 2>&1; then
+    log_sub "Skipping hooks: codex CLI not found"
+    return 0
+  fi
+
   mkdir -p "$codex_home"
   CODEX_HOME="$codex_home" python3 - "$config_path" "$hook_command" <<'PY'
 import json
