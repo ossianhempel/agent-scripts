@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# Pre-push hook: validate MARKETING_VERSION before pushing to release branches.
+# Installed by the asc-version-guard installer via: git config core.hooksPath .githooks
+#
+# Xcode Cloud builds release channels off the protected branches. If
+# MARKETING_VERSION isn't higher than what's live, CI fails in ci_post_clone.sh
+# and burns a build slot. Catch it here instead.
+
+set -eu
+
+ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+PROTECTED_BRANCHES="$(python3 -c 'import json;print(" ".join(json.load(open("'"$ROOT_DIR"'/.asc-release.json"))["protectedBranches"]))')"
+
+# git supplies one line per pushed ref on stdin:
+#   "<local_ref> <local_sha> <remote_ref> <remote_sha>"
+needs_check=0
+while read -r local_ref local_sha remote_ref remote_sha; do
+  [ -z "${remote_ref:-}" ] && continue
+  ref_short="${remote_ref##*/}"
+  for protected in $PROTECTED_BRANCHES; do
+    [ "$ref_short" = "$protected" ] && needs_check=1 && break
+  done
+done
+
+[ "$needs_check" -eq 0 ] && exit 0
+
+if ! bash "$ROOT_DIR/scripts/check-marketing-version.sh"; then
+  echo "" >&2
+  echo "Pre-push aborted. Bypass with --no-verify only if you know what you're doing." >&2
+  exit 1
+fi

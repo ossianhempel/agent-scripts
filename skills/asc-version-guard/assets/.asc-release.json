@@ -1,0 +1,9 @@
+{
+  "appAppleId": "0000000000",
+  "projectName": "MyApp",
+  "sourceOfTruth": "ios/project.yml",
+  "xcodeprojPath": "ios/MyApp.xcodeproj",
+  "protectedBranches": ["develop", "main"],
+  "lookupCountry": "us",
+  "buildNumberOffset": 0
+}
