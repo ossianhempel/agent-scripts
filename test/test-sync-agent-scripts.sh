@@ -125,8 +125,7 @@ OUTPUT_FILE="$TMP_DIR/output-skip-identical.txt"
   "$ROOT/scripts/sync-agent-scripts.sh" --providers agents,codex,claude,gemini,cursor
 ) >/dev/null
 
-if command -v codex >/dev/null 2>&1; then
-  python3 - "$HOME_DIR" "$ROOT/hooks/scripts/git-auto-pull-current-branch.sh" <<'PY'
+python3 - "$HOME_DIR" "$ROOT/hooks/scripts/git-auto-pull-current-branch.sh" <<'PY'
 import json
 import sys
 import tomllib
@@ -144,25 +143,6 @@ with open(f"{home}/.claude/settings.json", "r", encoding="utf-8") as f:
 claude_hooks = claude["hooks"]["SessionStart"][0]["hooks"]
 assert any(h.get("command") == command for h in claude_hooks)
 PY
-else
-  if [[ -f "$HOME_DIR/.codex/config.toml" ]]; then
-    echo "Expected Codex hook sync to skip without codex CLI" >&2
-    exit 1
-  fi
-
-  python3 - "$HOME_DIR" "$ROOT/hooks/scripts/git-auto-pull-current-branch.sh" <<'PY'
-import json
-import sys
-
-home = sys.argv[1]
-command = sys.argv[2]
-
-with open(f"{home}/.claude/settings.json", "r", encoding="utf-8") as f:
-    claude = json.load(f)
-claude_hooks = claude["hooks"]["SessionStart"][0]["hooks"]
-assert any(h.get("command") == command for h in claude_hooks)
-PY
-fi
 
 (
   cd "$WORKSPACE_DIR"

@@ -257,19 +257,11 @@ sync_codex_hook() {
     return 0
   fi
 
-  if ! command -v codex >/dev/null 2>&1; then
-    log_sub "Skipping hooks: codex CLI not found"
-    return 0
-  fi
-
   mkdir -p "$codex_home"
-  CODEX_HOME="$codex_home" python3 - "$config_path" "$hook_command" <<'PY'
-import json
+  python3 - "$config_path" "$hook_command" <<'PY'
 import os
-import select
-import subprocess
 import sys
-import time
+import tomllib
 
 path = sys.argv[1]
 command = sys.argv[2]
@@ -281,57 +273,19 @@ hook = {
     "statusMessage": "Pulling latest remote branch when safe",
 }
 
-env = os.environ.copy()
-process = subprocess.Popen(
-    ["codex", "app-server", "--listen", "stdio://"],
-    stdin=subprocess.PIPE,
-    stdout=subprocess.PIPE,
-    stderr=subprocess.DEVNULL,
-    text=True,
-    env=env,
-)
-
-def request(message):
-    process.stdin.write(json.dumps(message) + "\n")
-    process.stdin.flush()
-
-def read_response(request_id, timeout=10):
-    deadline = time.time() + timeout
-    while time.time() < deadline:
-        ready, _, _ = select.select([process.stdout], [], [], 0.2)
-        if not ready:
-            continue
-        line = process.stdout.readline()
-        if not line:
-            break
+text = ""
+config = {}
+if os.path.exists(path):
+    with open(path, "rb") as f:
+        raw = f.read()
+    text = raw.decode("utf-8")
+    if raw.strip():
         try:
-            payload = json.loads(line)
-        except json.JSONDecodeError:
-            continue
-        if payload.get("id") == request_id:
-            return payload
-    raise RuntimeError(f"timed out waiting for Codex config response {request_id}")
+            config = tomllib.loads(text)
+        except tomllib.TOMLDecodeError as exc:
+            raise SystemExit(f"failed to parse {path}: {exc}") from exc
 
-request({
-    "jsonrpc": "2.0",
-    "id": 1,
-    "method": "initialize",
-    "params": {
-        "clientInfo": {"name": "agent-scripts-sync", "title": None, "version": "0"},
-        "capabilities": {"experimentalApi": True, "requestAttestation": False},
-    },
-})
-read_response(1)
-
-request({
-    "jsonrpc": "2.0",
-    "id": 2,
-    "method": "config/read",
-    "params": {"includeLayers": False},
-})
-read_payload = read_response(2)
-config = read_payload.get("result", {}).get("config", {})
-data = config.get("hooks") if isinstance(config, dict) else {}
+data = config.get("hooks", {})
 if not isinstance(data, dict):
     data = {}
 
@@ -395,25 +349,60 @@ def strip_nulls(value):
 
 data = strip_nulls(data)
 
-request({
-    "jsonrpc": "2.0",
-    "id": 3,
-    "method": "config/value/write",
-    "params": {
-        "keyPath": "hooks",
-        "value": data,
-        "mergeStrategy": "replace",
-    },
-})
-write_payload = read_response(3)
-if "error" in write_payload:
-    raise RuntimeError(write_payload["error"])
+def toml_scalar(value):
+    if isinstance(value, bool):
+        return "true" if value else "false"
+    if isinstance(value, int):
+        return str(value)
+    if isinstance(value, str):
+        escaped = (
+            value.replace("\\", "\\\\")
+            .replace('"', '\\"')
+            .replace("\n", "\\n")
+        )
+        return f'"{escaped}"'
+    raise TypeError(f"unsupported TOML scalar: {value!r}")
 
-process.terminate()
-try:
-    process.wait(timeout=1)
-except subprocess.TimeoutExpired:
-    process.kill()
+def toml_inline(value):
+    if isinstance(value, dict):
+        parts = [f"{key} = {toml_inline(item)}" for key, item in value.items()]
+        return "{ " + ", ".join(parts) + " }"
+    if isinstance(value, list):
+        return "[" + ", ".join(toml_inline(item) for item in value) + "]"
+    return toml_scalar(value)
+
+def render_hooks_table(hooks_data):
+    lines = ["[hooks]"]
+    for event_name, groups in hooks_data.items():
+        if not isinstance(groups, list):
+            continue
+        lines.append(f"{event_name} = {toml_inline(groups)}")
+    return "\n".join(lines) + "\n"
+
+def remove_table_block(source, table_name):
+    lines = source.splitlines(keepends=True)
+    output = []
+    index = 0
+    target = f"[{table_name}]"
+    while index < len(lines):
+        if lines[index].strip() == target:
+            index += 1
+            while index < len(lines):
+                stripped = lines[index].strip()
+                if stripped.startswith("[") and stripped.endswith("]"):
+                    break
+                index += 1
+            continue
+        output.append(lines[index])
+        index += 1
+    return "".join(output).rstrip()
+
+base = remove_table_block(text, "hooks")
+rendered = render_hooks_table(data)
+next_text = f"{base}\n\n{rendered}" if base else rendered
+
+with open(path, "w", encoding="utf-8") as f:
+    f.write(next_text)
 PY
 }
 
