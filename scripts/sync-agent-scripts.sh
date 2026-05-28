@@ -26,8 +26,14 @@ Cursor, Copilot, Windsurf), ~/.claude/skills (Claude Code only), and
 ~/.gemini/antigravity-cli/skills (Antigravity CLI).
 Commands/prompts sync to each tool's native location.
 
+Profiles (profiles/<name>/skills/) are project-scoped skill packages. They are
+NOT part of the default run — sync them with the 'profiles' provider, which
+installs into each assigned project's .agents/skills (real dirs) and
+.claude/skills (symlinks). Assignments come from profile-assignments.json or
+from --profile/--project for a one-off.
+
 Options:
-  --providers <list>          Comma-separated providers (agents,codex,claude,gemini,cursor,copilot,antigravity)
+  --providers <list>          Comma-separated providers (agents,codex,claude,gemini,cursor,copilot,antigravity,profiles)
   --provider <name>           Add a single provider (repeatable)
   --agents-home <path>        Override agents home (default: ~/.agents)
   --agents-skills-dir <path>  Override agents skills directory (default: ~/.agents/skills)
@@ -42,6 +48,9 @@ Options:
   --copilot-prompts-dir <path>Override Copilot workspace prompts dir (default: ./.github/prompts)
   --copilot-user-prompts-dir <path>Override Copilot user prompts dir (required for user scope)
   --copilot-scope <scope>     Copilot scope: workspace, user, both, or none (default: none)
+  --profile <name>            Profile to sync for a one-off (repeatable; requires --project)
+  --project <path>            Target project root for a one-off profile sync
+  --profiles-manifest <path>  Override assignments file (default: ./profile-assignments.json)
   --dry-run                   Print actions without writing files
   -h, --help                  Show this help
 
@@ -50,6 +59,8 @@ Examples:
   scripts/sync-agent-scripts.sh --providers agents,claude
   scripts/sync-agent-scripts.sh --provider agents --agents-scope both
   scripts/sync-agent-scripts.sh --provider copilot --copilot-scope workspace
+  scripts/sync-agent-scripts.sh --provider profiles
+  scripts/sync-agent-scripts.sh --provider profiles --profile swift-app-developer --project ~/Developer/platesnap
 USAGE
 }
 
@@ -611,6 +622,121 @@ sync_skills_to() {
   shopt -u nullglob
 }
 
+# Print "project<TAB>profile" lines from the assignments manifest. A project
+# with multiple profiles yields one line per profile.
+parse_profile_manifest() {
+  local manifest="$1"
+  if [[ ! -f "$manifest" ]]; then
+    return 0
+  fi
+  python3 - "$manifest" <<'PY'
+import json
+import sys
+
+path = sys.argv[1]
+try:
+    with open(path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+except Exception as exc:  # noqa: BLE001
+    sys.stderr.write(f"failed to parse {path}: {exc}\n")
+    sys.exit(1)
+
+assignments = data.get("assignments", data)
+if not isinstance(assignments, dict):
+    sys.exit(0)
+
+for project, profiles in assignments.items():
+    if project.startswith("_"):
+        continue
+    if isinstance(profiles, str):
+        profiles = [profiles]
+    if not isinstance(profiles, list):
+        continue
+    for profile in profiles:
+        if isinstance(profile, str) and profile:
+            print(f"{project}\t{profile}")
+PY
+}
+
+# Create/refresh a symlink at $link pointing to $target via a relative path
+# computed from the link's directory. Idempotent and dry-run aware.
+#
+# Refuses to clobber a real directory or file at $link — only replaces existing
+# symlinks (any target) or creates new entries. A real dir with the same name
+# as a profile skill is treated as project-authored content (the agent-scripts
+# repo has no business deleting it); the sync skips it and warns loudly. The
+# user resolves manually: delete the dir if it's stale, or promote its content
+# into the profile if it's the canonical copy.
+make_relative_symlink() {
+  local link="$1"
+  local target="$2"
+  local link_dir
+  link_dir="$(dirname "$link")"
+
+  local rel
+  rel="$(python3 -c "import os,sys; print(os.path.relpath(sys.argv[1], sys.argv[2]))" "$target" "$link_dir")"
+
+  if [[ -L "$link" && "$(readlink "$link")" == "$rel" ]]; then
+    return 0
+  fi
+
+  # Safety: never destroy a real (non-symlink) directory or file at $link.
+  if [[ ! -L "$link" && -e "$link" ]]; then
+    log_sub "WARNING: $link is a real directory/file, not a symlink — refusing to clobber. Move or promote its content, then rerun."
+    return 0
+  fi
+
+  log_action "$(action_verb "$link")" "symlink" "$link -> $rel"
+  if [[ "$DRY_RUN" -eq 1 ]]; then
+    return 0
+  fi
+  mkdir -p "$link_dir"
+  # Only ever removes a symlink here — the real-dir case bailed above.
+  rm -f "$link"
+  ln -s "$rel" "$link"
+}
+
+# Install one profile's skills into a project as relative symlinks pointing
+# back into agent-scripts. Zero duplication, zero drift — edits in agent-scripts
+# show up instantly in every assigned project.
+#
+#   <project>/.agents/skills/<name>  -> ../../../agent-scripts/profiles/<profile>/skills/<name>
+#   <project>/.claude/skills/<name>  -> ../../.agents/skills/<name>
+#
+# Shared skills resolve through profile->_shared symlink chains naturally;
+# we deliberately do NOT collapse the chain so moves between profiles only
+# touch one place.
+sync_profile_to_project() {
+  local profile="$1"
+  local project="$2"
+  local src="$ROOT/profiles/$profile/skills"
+
+  if [[ ! -d "$src" ]]; then
+    log_sub "Skipping: missing profile '$profile' ($src)"
+    return 0
+  fi
+  # Never materialize a project root that doesn't exist — that would just
+  # create an empty <name>/.agents/skills/ tree out of nowhere.
+  if [[ ! -d "$project" ]]; then
+    log_sub "Skipping: project not found ($project)"
+    return 0
+  fi
+
+  local dest_agents="$project/.agents/skills"
+  local dest_claude="$project/.claude/skills"
+  log_sub "$profile -> $project (relative symlinks into agent-scripts)"
+
+  shopt -s nullglob
+  for skill_dir in "$src"/*; do
+    # Accept both real dirs and symlinks (shared skills are profile-level symlinks).
+    [[ -d "$skill_dir" || -L "$skill_dir" ]] || continue
+    skill_name="$(basename "$skill_dir")"
+    make_relative_symlink "$dest_agents/$skill_name" "$skill_dir"
+    make_relative_symlink "$dest_claude/$skill_name" "$dest_agents/$skill_name"
+  done
+  shopt -u nullglob
+}
+
 AGENTS_HOME_DEFAULT="$HOME/.agents"
 CODEX_HOME_DEFAULT="$HOME/.codex"
 CLAUDE_HOME_DEFAULT="$HOME/.claude"
@@ -627,6 +753,11 @@ CLAUDE_SKILLS_DIR_DEFAULT="$HOME/.claude/skills"
 CLAUDE_SKILLS_DIR="$CLAUDE_SKILLS_DIR_DEFAULT"
 ANTIGRAVITY_SKILLS_DIR_DEFAULT="$HOME/.gemini/antigravity-cli/skills"
 ANTIGRAVITY_SKILLS_DIR="$ANTIGRAVITY_SKILLS_DIR_DEFAULT"
+
+PROFILES_MANIFEST_DEFAULT="$ROOT/profile-assignments.json"
+PROFILES_MANIFEST="$PROFILES_MANIFEST_DEFAULT"
+PROFILE_NAMES=()
+PROFILE_PROJECT=""
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -677,6 +808,18 @@ while [[ $# -gt 0 ]]; do
       ANTIGRAVITY_SKILLS_DIR="$2"
       shift 2
       ;;
+    --profile)
+      PROFILE_NAMES+=("$2")
+      shift 2
+      ;;
+    --project)
+      PROFILE_PROJECT="$2"
+      shift 2
+      ;;
+    --profiles-manifest)
+      PROFILES_MANIFEST="$2"
+      shift 2
+      ;;
     --cursor-commands-dir)
       CURSOR_COMMANDS_DIR="$2"
       shift 2
@@ -710,7 +853,13 @@ while [[ $# -gt 0 ]]; do
 done
 
 if [[ ${#PROVIDERS[@]} -eq 0 ]]; then
-  PROVIDERS=(agents codex claude gemini cursor copilot antigravity)
+  # A one-off profile sync (--profile/--project without --providers) should only
+  # run the profiles provider, never fan out the global skill set.
+  if [[ ${#PROFILE_NAMES[@]} -gt 0 || -n "$PROFILE_PROJECT" ]]; then
+    PROVIDERS=(profiles)
+  else
+    PROVIDERS=(agents codex claude gemini cursor copilot antigravity)
+  fi
 fi
 
 case "$AGENTS_SCOPE" in
@@ -815,6 +964,38 @@ fi
 if want_provider "antigravity"; then
   log_section "Antigravity"
   sync_skills_to "$ANTIGRAVITY_SKILLS_DIR" "Skills"
+fi
+
+# --- Profiles: project-scoped skill packages (never part of the default run) ---
+if want_provider "profiles"; then
+  log_section "Profiles"
+
+  profile_pairs=()
+  if [[ ${#PROFILE_NAMES[@]} -gt 0 || -n "$PROFILE_PROJECT" ]]; then
+    if [[ -z "$PROFILE_PROJECT" || ${#PROFILE_NAMES[@]} -eq 0 ]]; then
+      log "One-off profile sync requires both --project and --profile."
+      exit 1
+    fi
+    for pn in "${PROFILE_NAMES[@]}"; do
+      profile_pairs+=("$PROFILE_PROJECT"$'\t'"$pn")
+    done
+  else
+    log_sub "Manifest -> $PROFILES_MANIFEST"
+    if [[ ! -f "$PROFILES_MANIFEST" ]]; then
+      log_sub "Skipping: no manifest at $PROFILES_MANIFEST (pass --profile/--project for a one-off)."
+    else
+      while IFS= read -r line; do
+        [[ -n "$line" ]] && profile_pairs+=("$line")
+      done < <(parse_profile_manifest "$PROFILES_MANIFEST")
+    fi
+  fi
+
+  for pair in "${profile_pairs[@]}"; do
+    profile_project="${pair%%$'\t'*}"
+    profile_name="${pair#*$'\t'}"
+    profile_project="${profile_project/#\~/$HOME}"
+    sync_profile_to_project "$profile_name" "$profile_project"
+  done
 fi
 
 # --- Cursor: commands only (skills handled by agents provider) ---
@@ -972,13 +1153,18 @@ ensure_claude_agents_symlink() {
   fi
 }
 
-# Scan ~/Developer for git repos
-log_section "Symlinks"
-log_sub "CLAUDE.md <-> AGENTS.md in ~/Developer repos"
-shopt -s nullglob
-for repo_dir in "$HOME/Developer"/*/; do
-  ensure_claude_agents_symlink "${repo_dir%/}"
-done
-shopt -u nullglob
+# Only sweep ~/Developer repos for CLAUDE.md <-> AGENTS.md symlinks during a
+# general (claude/agents) sync. A targeted run like `--provider profiles
+# --project X` should not silently mutate every other repo's instructions
+# files; the user expects scope to match the flag.
+if want_provider "claude" || want_provider "agents"; then
+  log_section "Symlinks"
+  log_sub "CLAUDE.md <-> AGENTS.md in ~/Developer repos"
+  shopt -s nullglob
+  for repo_dir in "$HOME/Developer"/*/; do
+    ensure_claude_agents_symlink "${repo_dir%/}"
+  done
+  shopt -u nullglob
+fi
 
 log "Done."

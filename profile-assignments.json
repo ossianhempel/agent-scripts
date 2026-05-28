@@ -1,0 +1,32 @@
+{
+  "_comment": "Maps project paths to profile skill packages. Keys are project roots (~ is expanded). Values are a profile name or a list of profile names. Profiles live in profiles/<name>/skills/ and are NOT synced by the default sync. Sync them with: scripts/sync-agent-scripts.sh --provider profiles. Profile installs use relative symlinks back into agent-scripts — agent-scripts is the single source of truth.",
+  "assignments": {
+    "~/Developer/platesnap": "swift-app-developer",
+    "~/Developer/hookbase": "swift-app-developer",
+    "~/Developer/lovenote": "swift-app-developer",
+    "~/Developer/mina-recept-ios": "swift-app-developer",
+    "~/Developer/morning-person": "swift-app-developer",
+    "~/Developer/petalpal": "swift-app-developer",
+    "~/Developer/shame": "swift-app-developer",
+    "~/Developer/shotly": "swift-app-developer",
+    "~/Developer/skinlytix": "swift-app-developer",
+    "~/Developer/swingpilot": "swift-app-developer",
+    "~/Developer/unwired": "swift-app-developer",
+    "~/Developer/valj-ratt": "swift-app-developer",
+    "~/Developer/walkmon": "swift-app-developer",
+    "~/Developer/gainslog-ios": "swift-app-developer",
+
+    "~/Developer/gainslog": "rn-app-developer",
+    "~/Developer/chat-analytics": "rn-app-developer",
+
+    "~/Developer/gainslog-web": "web-app-developer",
+    "~/Developer/mina-recept.se": "web-app-developer",
+    "~/Developer/ossianhempel_com": "web-app-developer",
+    "~/Developer/post-queue": "web-app-developer",
+    "~/Developer/share-app-images": "web-app-developer",
+    "~/Developer/sl-departure-board": "web-app-developer",
+    "~/Developer/St-rkande_tr-ning": "web-app-developer",
+    "~/Developer/walkmon-web": "web-app-developer",
+    "~/Developer/platesnap-web": "web-app-developer"
+  }
+}
