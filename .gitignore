@@ -4,3 +4,7 @@
 /.agent-readiness/
 /tools/agent-readiness/node_modules/
 /tools/agent-readiness/dist/
+
+# Python
+__pycache__/
+*.pyc
