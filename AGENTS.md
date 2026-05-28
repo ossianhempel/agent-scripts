@@ -68,16 +68,39 @@ See `tools.md` for full CLI tool reference (oracle, gh, gog, committer, trash, d
 - Personal AI assistant on Mac Mini.
 - Set up with `clawdbot onboard`, configure with `clawdbot configure`.
 
+### Docs Discovery
+At session start in this repo, run `bin/docs-list` (or `tsx scripts/docs-list.ts`). It prints every `docs/*.md` with its `summary:` and `read_when:` hints so you know which playbook to open before coding — that's the discovery mechanism for repo-local docs (changelog curation, supported agents, release flow, etc.). New docs MUST carry `summary:` + `read_when:` frontmatter to show up.
+
+### Changelog
+`CHANGELOG.md` at the repo root logs meaningful changes (skills added/removed/renamed, sync/audit behavior, AGENTS guidance). When you ship something another agent or future-you needs to know about, add a date-stamped section. See `docs/update-changelog.md` (surfaced by `bin/docs-list`) for the curation checklist when the file falls behind several commits.
+
 ### Skill Sync & Audit
 Skills live in `agent-scripts/skills/` and are mirrored into `~/.agents/skills/` (cross-tool), `~/.claude/skills/` (Claude Code), and `~/.gemini/antigravity-cli/skills/` (Antigravity CLI).
 
-**Where to add a new skill — read this carefully:** When working in this repo (`agent-scripts/`) and the user asks to add, install, or vendor a new skill, the skill MUST be created inside `agent-scripts/skills/<name>/`. Never drop it directly into `~/.claude/skills/`, `~/.agents/skills/`, `~/.codex/skills/`, or any repo-local `.claude/skills` / `.agents/skills` / `.codex/skills` folder. The repo `skills/` directory is the single source of truth; the sync script fans it out everywhere else. Putting it in a global or project-local cache instead breaks that sync and the skill will get pruned or shadowed. If in doubt, ask — but the default is always `agent-scripts/skills/`.
+**Supported agents** (the runtimes sync/prune target, their skill roots, and which keep usable session transcripts) are documented in `docs/supported-agents.md`. Read it before making any skill or script "work across all the agents we support" — e.g. session-log discovery (`agent-transcript`, `session-viewer`) or skill-root scanning (`skill-cleaner`). Only Claude Code and Codex keep full-turn JSONL transcripts; the rest log user prompts only or use binary/SQLite.
+
+**Where to add a new skill — read this carefully:** When working in this repo (`agent-scripts/`) and the user asks to add, install, or vendor a new skill, the skill MUST be created inside `agent-scripts/skills/<name>/` (global) or `agent-scripts/profiles/<profile>/skills/<name>/` (project-scoped — see Profiles below). Never drop it directly into `~/.claude/skills/`, `~/.agents/skills/`, `~/.codex/skills/`, or any repo-local `.claude/skills` / `.agents/skills` / `.codex/skills` folder. The repo is the single source of truth; the sync script fans it out everywhere else. Putting it in a global or project-local cache instead breaks that sync and the skill will get pruned or shadowed. If in doubt, ask — but the default is always `agent-scripts/skills/`.
 
 Two scripts manage sync:
-- `scripts/sync-agent-scripts.sh` — propagates repo skills + slash-commands to all agent runtimes. Run after creating, editing, moving, or deleting a skill. Does NOT prune.
-- `scripts/skills-audit.py scan` — reports orphans (global copies missing from repo), drift (global differs from repo), and local shadows. Run when in doubt about what's installed.
-- `scripts/skills-audit.py prune --execute` — deletes global skills that no longer exist in the repo. Default is dry-run; pass `--execute` to actually remove. Never touches project-local `.claude/skills` or `.agents/skills` inside repos.
+- `scripts/sync-agent-scripts.sh` — propagates repo skills + slash-commands to all agent runtimes. Run after creating, editing, moving, or deleting a skill. Does NOT prune. Does NOT sync profiles unless you pass `--provider profiles`.
+- `scripts/skills-audit.py scan` — reports orphans (global copies missing from repo), drift (global differs from repo), local shadows, and the profile sections (assignments, profile drift, profile orphans, project-native skills, name collisions). Run when in doubt about what's installed.
+- `scripts/skills-audit.py prune --execute` — deletes global skills that no longer exist in the repo. Default is dry-run; pass `--execute` to actually remove. Never touches project-local `.claude/skills` or `.agents/skills` inside repos. Add `--profiles` to also prune profile orphans from assigned project scopes — but **only** skills the profile system manages elsewhere (installed by a different profile); skills authored inside a project that the repo has never seen are reported under "Project-local skills not in any repo profile" and are never pruned.
 Use these instead of `rm -rf` on cached skill directories.
+
+#### Profiles (project-scoped skill packages)
+The skills in `skills/` are **global** — synced to every runtime everywhere. To keep that set small, focused skills live in **profiles** and install only into the projects that need them.
+
+- **Layout:** `profiles/<name>/skills/<skill>/` (e.g. `swift-app-developer`, `rn-app-developer`). Same `SKILL.md` format as a global skill.
+- **Shared skills use symlinks.** A skill that belongs to two-plus profiles but not global lives once in `profiles/_shared/skills/<skill>/`; each profile that uses it holds a symlink `profiles/<profile>/skills/<skill> -> ../../_shared/skills/<skill>`. One source of truth, no duplication. Sync resolves the symlink and copies the real contents into the target project. Prefer this over copying a skill into multiple profiles.
+- **Targeting:** `profile-assignments.json` maps project paths (`~` expanded) to a profile name or list of names.
+- **The default sync never touches profiles.** `scripts/sync-agent-scripts.sh` with no args only fans out global `skills/`. Sync profiles explicitly with the non-default `profiles` provider:
+  - `scripts/sync-agent-scripts.sh --provider profiles` — sync every assignment in the manifest.
+  - `scripts/sync-agent-scripts.sh --provider profiles --profile <name> --project <path>` — one-off.
+- **Project install is a chain of relative symlinks back into agent-scripts** — agent-scripts is the single source of truth, zero copies, zero drift. For each profile skill:
+  - `<project>/.agents/skills/<skill>` → `../../../agent-scripts/profiles/<profile>/skills/<skill>`
+  - `<project>/.claude/skills/<skill>` → `../../.agents/skills/<skill>`
+  Shared skills resolve through one more hop (profile `<skill>` is itself a symlink to `_shared/skills/<skill>`). Edits in agent-scripts show up instantly in every assigned project; nothing to re-copy or re-sync after a content change. Symlinks are relative, so they work cross-machine as long as the project and agent-scripts are siblings under the same parent (`~/Developer/`, `~/repos/`, etc.).
+- **Global vs profile:** if nearly every project benefits, keep it in `skills/`. If it only matters for one platform/stack, put it in that profile. If two profiles share it but global doesn't, use `_shared` + symlinks.
 
 ## Design Guidelines
 
