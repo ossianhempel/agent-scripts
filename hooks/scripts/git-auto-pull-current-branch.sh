@@ -17,14 +17,15 @@ fi
 
 cd "$repo_root"
 
+head_ref="$(git symbolic-ref --quiet HEAD 2>/dev/null || true)"
 branch="$(git symbolic-ref --quiet --short HEAD 2>/dev/null || true)"
 if [[ -z "$branch" ]]; then
   log "skip, detached HEAD in $repo_root"
   exit 0
 fi
 
-upstream="$(git rev-parse --abbrev-ref --symbolic-full-name '@{u}' 2>/dev/null || true)"
-if [[ -z "$upstream" ]]; then
+upstream="$(git for-each-ref --format='%(upstream:short)' "$head_ref" 2>/dev/null || true)"
+if [[ -z "$upstream" || "$upstream" == '@{u}' || "$upstream" == '@{upstream}' ]]; then
   log "skip, $branch has no upstream"
   exit 0
 fi
