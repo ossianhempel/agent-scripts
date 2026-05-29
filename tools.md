@@ -1,6 +1,6 @@
 # Tools Reference
 
-CLI tools available on this machine. Use these for agentic tasks.
+CLI tools available on Ossian's machines. Use these for agentic tasks.
 
 ## agent-readiness
 Deterministic readiness evaluator with a CLI + JSON report schema.
@@ -55,6 +55,19 @@ Safe commit helper that stages only the paths you pass in.
 ```bash
 ./scripts/committer "feat: add widget" src/widget.ts
 ```
+
+---
+
+## trash
+Recoverable file deletion for macOS.
+
+**Usage**:
+```bash
+trash path/to/file
+trash path/to/folder
+```
+
+Use `trash` instead of `rm` for user files or repo files that need removal.
 
 ---
 
@@ -189,3 +202,11 @@ Repeating updates write directly to the Things database (Full Disk Access may be
 Obsidian vault for notes and knowledge management.
 
 **Location**: `~/ossians-second-brain-sync`
+
+**Usage**:
+```bash
+obsidian --help
+obsidian search query="query"
+obsidian read path=daily-notes/2026-05-28.md
+obsidian open path=daily-notes/2026-05-28.md
+```

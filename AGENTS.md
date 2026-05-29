@@ -31,6 +31,9 @@ Define finishing criteria for yourself before you start: what does "done" look l
 - Personal Website repo: ~/Developer/ossianhempel_com
 - Obsidian vault: /Users/ossianhempel/ossians-second-brain-sync
 
+## Notes Lookup
+- If I say "check my notes", "read what I've written about this", "research this in my notes", or similar, search the Obsidian vault first. Use web search or other sources second unless I explicitly ask for them.
+
 ## Docs
 - Start: run docs list (docs:list script, or bin/docs-list here if present; ignore if not installed); open docs before coding.
 - Keep notes short; update docs when behavior/API changes.
