@@ -70,6 +70,10 @@ contains format rules, character limits, structural patterns, and examples.
 - `references/social-profiles.md` - Profile copy across platforms (IG, X,
   TikTok, LinkedIn). Display name, bio structure, what to cut, before/after
   examples.
+- `references/ai-slop-checklist.md` - The operational rubric for catching
+  AI-generated writing. Mechanical tells (banned vocab, em dashes, filler,
+  emoji piling) plus judgment tells (rule of three, tone, rhythm). Backed by
+  the linter at `scripts/ai_slop_lint.py`. Open before declaring any copy done.
 - `references/obsidian-staging.md` - Where finished slideshow / video /
   single-image copy gets written so Ossian can copy-paste it into
   TikTok and Instagram. Open this whenever the deliverable is a
@@ -300,10 +304,16 @@ describing features, show what changes for the user.
    file (character counts, sequence, layout).
 5. **Apply the Hand Test.** Cover the visual. Does the text sell alone?
 6. **Cut.** Remove every word that isn't earning its place.
-7. **Offer 2–3 variants** when there's a clear creative choice (tone, angle,
+7. **Run the AI-slop gate.** Before showing the draft, run it through the
+   mechanical linter and fix every hit:
+   `python3 skills/copywriter/scripts/ai_slop_lint.py -` (pipe the draft in).
+   Then read the judgment section of `references/ai-slop-checklist.md` and
+   fix what the linter can't see (rule-of-three cadence, tone tells, flat
+   rhythm).
+8. **Offer 2–3 variants** when there's a clear creative choice (tone, angle,
    length). Don't drown Ossian in 10 options - give the strongest 2–3 with a
    one-line note on what each is optimizing for.
-8. **Stage finished social copy in Obsidian.** When the deliverable is a
+9. **Stage finished social copy in Obsidian.** When the deliverable is a
    ready-to-post slideshow, video, or single-image post for one of
    Ossian's apps (PlateSnap, GainsLog, Walkmon), append the final
    version to that app's `Posts - Staging.md` file in the vault using
