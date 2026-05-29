@@ -89,6 +89,48 @@ Hand prompts + files to other AIs (GPT-5 Pro, etc.).
 
 ---
 
+## summarize
+Summarize or extract content from URLs, articles, PDFs, local files, YouTube/videos, podcasts, transcripts, and stdin text.
+
+**Install**:
+```bash
+brew install steipete/tap/summarize
+```
+
+**Usage**:
+```bash
+summarize "https://example.com"
+summarize "/path/to/file.pdf"
+summarize "https://youtu.be/..." --youtube auto
+summarize "https://example.com" --extract --format md
+pbpaste | summarize -
+```
+
+Companion skill: `skills/summarize`.
+
+---
+
+## peekaboo
+Capture, inspect, and automate macOS UI with screenshots, annotated UI maps, app/window/menu control, and keyboard/mouse input.
+
+**Install**:
+```bash
+brew install steipete/tap/peekaboo
+```
+
+**Usage**:
+```bash
+peekaboo permissions
+peekaboo see --annotate --path /tmp/peekaboo-see.png
+peekaboo image --mode screen --path /tmp/screen.png
+peekaboo list apps --json
+peekaboo click --on B1
+```
+
+Companion skill: `skills/peekaboo`.
+
+---
+
 ## gh
 GitHub CLI for PRs, issues, CI, releases.
 

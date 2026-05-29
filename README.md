@@ -34,6 +34,7 @@ Source of truth on this machine: `~/Developer/agent-scripts`.
 - `hooks/`: shared agent hook scripts and generated global hook wiring.
 - `slash-commands/`: markdown files that define reusable agent commands.
 - `scripts/`: utilities for syncing and maintenance.
+- `tools.md`: shared CLI tool catalog, matching Steipete's lowercase convention.
 - `tools/`: standalone CLIs and evaluators used by agents.
 - `docs/`: lightweight documentation.
 
@@ -176,6 +177,8 @@ Tools
 - `docs-list`
 - `browser-tools`
 - `oracle`
+- `summarize`
+- `peekaboo`
 - `gh`
 - `gog`
 - `things`

@@ -61,7 +61,7 @@ Define finishing criteria for yourself before you start: what does "done" look l
 
 ## Tools
 
-See `tools.md` for full CLI tool reference (oracle, gh, gog, committer, trash, docs-list, browser-tools, things, obsidian).
+See `tools.md` for full CLI tool reference (oracle, summarize, peekaboo, gh, gog, committer, trash, docs-list, browser-tools, things, obsidian).
 
 ### Clawdbot
 - Don't edit/touch source code; keep it vanilla for upstream updates.
@@ -76,6 +76,8 @@ At session start in this repo, run `bin/docs-list` (or `tsx scripts/docs-list.ts
 
 ### Skill Sync & Audit
 Skills live in `agent-scripts/skills/` and are mirrored into `~/.agents/skills/` (cross-tool), `~/.claude/skills/` (Claude Code), and `~/.gemini/antigravity-cli/skills/` (Antigravity CLI).
+
+Small CLI tools that need a "when to use this" trigger should usually have a companion skill in `skills/<tool-name>/` plus a short entry in `tools.md`. The binary gives agents capability; the skill description gives agents the trigger surface.
 
 **Supported agents** (the runtimes sync/prune target, their skill roots, and which keep usable session transcripts) are documented in `docs/supported-agents.md`. Read it before making any skill or script "work across all the agents we support" — e.g. session-log discovery (`agent-transcript`, `session-viewer`) or skill-root scanning (`skill-cleaner`). Only Claude Code and Codex keep full-turn JSONL transcripts; the rest log user prompts only or use binary/SQLite.
 

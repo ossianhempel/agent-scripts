@@ -9,6 +9,11 @@ read_when:
 
 A running log of meaningful changes to this toolkit — skills, profiles, sync/audit behavior, AGENTS guidance. One section per change, reverse-chronological. Add an entry whenever you ship something another agent or future-you needs to know about. Curate with the `update-changelog` skill.
 
+## 2026-05-28 — Summarize and Peekaboo Skills
+- Added global `summarize` skill for the `steipete/tap/summarize` CLI so agents know when to summarize/extract URLs, PDFs, local files, YouTube/videos, podcasts, transcripts, and stdin text.
+- Added global `peekaboo` skill for the `steipete/tap/peekaboo` CLI so agents know when to inspect screenshots, verify native macOS UI, and automate apps/windows/menus/input.
+- Updated `AGENTS.md` and `tools.md` to document the pattern: install the CLI for capability, add a companion skill for trigger behavior.
+
 ## 2026-05-28 — Project-Scoped Skill Profiles + Symlink Sync
 - Added `profiles/<name>/skills/` layout for project-scoped skill packages, with `profiles/_shared/skills/` as a deduplicated store symlinked into the profiles that share a skill.
 - Added `profiles/swift-app-developer/` (9 own iOS/SwiftUI/Xcode skills), `profiles/rn-app-developer/` (11 own Expo/RN skills promoted from gainslog), and `profiles/web-app-developer/` (14 `_shared` symlinks: convex-*, clerk + clerk-cli/setup/custom-ui, privacy-policy).
