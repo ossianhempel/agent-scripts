@@ -1,6 +1,7 @@
 ---
 name: handoff
 description: "Write a path-free handoff prompt for another agent and copy it to clipboard."
+argument-hint: "What will the next session be used for?"
 ---
 
 # Handoff
@@ -10,6 +11,10 @@ on a specific task.
 
 Use when the user asks for `handoff <task>`, "write a handoff", "delegate this",
 or wants a prompt for another agent.
+
+Do not duplicate content already captured in other artifacts (PRDs, plans, ADRs, issues, commits, diffs). Reference them by path or URL instead.
+
+If the user passed arguments, treat them as a description of what the next session will focus on and tailor the doc accordingly.
 
 ## Workflow
 
