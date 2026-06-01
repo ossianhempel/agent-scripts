@@ -1,6 +1,6 @@
 ---
 name: convex-performance-audit
-description: Audits and optimizes Convex application performance across hot-path reads, write contention, subscription cost, and function limits. Use this skill when a Convex feature is slow or expensive, npx convex insights shows high bytes or documents read, OCC conflict errors or mutation retries appear, subscriptions or UI updates are costly, functions hit execution or transaction limits, or the user mentions performance, latency, read amplification, or invalidation problems in a Convex app.
+description: Audit and optimize Convex performance across hot-path reads, write contention, subscription cost, and function limits. Use when a Convex feature is slow or expensive, convex insights shows high reads, OCC conflicts or mutation retries appear, functions hit limits, or the user mentions latency, read amplification, or invalidation.
 ---
 
 # Convex Performance Audit

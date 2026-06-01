@@ -1,6 +1,6 @@
 ---
 name: convex-setup-auth
-description: Sets up Convex authentication with user management, identity mapping, and access control. Use this skill when adding login or signup to a Convex app, configuring Convex Auth, Clerk, WorkOS AuthKit, Auth0, or custom JWT providers, wiring auth.config.ts, protecting queries and mutations with ctx.auth.getUserIdentity(), creating a users table with identity mapping, or setting up role-based access control, even if the user just says "add auth" or "make it require login."
+description: Set up Convex auth with user management, identity mapping, and access control. Use when adding login/signup, configuring Convex Auth, Clerk, WorkOS AuthKit, Auth0, or custom JWT, wiring auth.config.ts, protecting functions with ctx.auth.getUserIdentity(), or adding role-based access control — even if the user just says "add auth."
 ---
 
 # Convex Authentication Setup

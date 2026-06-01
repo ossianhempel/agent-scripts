@@ -4,3 +4,11 @@ repos:
     hooks:
       - id: markdownlint-cli2
         args: ["--config", ".markdownlint-cli2.jsonc"]
+  - repo: local
+    hooks:
+      - id: check-contents
+        name: README Contents in sync with skills/
+        entry: scripts/check-contents.sh
+        language: script
+        pass_filenames: false
+        files: ^(README\.md|skills/.*/SKILL\.md)$

@@ -142,26 +142,25 @@ Run: `pre-commit run --all-files`
 
 ## Contents
 Skills
-- `agent-food-admin`
-- `agent-readiness`
-- `aso-appstore-screenshots`
-- `convex-auth-setup`
-- `convex-components-guide`
-- `convex-function-creator`
-- `convex-helpers-guide`
-- `convex-migration-helper`
-- `convex-quickstart`
-- `convex-schema-builder`
-- `create-cli`
+- `agent-transcript`
+- `autoreview`
+- `coolify`
+- `copywriter`
 - `frontend-design`
-- `ios-marketing-capture`
-- `ios-simulator`
-- `markdown-converter`
-- `notion`
-- `oracle`
+- `grill-me`
+- `grill-with-docs`
+- `handoff`
+- `obsidian`
+- `peekaboo`
 - `playwright`
-- `revenuecat`
-- `update-agent-scripts`
+- `review-agent-md`
+- `session-viewer`
+- `setup-pre-commit`
+- `skill-cleaner`
+- `skill-creator`
+- `skimmify`
+- `summarize`
+- `to-prd`
 
 Slash commands
 - `commit`
