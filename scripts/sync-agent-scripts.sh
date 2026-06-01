@@ -246,8 +246,9 @@ sync_markdown_tree() {
   local src_root="$1"
   local dest_root="$2"
 
+  # No source tree is a benign "nothing to sync" state (e.g. a repo with zero
+  # slash commands) — skip quietly rather than logging a scary line.
   if [[ ! -d "$src_root" ]]; then
-    log "Skipping: missing source $src_root"
     return 0
   fi
 
@@ -944,18 +945,21 @@ if want_provider "gemini"; then
 
   log_sub "Commands -> $gemini_commands_dir"
 
-  while IFS= read -r -d '' file; do
-    rel="${file#$ROOT/slash-commands/}"
-    base_name="${rel##*/}"
-    base_name="${base_name%.md}"
-    rel_dir="$(dirname "$rel")"
-    if [[ "$rel_dir" == "." ]]; then
-      dest_dir="$gemini_commands_dir"
-    else
-      dest_dir="$gemini_commands_dir/$rel_dir"
-    fi
-    render_gemini_toml "$file" "$dest_dir/$base_name.toml" "$base_name"
-  done < <(find "$ROOT/slash-commands" -type f -name '*.md' -print0)
+  # Guard the find: a missing slash-commands/ tree is a benign no-op, not an error.
+  if [[ -d "$ROOT/slash-commands" ]]; then
+    while IFS= read -r -d '' file; do
+      rel="${file#$ROOT/slash-commands/}"
+      base_name="${rel##*/}"
+      base_name="${base_name%.md}"
+      rel_dir="$(dirname "$rel")"
+      if [[ "$rel_dir" == "." ]]; then
+        dest_dir="$gemini_commands_dir"
+      else
+        dest_dir="$gemini_commands_dir/$rel_dir"
+      fi
+      render_gemini_toml "$file" "$dest_dir/$base_name.toml" "$base_name"
+    done < <(find "$ROOT/slash-commands" -type f -name '*.md' -print0)
+  fi
 
   update_gemini_settings "$GEMINI_HOME/settings.json" "$GEMINI_CONTEXT_FILE_DEFAULT"
 fi
