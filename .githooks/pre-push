@@ -1,0 +1,69 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Auto-sync (and prune dry-run) when publishing changes to main.
+#
+# The post-merge/post-checkout/post-rewrite hooks cover *incoming* changes
+# (pull/checkout/rebase). This hook covers the gap for *outgoing* changes:
+# when you push your own work to main, propagate skills/commands/scripts into
+# the installed agent runtimes and flag any global orphan skills.
+#
+# Non-blocking by design: sync/prune failures only warn — the push always
+# proceeds. Prune runs dry-run only; it never deletes (run
+# `scripts/skills-audit.py prune --execute` yourself to apply).
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$ROOT"
+
+log() { printf 'agent-scripts pre-push: %s\n' "$*" >&2; }
+
+ZERO="0000000000000000000000000000000000000000"
+
+# stdin lines: <local ref> <local sha> <remote ref> <remote sha>
+pushing_main=0
+range=""
+while read -r local_ref local_sha remote_ref remote_sha; do
+  [ "${remote_ref:-}" = "refs/heads/main" ] || continue
+  # Branch deletion (local sha all-zero) — nothing to sync.
+  [ "$local_sha" = "$ZERO" ] && continue
+  pushing_main=1
+  if [ "$remote_sha" = "$ZERO" ]; then
+    range=""                      # new ref on remote; can't diff, sync unconditionally
+  else
+    range="$remote_sha..$local_sha"
+  fi
+done
+
+[ "$pushing_main" -eq 1 ] || exit 0
+
+# Only sync when the pushed commits actually touch synced paths (parity with
+# run-sync-if-needed.sh). On a brand-new remote ref we have no range, so sync.
+if [ -n "$range" ]; then
+  if ! git diff --name-only "$range" -- skills slash-commands scripts | grep -q .; then
+    log "no skill/command/script changes in push; skipping sync"
+    exit 0
+  fi
+fi
+
+SYNC_SCRIPT="$ROOT/scripts/sync-agent-scripts.sh"
+if [ -f "$SYNC_SCRIPT" ]; then
+  log "syncing agent runtimes…"
+  if bash "$SYNC_SCRIPT"; then
+    log "sync complete"
+  else
+    log "WARNING: sync failed (non-blocking); push continues"
+  fi
+fi
+
+# Prune: dry-run + warn only. Surfaces global orphan skills without deleting.
+AUDIT="$ROOT/scripts/skills-audit.py"
+if [ -f "$AUDIT" ] && command -v python3 >/dev/null 2>&1; then
+  prune_out="$(python3 "$AUDIT" prune 2>&1 || true)"
+  if printf '%s' "$prune_out" | grep -q "Would remove"; then
+    log "WARNING: global orphan skills detected (not deleted):"
+    printf '%s\n' "$prune_out" | sed 's/^/  /' >&2
+    log "run 'scripts/skills-audit.py prune --execute' to remove them"
+  fi
+fi
+
+exit 0

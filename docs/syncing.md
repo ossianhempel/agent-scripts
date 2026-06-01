@@ -173,7 +173,14 @@ If you want local auto-sync on pull/checkout/rebase:
 
 This installs repo-local hooks (via `core.hooksPath`) that run
 `scripts/sync-agent-scripts.sh` when changes are detected under
-`skills/`, `slash-commands/`, or `scripts/`.
+`skills/`, `slash-commands/`, or `scripts/`:
+
+- `post-merge` / `post-checkout` / `post-rewrite` — sync on *incoming* changes
+  (pull, checkout, rebase).
+- `pre-push` — sync on *outgoing* changes when pushing **`main`**, covering the
+  gap where you publish your own work. It also runs `skills-audit.py prune` in
+  **dry-run** mode and warns about global orphan skills without deleting them.
+  Both steps are non-blocking: failures only warn, the push always proceeds.
 
 To remove the hooks:
 

@@ -19,6 +19,7 @@ chmod +x \
   "$ROOT/.githooks/post-merge" \
   "$ROOT/.githooks/post-checkout" \
   "$ROOT/.githooks/post-rewrite" \
+  "$ROOT/.githooks/pre-push" \
   "$ROOT/.githooks/run-sync-if-needed.sh"
 
 echo "Hooks installed: core.hooksPath=.githooks"
