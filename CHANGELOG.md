@@ -9,6 +9,11 @@ read_when:
 
 A running log of meaningful changes to this toolkit — skills, profiles, sync/audit behavior, AGENTS guidance. One section per change, reverse-chronological. Add an entry whenever you ship something another agent or future-you needs to know about. Curate with the `update-changelog` skill.
 
+## 2026-06-03 — Promote 4 web skills into web-app-developer profile
+- Promoted `hono`, `better-auth-best-practices`, `vercel-composition-patterns`, and `vercel-react-best-practices` from project-native skills (originally living only in `resume-builder`) into `profiles/web-app-developer/skills/`. Every web-app-developer project now gets them on sync.
+- Replaced the project-native copies in `resume-builder` with the standard relative symlinks back into agent-scripts (no more duplicated content).
+- Assigned `resume-builder` and `top-of-class` to their profiles (`web-app-developer` / `swift-app-developer`) in `profile-assignments.json`.
+
 ## 2026-06-02 — Skill Usage Tracking (Claude + Codex)
 - Added `hooks/scripts/track-skill-usage.py`, a `PostToolUse` hook wired into both Claude Code (`~/.claude/settings.json`, matcher `Skill`) and Codex (`~/.codex/config.toml`, matcher `exec_command`, async). It logs which skills get used to `~/.local/share/agent-skill-usage/events.jsonl` (network-free, local JSONL).
 - Detection is agent-aware: Claude's `Skill` tool input vs Codex's `.../skills/<name>/SKILL.md` reads. Batch reads of many `SKILL.md` in one call are tagged `skill_scan` (catalog listing) and excluded from the report by default.
