@@ -9,6 +9,12 @@ read_when:
 
 A running log of meaningful changes to this toolkit — skills, profiles, sync/audit behavior, AGENTS guidance. One section per change, reverse-chronological. Add an entry whenever you ship something another agent or future-you needs to know about. Curate with the `update-changelog` skill.
 
+## 2026-06-02 — Skill Usage Tracking (Claude + Codex)
+- Added `hooks/scripts/track-skill-usage.py`, a `PostToolUse` hook wired into both Claude Code (`~/.claude/settings.json`, matcher `Skill`) and Codex (`~/.codex/config.toml`, matcher `exec_command`, async). It logs which skills get used to `~/.local/share/agent-skill-usage/events.jsonl` (network-free, local JSONL).
+- Detection is agent-aware: Claude's `Skill` tool input vs Codex's `.../skills/<name>/SKILL.md` reads. Batch reads of many `SKILL.md` in one call are tagged `skill_scan` (catalog listing) and excluded from the report by default.
+- Added `scripts/skill-usage-report.py` + `bin/skill-usage` wrapper — answers "which skills do I actually use, per repo/agent, this week?" with `--since/--agent/--repo/--by/--json` flags. By default excludes catalog scans and agent-scripts authoring noise.
+- Documented in `docs/skill-usage-tracking.md`. Hook-based tracking only reaches Claude + Codex (the only supported runtimes with a comparable `PostToolUse` hook); Codex needs a one-time hook-trust approval on next launch.
+
 ## 2026-05-28 — Summarize and Peekaboo Skills
 - Added global `summarize` skill for the `steipete/tap/summarize` CLI so agents know when to summarize/extract URLs, PDFs, local files, YouTube/videos, podcasts, transcripts, and stdin text.
 - Added global `peekaboo` skill for the `steipete/tap/peekaboo` CLI so agents know when to inspect screenshots, verify native macOS UI, and automate apps/windows/menus/input.

@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# Thin wrapper for the skill-usage report. Run from anywhere.
+set -euo pipefail
+here="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+exec python3 "$here/scripts/skill-usage-report.py" "$@"
