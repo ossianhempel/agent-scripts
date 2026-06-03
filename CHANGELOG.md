@@ -10,8 +10,9 @@ read_when:
 A running log of meaningful changes to this toolkit — skills, profiles, sync/audit behavior, AGENTS guidance. One section per change, reverse-chronological. Add an entry whenever you ship something another agent or future-you needs to know about. Curate with the `update-changelog` skill.
 
 ## 2026-06-03 — Promote 4 web skills into web-app-developer profile
-- Promoted `hono`, `better-auth-best-practices`, `vercel-composition-patterns`, and `vercel-react-best-practices` from project-native skills (originally living only in `resume-builder`) into `profiles/web-app-developer/skills/`. Every web-app-developer project now gets them on sync.
-- Replaced the project-native copies in `resume-builder` with the standard relative symlinks back into agent-scripts (no more duplicated content).
+- Promoted `hono`, `better-auth-best-practices`, `vercel-composition-patterns`, and `vercel-react-best-practices` from project-native skills into `profiles/web-app-developer/skills/`. Every web-app-developer project now gets them on sync.
+- Reconciled divergent copies found across projects: the canonical versions of `hono` (579-line inline-API variant) and the two `vercel-*` skills are `walkmon-web`'s superset (vercel-react-best-practices carries 72 rule files + generator scaffolding). `resume-builder`'s thinner copies and `platesnap-web`'s variant were superseded (platesnap had nothing unique).
+- Replaced project-native copies in `resume-builder`, `walkmon-web`, and `platesnap-web` with the standard relative symlinks back into agent-scripts; fanned the profile out to all 11 assigned web projects. (Pre-existing project-native `stripe-best-practices` copies in walkmon-web/platesnap-web were left untouched — out of scope, flagged for later.)
 - Assigned `resume-builder` and `top-of-class` to their profiles (`web-app-developer` / `swift-app-developer`) in `profile-assignments.json`.
 
 ## 2026-06-02 — Skill Usage Tracking (Claude + Codex)
