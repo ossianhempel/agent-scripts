@@ -57,7 +57,7 @@ scripts/gen-subagents.py [--dry-run]
 
 ## Pruning is manifest-based
 
-The generator writes a `.agent-scripts-manifest` in each target dir listing the files it created. On each run it removes previously-generated files that are no longer in `subagents/`, and **never touches files it didn't write** — hand-authored agents in `~/.claude/agents/` are safe. (This is separate from `skills-audit.py`, which prunes skills, not subagents.)
+The generator writes a `.agent-scripts-manifest` in each target dir listing the files it created. On each run it removes previously-generated files that are no longer in `subagents/`, and **never touches files it didn't write** — hand-authored agents in `~/.claude/agents/` are safe. This holds even on a name collision: if a target file exists but isn't in the prior manifest (hand-authored, or from another tool), the generator **skips it with a warning rather than overwriting**, and keeps it out of the manifest so a later prune can't delete it either. Rename the canonical subagent to resolve such a collision. (This is separate from `skills-audit.py`, which prunes skills, not subagents.)
 
 ## Status & roadmap
 
