@@ -95,6 +95,29 @@ Chrome DevTools helper (navigate, evaluate, screenshot, inspect, etc.).
 
 ---
 
+## openclaw
+Personal AI assistant service. On this Mac it runs as the launch agent
+`ai.openclaw.gateway`, with state under `~/.openclaw`.
+
+**Docs**: `docs/openclaw-operations.md`
+
+**Health checks**:
+```bash
+launchctl print gui/$(id -u)/ai.openclaw.gateway
+tail -n 160 ~/Library/Logs/openclaw/gateway.log
+find ~/.openclaw/telegram/ingress-spool-default -maxdepth 1 -type f -print
+```
+
+**Restart**:
+```bash
+launchctl kickstart -k gui/$(id -u)/ai.openclaw.gateway
+```
+
+Use this when Telegram/Discord/WhatsApp channels stop responding. Do not edit
+OpenClaw source code for local service recovery.
+
+---
+
 ## oracle
 Hand prompts + files to other AIs (GPT-5 Pro, etc.).
 

@@ -9,6 +9,10 @@ read_when:
 
 A running log of meaningful changes to this toolkit — skills, profiles, sync/audit behavior, AGENTS guidance. One section per change, reverse-chronological. Add an entry whenever you ship something another agent or future-you needs to know about. Curate with the `update-changelog` skill.
 
+## 2026-06-04 — Document OpenClaw launch-agent recovery
+- Added `docs/openclaw-operations.md` with the current macOS OpenClaw service facts: `ai.openclaw.gateway`, state under `~/.openclaw`, live logs under `~/Library/Logs/openclaw/gateway.log`, Telegram ingress spool checks, and the launchctl restart/verify flow.
+- Removed the stale README reference to the missing `scripts/update-clawdbot.sh` helper, added README/AGENTS/tools pointers to the new operations checklist, and clarified that Telegram spool files mean Telegram delivered the message but local OpenClaw processing got stuck.
+
 ## 2026-06-04 — Local skill-usage dashboard
 - Added a local-only visual dashboard for the skill-usage tracking: `scripts/skill-dashboard-server.py` (stdlib localhost server that reads the event log live), `dashboard/index.html` (self-contained, no CDNs — KPI cards, per-agent stacked top-skills bars, per-repo bars, activity sparkline, recent-invocations table, instant client-side filters), `bin/skill-dashboard`, and a double-clickable `Skill Dashboard.command` launcher.
 - Deliberately **not** on GitHub Pages: the event log carries repo/client names + local paths and `agent-scripts` is public, so the dashboard binds to `127.0.0.1` and never commits/sends data. Refresh button + 20s auto-refresh re-read the file, so no terminal commands are needed during use. Documented in `docs/skill-usage-tracking.md`.

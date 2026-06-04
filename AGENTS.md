@@ -76,7 +76,13 @@ See `tools.md` for full CLI tool reference (oracle, summarize, peekaboo, gh, gog
 ### Clawdbot
 - Don't edit/touch source code; keep it vanilla for upstream updates.
 - Personal AI assistant on Mac Mini.
-- Set up with `clawdbot onboard`, configure with `clawdbot configure`.
+- Current service is the OpenClaw launch agent `ai.openclaw.gateway`; runtime
+  state lives in `~/.openclaw` (`~/.clawdbot` is a symlink on this Mac).
+- If Telegram stops responding, read `docs/openclaw-operations.md` before
+  guessing. Check the launch agent, `~/Library/Logs/openclaw/gateway.log`, and
+  `~/.openclaw/telegram/ingress-spool-default/` first.
+- Set up/configure with `openclaw` commands unless an older install explicitly
+  only has `clawdbot`.
 
 ### Docs Discovery
 At session start in this repo, run `bin/docs-list` (or `tsx scripts/docs-list.ts`). It prints every `docs/*.md` with its `summary:` and `read_when:` hints so you know which playbook to open before coding — that's the discovery mechanism for repo-local docs (changelog curation, supported agents, release flow, etc.). New docs MUST carry `summary:` + `read_when:` frontmatter to show up.
