@@ -9,7 +9,7 @@ Run this when work is **solved and verified**, not mid-flight, and when there's 
 
 This skill is free-standing — no other skill or project setup is required. It is **loosely coupled** to your toolkit where that helps: it can hand prevention rules to `review-agent-md`, writes glossary entries in the `grill-with-docs` `CONCEPTS.md` format, and complements `plan` (a recurring miss may mean a planning gap). None of those need to be present.
 
-It ships with one companion: the **learnings-researcher** subagent (`agents/learnings-researcher.md`) — the *read* side of the loop. `compound` writes solution docs; the researcher surfaces them again later. Dispatch it as a subagent where useful, or do its grep-and-distill inline if the runtime has no subagents. It's also valuable **outside** this skill — run it before starting work (or from `plan`) to ask "what has this repo already learned about this?" so you don't re-debug a solved problem.
+It has one companion: the **learnings-researcher** subagent — the *read* side of the loop. `compound` writes solution docs; the researcher surfaces them again later. It's a registered cross-tool subagent (defined in `agent-scripts/subagents/learnings-researcher.md`, generated into each harness's native agents dir), so invoke it by name where the runtime supports subagents, or do its grep-and-distill inline if it doesn't. It's also valuable **outside** this skill — run it before starting work (or from `plan`) to ask "what has this repo already learned about this?" so you don't re-debug a solved problem.
 
 ## The three questions
 
@@ -48,7 +48,7 @@ Sort what you found into the routes below. A learning can produce more than one 
 
 Write to `docs/solutions/<category>/<slug>.md` (create dirs lazily). Pick a category that fits — e.g. `build-errors/`, `runtime-errors/`, `database/`, `performance/`, `integration/`, `architecture/`, `conventions/`, `tooling/`, `workflow/`. Invent one if none fits; consistency matters more than the exact taxonomy.
 
-**Before writing, check for an existing doc on the same problem.** Dispatch the **learnings-researcher** subagent in `overlap-check` mode (it reads `agents/learnings-researcher.md`, greps `docs/solutions/`, and returns either a doc to update or "no overlap — create new") — or grep inline if subagents aren't available. If a doc overlaps heavily, **update it** rather than duplicate; if it's adjacent, cross-link.
+**Before writing, check for an existing doc on the same problem.** Invoke the **learnings-researcher** subagent in `overlap-check` mode (greps `docs/solutions/` and returns either a doc to update or "no overlap — create new") — or grep inline if subagents aren't available. If a doc overlaps heavily, **update it** rather than duplicate; if it's adjacent, cross-link.
 
 Use this lightweight, greppable shape:
 
