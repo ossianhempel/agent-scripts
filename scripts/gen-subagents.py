@@ -106,9 +106,11 @@ def emit_codex(a: dict) -> str:
     # 'inherit' => omit model so Codex uses the parent session model.
     if a["model"] and a["model"] != "inherit":
         lines.append(f'model = "{_toml_basic(a["model"])}"')
-    # Codex puts the system prompt in a field, not the body. Triple-quote it;
-    # escape any stray triple-quote run in the prompt to stay valid TOML.
-    body = a["body"].replace('"""', '\\"\\"\\"')
+    # Codex puts the system prompt in a field, not the body. It's a multi-line
+    # TOML *basic* string, so the body needs the same escaping as the scalar
+    # fields: backslashes (regex like \d, Windows paths, LaTeX) and quotes both
+    # matter. Escaping every " also stops a stray """ run from closing early.
+    body = _toml_basic(a["body"])
     lines.append(f'developer_instructions = """\n{body}"""')
     return "\n".join(lines) + "\n"
 
