@@ -33,7 +33,7 @@ installs into each assigned project's .agents/skills (real dirs) and
 from --profile/--project for a one-off.
 
 Options:
-  --providers <list>          Comma-separated providers (agents,codex,claude,gemini,cursor,copilot,antigravity,profiles)
+  --providers <list>          Comma-separated providers (agents,subagents,codex,claude,gemini,cursor,copilot,antigravity,profiles)
   --provider <name>           Add a single provider (repeatable)
   --agents-home <path>        Override agents home (default: ~/.agents)
   --agents-skills-dir <path>  Override agents skills directory (default: ~/.agents/skills)
@@ -859,7 +859,7 @@ if [[ ${#PROVIDERS[@]} -eq 0 ]]; then
   if [[ ${#PROFILE_NAMES[@]} -gt 0 || -n "$PROFILE_PROJECT" ]]; then
     PROVIDERS=(profiles)
   else
-    PROVIDERS=(agents codex claude gemini cursor copilot antigravity)
+    PROVIDERS=(agents subagents codex claude gemini cursor copilot antigravity)
   fi
 fi
 
@@ -897,6 +897,18 @@ if want_provider "agents"; then
 
   if scope_has "$AGENTS_SCOPE" "project"; then
     sync_skills_to "$RUN_DIR/.agents/skills" "Project skills"
+  fi
+fi
+
+# --- Subagents: native subagent files generated per harness from subagents/ ---
+if want_provider "subagents"; then
+  log_section "Subagents"
+  if [[ -d "$ROOT/subagents" ]]; then
+    gen_args=(--claude-agents-dir "$CLAUDE_HOME/agents" --codex-agents-dir "$CODEX_HOME/agents")
+    [[ "$DRY_RUN" -eq 1 ]] && gen_args+=(--dry-run)
+    python3 "$ROOT/scripts/gen-subagents.py" "${gen_args[@]}"
+  else
+    log_sub "No subagents/ dir; skipping"
   fi
 fi
 
