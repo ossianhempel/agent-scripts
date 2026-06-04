@@ -15,6 +15,7 @@ import http.server
 import json
 import os
 import socketserver
+import subprocess
 import sys
 import threading
 import webbrowser
@@ -84,6 +85,16 @@ class Handler(http.server.BaseHTTPRequestHandler):
         self._send(404, b"not found", "text/plain")
 
 
+def open_browser(url: str) -> None:
+    if sys.platform == "darwin":
+        try:
+            subprocess.run(["open", url], check=True)
+            return
+        except Exception:
+            pass
+    webbrowser.open(url)
+
+
 def main() -> int:
     # Bind to a free port on localhost only.
     with socketserver.TCPServer(("127.0.0.1", 0), Handler) as httpd:
@@ -92,9 +103,12 @@ def main() -> int:
         print(f"\n  Skill-usage dashboard → {url}", flush=True)
         print(f"  Reading: {data_file()}", flush=True)
         print("  Press Ctrl-C (or close this window) to stop.\n", flush=True)
-        # Open the browser shortly after the server starts accepting.
+        # Open the browser shortly after the server starts accepting. On macOS,
+        # use the native `open` so the page lands in a normal window/tab of the
+        # user's default browser — webbrowser.open can spawn an odd transient
+        # Chrome window on some setups.
         if "--no-open" not in sys.argv:
-            threading.Timer(0.4, lambda: webbrowser.open(url)).start()
+            threading.Timer(0.4, lambda: open_browser(url)).start()
         try:
             httpd.serve_forever()
         except KeyboardInterrupt:
