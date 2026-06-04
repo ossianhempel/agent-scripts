@@ -63,6 +63,23 @@ By default the report **excludes** two kinds of noise:
 - Loads inside the `agent-scripts` repo — that's almost always *authoring* a
   skill, not using one.
 
+## Visual dashboard (local-only)
+
+Double-click **`Skill Dashboard.command`** at the repo root (or run
+`bin/skill-dashboard`). It starts a tiny localhost server
+(`scripts/skill-dashboard-server.py`) that reads the event log live and opens a
+single-page dashboard (`dashboard/index.html`) in your browser: KPI cards, top
+skills (stacked per agent), per-repo bars, an activity-over-time sparkline, and a
+recent-invocations table. Filters for window (7/30/90/all), agent, and the
+scans/authoring toggles work instantly client-side.
+
+It is **deliberately local-only** — binds to `127.0.0.1`, reads
+`~/.local/share` only, commits and sends nothing. That's why it's not on GitHub
+Pages: the event log carries repo/client names and local paths, and
+`agent-scripts` is a public repo. The dashboard has a **Refresh** button and a
+20s auto-refresh; both just re-read the file, so no terminal commands are needed
+while it's open. Close the window (or Ctrl-C) to stop the server.
+
 ## Wiring (already installed)
 
 - **Claude Code** — `~/.claude/settings.json`, `hooks.PostToolUse`, matcher
