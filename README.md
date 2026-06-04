@@ -144,6 +144,8 @@ Run: `pre-commit run --all-files`
 Skills
 - `agent-transcript`
 - `autoreview`
+- `brainstorm`
+- `compound`
 - `coolify`
 - `copywriter`
 - `frontend-design`
@@ -152,6 +154,7 @@ Skills
 - `handoff`
 - `obsidian`
 - `peekaboo`
+- `plan`
 - `playwright`
 - `review-agent-md`
 - `session-viewer`
@@ -160,7 +163,6 @@ Skills
 - `skill-creator`
 - `skimmify`
 - `summarize`
-- `to-prd`
 
 Slash commands
 - `commit`
