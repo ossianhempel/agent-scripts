@@ -164,6 +164,9 @@ Skills
 - `skimmify`
 - `summarize`
 
+Subagents (canonical in `subagents/`, generated per harness — see `docs/subagents.md`)
+- `learnings-researcher`
+
 Slash commands
 - `commit`
 - `draft-pr`
