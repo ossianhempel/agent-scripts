@@ -28,6 +28,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import sys
 from pathlib import Path
@@ -82,12 +83,22 @@ def parse_agent(path: Path) -> dict:
 
 # --- emitters -----------------------------------------------------------------
 
+def _yaml_scalar(s: str) -> str:
+    # YAML is a JSON superset, so a json.dumps string is a valid YAML
+    # double-quoted scalar — safely quoting/escaping values that contain ': ',
+    # a leading indicator char ('"', "'", '[', '{', '#', ...), or a trailing ':'.
+    return json.dumps(s, ensure_ascii=False)
+
+
 def emit_claude(a: dict) -> str:
-    lines = ["---", f"name: {a['name']}", f"description: {a['description']}"]
-    if a["model"] and a["model"] != "":
-        lines.append(f"model: {a['model']}")
+    lines = ["---", f"name: {_yaml_scalar(a['name'])}",
+             f"description: {_yaml_scalar(a['description'])}"]
+    if a["model"]:
+        lines.append(f"model: {_yaml_scalar(a['model'])}")
     tools = ACCESS[a["access"]]["claude_tools"]
     if tools:
+        # Controlled vocabulary (no special chars) — Claude's documented
+        # comma-separated bare-name form, left unquoted.
         lines.append(f"tools: {', '.join(tools)}")
     lines += ["---", "", a["body"]]
     return "\n".join(lines)
