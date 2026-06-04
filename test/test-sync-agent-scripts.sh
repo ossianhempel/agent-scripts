@@ -41,9 +41,9 @@ assert_not_contains() {
   fi
 }
 
-# Agents provider syncs skills to ~/.agents/skills
+# Agents provider syncs skills to ~/.agents/skills (as symlinks into the repo)
 assert_contains "Global skills -> $HOME_DIR/.agents/skills"
-assert_contains "- create skill copywriter ("
+assert_contains "- create symlink -> $HOME_DIR/.agents/skills/copywriter -> "
 
 # Claude provider syncs skills to ~/.claude/skills
 assert_contains "Skills -> $HOME_DIR/.claude/skills"
@@ -101,7 +101,7 @@ OUTPUT_FILE="$TMP_DIR/output-project.txt"
 ) > "$OUTPUT_FILE"
 
 assert_contains "Project skills -> $WORKSPACE_DIR/.agents/skills"
-assert_contains "- create skill copywriter ("
+assert_contains "- create symlink -> $WORKSPACE_DIR/.agents/skills/copywriter -> "
 
 # --- Copilot default scope ---
 OUTPUT_FILE="$TMP_DIR/output-copilot-default.txt"
@@ -150,7 +150,9 @@ PY
   "$ROOT/scripts/sync-agent-scripts.sh" --dry-run --providers agents,codex,claude,gemini,cursor
 ) > "$OUTPUT_FILE"
 
-assert_not_contains "- create skill"
-assert_not_contains "- update skill"
+assert_not_contains "- create symlink -> $HOME_DIR/.agents/skills/"
+assert_not_contains "- update symlink -> $HOME_DIR/.agents/skills/"
+assert_not_contains "- create symlink -> $HOME_DIR/.claude/skills/"
+assert_not_contains "- update symlink -> $HOME_DIR/.claude/skills/"
 
 echo "ok"

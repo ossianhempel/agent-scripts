@@ -23,23 +23,6 @@ needs rethinking).
 The output is a working outline that feels like a smart person's notes -
 opinionated, specific, and structurally driven by the content itself.
 
-## Feedback Log (DO THIS FIRST)
-
-**At the start of every session, before doing anything else**, read the file
-`feedback.log` in this skill's folder. It contains accumulated preferences and
-corrections from previous sessions. Apply everything in it as if it were part of
-this SKILL.md.
-
-**During a session**, whenever Ossian gives a correction, states a preference, or
-says something like "don't do X" / "I prefer Y" / "always do Z":
-
-1. Decide: is this a **general preference** that applies to future sessions, or
-   is it **specific to the current task only**?
-2. If it's general, **immediately append it to `feedback.log`** using the Edit
-   or Write tool. Don't wait until the end of the session.
-3. Format each entry as: `[YYYY-MM-DD] <the preference or correction>`
-4. Skip anything that only matters for the current task.
-
 ## When This Skill Activates
 
 - User wants to plan or outline a blog post or article

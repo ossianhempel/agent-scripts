@@ -14,19 +14,6 @@ metadata:
 # React Native Skills
 
 
-## Feedback Log (Read First)
-
-At the start of every session, before doing anything else, read `feedback.log` in this skill's folder. It contains accumulated preferences and corrections from previous sessions — apply them as if they were part of this SKILL.md.
-
-During a session, when the user gives a correction, states a preference, or says something like "don't do X" / "I prefer Y" / "always do Z":
-
-1. Decide: is this a general preference that should apply to future sessions, or specific to the current task?
-2. If general, immediately append it to `feedback.log` by editing the file. Don't wait until the end of the session.
-3. Format each entry as: `[YYYY-MM-DD] <the preference or correction>`
-4. Skip anything that only matters for the current task.
-
----
-
 Comprehensive best practices for React Native and Expo applications. Contains
 rules across multiple categories covering performance, animations, UI patterns,
 and platform-specific optimizations.

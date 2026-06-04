@@ -21,10 +21,13 @@ Usage: scripts/sync-agent-scripts.sh [options]
 
 Sync skills/ and slash-commands/ from this repo into supported agent runtimes.
 
-Skills sync to ~/.agents/skills (cross-tool standard, read by Codex, Gemini,
+Skills install as relative symlinks into this repo's skills/ — one canonical
+copy, every runtime links to it (no duplication, no re-sync after edits). The
+link targets are ~/.agents/skills (cross-tool standard, read by Codex, Gemini,
 Cursor, Copilot, Windsurf), ~/.claude/skills (Claude Code only), and
-~/.gemini/antigravity-cli/skills (Antigravity CLI).
-Commands/prompts sync to each tool's native location.
+~/.gemini/antigravity-cli/skills (Antigravity CLI). This makes agent-scripts a
+runtime dependency: move or delete it and the links break.
+Commands/prompts are copied to each tool's native location.
 
 Profiles (profiles/<name>/skills/) are project-scoped skill packages. They are
 NOT part of the default run — sync them with the 'profiles' provider, which
@@ -87,13 +90,6 @@ log_action() {
   printf '  - %s %s -> %s\n' "$verb" "$src" "$dest"
 }
 
-log_sync_summary() {
-  local verb="$1"
-  local label="$2"
-  local count="$3"
-  printf '  - %s skill %s (%s files)\n' "$verb" "$label" "$count"
-}
-
 action_verb() {
   local dest="$1"
   if [[ -e "$dest" ]]; then
@@ -110,15 +106,6 @@ files_identical() {
     return 1
   fi
   cmp -s "$src" "$dest"
-}
-
-dirs_identical() {
-  local src="$1"
-  local dest="$2"
-  if [[ ! -d "$dest" ]]; then
-    return 1
-  fi
-  diff -qr --exclude='feedback.log' "$src" "$dest" >/dev/null 2>&1
 }
 
 to_lower() {
@@ -139,47 +126,6 @@ run_copy_file() {
   fi
   mkdir -p "$(dirname "$dest")"
   cp -f "$src" "$dest"
-}
-
-run_sync_dir() {
-  local src="$1"
-  local dest="$2"
-  local label="${3:-}"
-  local count
-  local verb
-
-  if dirs_identical "$src" "$dest"; then
-    return 0
-  fi
-
-  count=$(find "$src" -type f | wc -l | tr -d ' ')
-  verb=$(action_verb "$dest")
-  if [[ -n "$label" ]]; then
-    log_sync_summary "$verb" "$label" "$count"
-  else
-    log_action "$verb" "$src" "$dest ($count files)"
-  fi
-
-  if [[ "$DRY_RUN" -eq 1 ]]; then
-    return 0
-  fi
-
-  # Preserve destination feedback.log (written by agents during sessions)
-  local saved_feedback=""
-  if [[ -f "$dest/feedback.log" ]]; then
-    saved_feedback=$(mktemp)
-    cp -f "$dest/feedback.log" "$saved_feedback"
-  fi
-
-  rm -rf "$dest"
-  mkdir -p "$(dirname "$dest")"
-  cp -a "$src" "$dest"
-
-  # Restore preserved feedback.log
-  if [[ -n "$saved_feedback" ]]; then
-    cp -f "$saved_feedback" "$dest/feedback.log"
-    rm -f "$saved_feedback"
-  fi
 }
 
 update_gemini_settings() {
@@ -610,15 +556,19 @@ scope_has() {
   [[ "$scope" == "$target" ]]
 }
 
+# Global skills install as relative symlinks straight into agent-scripts —
+# one canonical copy in the repo, every runtime links to it. Zero duplication,
+# zero drift: edit a skill in the repo and every tool sees it instantly, no
+# re-sync needed. (Profiles use the same model for project-scoped skills.)
 sync_skills_to() {
   local dest_dir="$1"
   local label="$2"
-  log_sub "$label -> $dest_dir"
+  log_sub "$label -> $dest_dir (symlinks into agent-scripts)"
   shopt -s nullglob
   for skill_dir in "$ROOT/skills"/*; do
     [[ -d "$skill_dir" ]] || continue
     skill_name="$(basename "$skill_dir")"
-    run_sync_dir "$skill_dir" "$dest_dir/$skill_name" "$skill_name"
+    make_relative_symlink "$dest_dir/$skill_name" "$skill_dir" 1
   done
   shopt -u nullglob
 }
@@ -662,15 +612,21 @@ PY
 # Create/refresh a symlink at $link pointing to $target via a relative path
 # computed from the link's directory. Idempotent and dry-run aware.
 #
-# Refuses to clobber a real directory or file at $link — only replaces existing
-# symlinks (any target) or creates new entries. A real dir with the same name
-# as a profile skill is treated as project-authored content (the agent-scripts
-# repo has no business deleting it); the sync skips it and warns loudly. The
-# user resolves manually: delete the dir if it's stale, or promote its content
-# into the profile if it's the canonical copy.
+# By default refuses to clobber a real directory or file at $link — only
+# replaces existing symlinks (any target) or creates new entries. A real dir
+# with the same name as a profile skill is treated as project-authored content
+# (the agent-scripts repo has no business deleting it); the sync skips it and
+# warns loudly. The user resolves manually: delete the dir if it's stale, or
+# promote its content into the profile if it's the canonical copy.
+#
+# Pass force=1 only for fully sync-managed destinations (the global skills
+# dirs), where a real dir is a stale copy from the old copy-based model and is
+# safe to replace with a symlink — the same name was already overwritten on
+# every prior sync under the copy model, so this is not new clobbering behavior.
 make_relative_symlink() {
   local link="$1"
   local target="$2"
+  local force="${3:-0}"
   local link_dir
   link_dir="$(dirname "$link")"
 
@@ -681,8 +637,9 @@ make_relative_symlink() {
     return 0
   fi
 
-  # Safety: never destroy a real (non-symlink) directory or file at $link.
-  if [[ ! -L "$link" && -e "$link" ]]; then
+  # Safety: never destroy a real (non-symlink) directory or file at $link unless
+  # explicitly forced for a sync-managed destination.
+  if [[ ! -L "$link" && -e "$link" && "$force" != "1" ]]; then
     log_sub "WARNING: $link is a real directory/file, not a symlink — refusing to clobber. Move or promote its content, then rerun."
     return 0
   fi
@@ -692,8 +649,9 @@ make_relative_symlink() {
     return 0
   fi
   mkdir -p "$link_dir"
-  # Only ever removes a symlink here — the real-dir case bailed above.
-  rm -f "$link"
+  # rm -rf on a symlink removes only the link, not its target; on a forced
+  # real-dir replacement it removes the stale copy.
+  rm -rf "$link"
   ln -s "$rel" "$link"
 }
 

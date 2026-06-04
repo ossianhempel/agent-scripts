@@ -23,23 +23,6 @@ This is the general copywriting skill. It covers the philosophy and rules that
 apply everywhere. For format-specific guidance (length, structure, character
 limits, examples), open the matching reference file in `references/`.
 
-## Feedback Log (DO THIS FIRST)
-
-**At the start of every session, before doing anything else**, read the file
-`feedback.log` in this skill's folder. It contains accumulated preferences and
-corrections from previous sessions. Apply everything in it as if it were part
-of this SKILL.md.
-
-**During a session**, whenever Ossian gives a correction, states a preference,
-or says something like "don't do X" / "I prefer Y" / "always do Z":
-
-1. Decide: is this a **general preference** that applies to future sessions, or
-   is it **specific to the current task only**?
-2. If it's general, **immediately append it to `feedback.log`** using the Edit
-   or Write tool. Don't wait until the end of the session.
-3. Format each entry as: `[YYYY-MM-DD] <the preference or correction>`
-4. Skip anything that only matters for the current task.
-
 ## Reference Files
 
 Open the file that matches the medium before writing. Each reference file

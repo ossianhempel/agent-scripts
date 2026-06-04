@@ -9,19 +9,34 @@ read_when:
 
 > **Note:** Slash commands (in `slash-commands/`) are deprecated in Codex. Use skills instead. Claude Code still supports slash commands, but skills work everywhere and are the recommended approach.
 
-Use `scripts/sync-agent-scripts.sh` to copy the skills, slash commands, and
+Use `scripts/sync-agent-scripts.sh` to install the skills, slash commands, and
 agent hooks in this repo into each agent runtime's standard locations.
 
 ## Architecture
 
-Skills sync to two locations:
+Skills install as **relative symlinks** pointing back into this repo's
+`skills/` — there is one canonical copy (in agent-scripts) and every runtime
+links to it. The link targets are:
 
 - **`~/.agents/skills`** — cross-tool standard read by Codex, Gemini CLI, Cursor,
-  Copilot, Windsurf, and others. One copy serves all these tools.
+  Copilot, Windsurf, and others. One link set serves all these tools.
 - **`~/.claude/skills`** — Claude Code only (does not yet support `.agents/`).
+- **`~/.gemini/antigravity-cli/skills`** — Antigravity CLI.
 
-Commands, prompts, and hooks sync to each tool's native location since formats
-differ.
+Each link resolves like
+`~/.claude/skills/<skill> -> ../../Developer/agent-scripts/skills/<skill>`.
+
+Consequences (same model the profiles already use):
+
+- **Zero duplication** — one copy on disk, period.
+- **No drift, no re-sync after edits** — change a skill in agent-scripts and
+  every runtime sees it immediately. You only re-run sync to add or remove a
+  skill, not to edit one.
+- **agent-scripts is a runtime dependency** — move or delete the repo and every
+  runtime's skill links break.
+
+Commands, prompts, and hooks are still **copied** to each tool's native location
+since their formats differ per tool.
 
 These are the **global** skills — every assigned runtime gets all of them.
 Project-scoped skills are handled separately as **profiles** (see
@@ -190,12 +205,13 @@ git config --unset core.hooksPath
 
 ## Default destinations
 
-Skills:
+Skills (installed as relative symlinks into this repo's `skills/`):
 
 - Cross-tool: `~/.agents/skills` (Codex, Gemini, Cursor, Copilot, Windsurf)
 - Claude Code: `~/.claude/skills`
+- Antigravity CLI: `~/.gemini/antigravity-cli/skills`
 
-Commands/prompts:
+Commands/prompts (copied):
 
 - Codex: `~/.codex/prompts`
 - Claude Code: `~/.claude/commands`

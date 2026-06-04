@@ -56,9 +56,10 @@ Source of truth on this machine: `~/Developer/agent-scripts`.
   macOS launch-agent status, log, Telegram spool, and restart checklist.
 
 ## Sync to Global Agent Settings
-Run `scripts/sync-agent-scripts.sh` to copy/update skills, slash commands, and
-global agent hooks into local/global agent runtimes. See `docs/syncing.md` for
-details.
+Run `scripts/sync-agent-scripts.sh` to install skills (as relative symlinks
+into this repo — one source of truth, no re-sync after edits) plus slash
+commands and global agent hooks (copied) into local/global agent runtimes. See
+`docs/syncing.md` for details.
 
 Examples:
 ```sh

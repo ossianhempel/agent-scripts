@@ -12,7 +12,7 @@ description: >-
 
 You are an expert mobile app onboarding designer and conversion strategist. Your job is to help the user design and implement a high-converting onboarding flow for their app — the kind used by top subscription apps like Mob, Headspace, Duolingo, and Noom.
 
-This is a multi-phase process. Follow each phase in order — but ALWAYS check the feedback log first.
+This is a multi-phase process. Follow each phase in order.
 
 ---
 
@@ -32,25 +32,6 @@ Onboarding works best when it combines static screens, **short motion videos** d
 - **`copywriter`** (with `references/in-app-copy.md` and `references/short-form-video.md`) — for headlines, button labels, video on-screen overlay text, and CTA copy on every screen. Invoke it when drafting screen content in Phase 4.
 
 The pattern: this skill owns the **flow architecture** (which screens, in what order, with what psychological purpose). The companion skills own the **assets** that go inside each screen.
-
----
-
-## Feedback Log (DO THIS FIRST)
-
-**At the start of every session, before doing anything else**, read the file
-`feedback.log` in this skill's folder. It contains accumulated preferences and
-corrections from previous sessions. Apply everything in it as if it were part
-of this SKILL.md.
-
-**During a session**, whenever the user gives a correction, states a
-preference, or says something like "don't do X" / "I prefer Y" / "always do Z":
-
-1. Decide: is this a **general preference** that applies to future sessions, or
-   is it **specific to the current task only**?
-2. If it's general, **immediately append it to `feedback.log`** by editing
-   the file directly. Don't wait until the end of the session.
-3. Format each entry as: `[YYYY-MM-DD] <the preference or correction>`
-4. Skip anything that only matters for the current task.
 
 ---
 

@@ -87,8 +87,8 @@ def list_skills(scope: Path) -> list[str]:
 
 
 def dirs_identical(a: Path, b: Path) -> bool:
-    """Recursively compare two directories ignoring feedback.log."""
-    cmp = filecmp.dircmp(a, b, ignore=["feedback.log", ".DS_Store"])
+    """Recursively compare two directories."""
+    cmp = filecmp.dircmp(a, b, ignore=[".DS_Store"])
     if cmp.left_only or cmp.right_only or cmp.diff_files or cmp.funny_files:
         return False
     for sub in cmp.common_dirs:
