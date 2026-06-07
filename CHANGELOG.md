@@ -9,6 +9,12 @@ read_when:
 
 A running log of meaningful changes to this toolkit — skills, profiles, sync/audit behavior, AGENTS guidance. One section per change, reverse-chronological. Add an entry whenever you ship something another agent or future-you needs to know about. Curate with the `update-changelog` skill.
 
+## 2026-06-06 — Add plan inbox skill
+- Added global skill `skills/plan-inbox/` with a bundled scanner for unfinished `docs/plans/` artifacts and optional unresolved `docs/brainstorms/` backlog. It supports current-project, `--project`, `--global`, and `--json` modes, treats `Completed`/`Superseded`/`Abandoned` plans as closed, and treats brainstorms linked to plans as already planned.
+
+## 2026-06-06 — Setup pre-commit adds staged LOC lint
+- Updated `setup-pre-commit` so new hook installs add a `lint:max-lines:staged` gate with a 500-line source-file limit. The checker reads only staged added/copied/modified/renamed files, so existing oversized files do not block commits until they are touched.
+
 ## 2026-06-04 — Global skills install as symlinks; drop skill feedback logs
 - **Global skills now sync as relative symlinks into the repo** instead of copies. `sync_skills_to` links each runtime's `<skill>` entry straight to `skills/<skill>` in agent-scripts (for `~/.agents/skills`, `~/.claude/skills`, and `~/.gemini/antigravity-cli/skills`), matching the model profiles already use. One source of truth, zero duplication, no drift — editing a skill no longer needs a re-sync (only add/move/delete does). Tradeoff: agent-scripts is now a hard runtime dependency of the home skill dirs; move or delete it and the links break. `make_relative_symlink` gained an opt-in `force` arg to replace the old real-dir copies (used only for fully sync-managed global dirs; profiles keep their refuse-to-clobber guard). Removed the now-dead `run_sync_dir`/`dirs_identical`/`log_sync_summary` copy helpers (−115 lines). Audit "drift" sections are now structurally always-empty.
 - **Removed the per-skill `feedback.log` mechanism entirely.** Deleted all 5 (empty) `feedback.log` files and the "Feedback Log (DO THIS FIRST)" instruction blocks from `copywriter`, `onboarding-flow`, `building-native-ui`, `react-native-skills`, and archived `article-outline`. Stripped the feedback-preservation plumbing from `sync-agent-scripts.sh` and the ignore entry from `skills-audit.py`.
