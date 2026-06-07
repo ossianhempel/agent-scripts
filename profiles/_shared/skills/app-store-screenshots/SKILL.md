@@ -34,8 +34,9 @@ Supported devices out of the box:
 1. **Copies a pre-built template** from `template/` (co-located with this `SKILL.md`) into the user's working directory.
 2. Installs dependencies with the user's package manager.
 3. Drops the user's screenshots into `public/screenshots/...` and their app icon into `public/`.
-4. (Optionally) prefills `src/lib/defaults.ts` with the user's app name and starting copy so the first preview is meaningful.
-5. Starts the dev server and tells the user to open the editor in the browser.
+4. Writes a copy-first screenshot story from the user's pain, outcome, proof, and feature list.
+5. Prefills `src/lib/defaults.ts` with the user's app name and starting copy so the first preview is meaningful.
+6. Starts the dev server and tells the user to open the editor in the browser.
 
 You should NOT write `page.tsx`, device frames, or export logic by hand. They live in the template.
 
@@ -56,21 +57,65 @@ Ask the user these. Do not proceed until you have answers:
 2. **App icon** — "Where is your app icon PNG?"
 3. **App name** — "What's the app called?"
 4. **Feature list** — "List your app's features in priority order. What's the #1 thing your app does?"
-5. **Style direction** — "What style do you want? You can either (a) pick one of the named deep-spec styles, or (b) describe your own vibe in your own words (warm/organic, dark/moody, clean/minimal, bold/colorful, plus any reference apps you like) and I'll build a custom palette. The template also ships with `clean-light`, `dark-bold`, `warm-editorial`, and `ocean-fresh` palette presets you can start from. The named deep specs live in `style-prompts/` — see `style-prompts.md` for the full index. Currently available: Retro Rubberhose Mascot, Moody Curated Dating, Paper Sticker Skeuomorphic, Dreamy Pastel Couples, Hand-Drawn Editorial Tasks, Glossy 3D K-Beauty Creator. If the user names one of these — or describes something that clearly matches one — read `style-prompts/_QUALITY_BAR.md` first, then the matching deep spec file, and apply its entire spec (palette, gradients, shadows, rotations, per-slide breakdown). If the user describes a fully custom style, fall back to the General Visual Design Principles below and pick the closest deep spec as a starting reference."
+5. **User pain** — "What frustration, delay, anxiety, or repeated annoyance does the app remove?"
+6. **After-state** — "What changes for the user after they use it?"
+7. **Proof** — "What proof can we show? Examples: ratings, users, streaks, speed, before/after result, testimonial, saved time, real output."
+8. **Style direction** — "What style do you want? You can either (a) pick one of the named deep-spec styles, or (b) describe your own vibe in your own words (warm/organic, dark/moody, clean/minimal, bold/colorful, plus any reference apps you like) and I'll build a custom palette. The template also ships with `clean-light`, `dark-bold`, `warm-editorial`, and `ocean-fresh` palette presets you can start from. The named deep specs live in `style-prompts/` — see `style-prompts.md` for the full index. Currently available: Retro Rubberhose Mascot, Moody Curated Dating, Paper Sticker Skeuomorphic, Dreamy Pastel Couples, Hand-Drawn Editorial Tasks, Glossy 3D K-Beauty Creator. If the user names one of these — or describes something that clearly matches one — read `style-prompts/_QUALITY_BAR.md` first, then the matching deep spec file, and apply its entire spec (palette, gradients, shadows, rotations, per-slide breakdown). If the user describes a fully custom style, fall back to the General Visual Design Principles below and pick the closest deep spec as a starting reference."
 
 ### Optional
 
-6. **Target stores** — Apple App Store only, Google Play only, or both? Determines which platform decks to seed.
-7. **iPad / Android tablet screenshots** — If yes, what sizes and orientations?
-8. **Feature Graphic** — Want a 1024×500 Play Store banner too?
-9. **Localized screenshots** — Languages? (e.g. en, de, es, pt, ja, ar, he)
-10. **Number of slides** — Apple allows up to 10, Google Play up to 8.
-11. **Brand colors / font** — If they want a custom theme beyond the four presets.
-12. **Additional instructions** — Anything specific.
+9. **Target stores** — Apple App Store only, Google Play only, or both? Determines which platform decks to seed.
+10. **iPad / Android tablet screenshots** — If yes, what sizes and orientations?
+11. **Feature Graphic** — Want a 1024×500 Play Store banner too?
+12. **Localized screenshots** — Languages? (e.g. en, de, es, pt, ja, ar, he)
+13. **Number of slides** — Apple allows up to 10, Google Play up to 8.
+14. **Brand colors / font** — If they want a custom theme beyond the four presets.
+15. **Additional instructions** — Anything specific.
 
 **IMPORTANT:** If the user gives instructions at any point, follow them. They override skill defaults.
 
-## Step 2: Scaffold the Template
+## Step 2: Write the Screenshot Story
+
+Do this before scaffolding. Screenshots convert when the text tells the story and the UI acts as evidence. Do not start from the feature list and do not seed generic feature labels.
+
+### Copy-First Deck Outline
+
+Draft the first version of the deck in this order:
+
+| Slot | Purpose | Headline job |
+|------|---------|--------------|
+| #1 | **Name the pain** | Make the target user feel seen before they know the feature set |
+| #2 | **State the shift** | Show what changes once they use the app |
+| #3 | **Show proof** | Use ratings, usage, a concrete result, or a believable output |
+| #4-5 | **Feature delivery** | Show the one or two features that prove the shift |
+| #6+ | **Expansion** | Ecosystem, secondary features, feature wall, or phone mosaic |
+
+Skip slots that genuinely do not fit, but keep the order. If the first three screenshots work in any sequence, the deck is a catalog, not a story.
+
+### Rewrite Features Into Outcomes
+
+Turn feature labels into user-facing outcomes before putting them into `defaults.ts`.
+
+| Weak feature label | Better screenshot headline |
+|--------------------|----------------------------|
+| Customizable dashboard | See everything that matters |
+| Workout tracking | Never forget what you lifted |
+| Notes to slides | Stop designing slides |
+| Auto-numbering | Never fix slides manually again |
+
+Keep each headline to one idea. If a headline needs two clauses to make sense, split it into another slide or use the feature as a subline/proof element.
+
+### Copy Gate Before Scaffolding
+
+Before editing `src/lib/defaults.ts`, check:
+
+- The first slide names a pain, desire, or clear after-state; it is not the app category.
+- The first three slides read in order: pain -> shift -> proof.
+- Every headline still works if the UI is covered.
+- Every headline is 8 words or fewer unless the user explicitly chooses a more editorial style.
+- Feature names support the promise; they are not the promise.
+
+## Step 3: Scaffold the Template
 
 ### Detect Package Manager
 
@@ -117,15 +162,15 @@ public/
 
 The default sample slides reference filenames `01.png`–`05.png` per device under `en/`. If the user names their screenshots differently, either rename them or update `src/lib/defaults.ts` so the initial deck points at the right files. The user can also drag-drop files directly into the editor at runtime — those become embedded data URIs and don't need to live on disk.
 
-### (Optional) Seed Initial Copy
+### Seed Initial Copy
 
-If the user provided headlines, edit `src/lib/defaults.ts` to set:
+Use the copy-first deck from Step 2 to edit `src/lib/defaults.ts` and set:
 - `appName`
 - `tagline`
 - `themeId` (one of `"clean-light" | "dark-bold" | "warm-editorial" | "ocean-fresh"`, or add a new entry to `THEMES` in `src/lib/constants.ts`)
 - Starter slides per device with the user's `label` + `headline` + screenshot paths
 
-Otherwise, leave the defaults — the user can rewrite copy in the editor.
+Do not leave generic defaults when the user has provided enough context to write a first pass. The editor should open on a real marketing story, not placeholder feature labels.
 
 ### Start the Dev Server
 
@@ -135,7 +180,7 @@ bun dev    # → http://localhost:3000
 
 Tell the user to open the URL and start editing. The editor auto-saves to **`app-store-screenshots.json`** at the project root (plus a `localStorage` mirror for instant paint). Uploaded screenshots land in `public/screenshots/uploaded/<hash>.png`. Both are git-trackable — committing them means another machine can `git clone` and resume the exact deck.
 
-## Step 3: Coach the User on Copy
+## Step 4: Coach the User on Copy
 
 Inside the editor the user will write headlines themselves, but they often need guidance. Apply these rules when reviewing their copy or generating suggestions.
 
@@ -164,16 +209,16 @@ Inside the editor the user will write headlines themselves, but they often need 
 
 ### Narrative Arc
 
-The user's slide deck should follow a rough arc (skip slots that don't fit):
+The user's slide deck should follow the copy-first arc from Step 2. Skip slots that do not fit, but preserve the sequence:
 
 | Slot | Purpose |
 |------|---------|
-| #1 | **Hero / Main Benefit** — the ONLY slide most people see |
-| #2 | **Differentiator** — what makes the app unique |
-| #3 | **Ecosystem** — widgets, watch, extensions (skip if N/A) |
-| #4+ | **Core Features** — one per slide, most important first |
-| 2nd-to-last | **Trust Signal** — "made for people who [X]" |
-| Last | **More Features** — pills listing extras (skip if few features) |
+| #1 | **Pain / Main After-State** — the ONLY slide most people see |
+| #2 | **Shift** — what becomes easier, calmer, faster, clearer, or more satisfying |
+| #3 | **Proof** — ratings, users, concrete result, before/after, real output |
+| #4-5 | **Feature Delivery** — the capabilities that make the shift believable |
+| 2nd-to-last | **Ecosystem / Differentiator** — widgets, watch, integrations, unique angle |
+| Last | **Feature Wall or Phone Mosaic** — extras only after the main story is sold |
 
 ### Layout Variation
 
@@ -259,7 +304,7 @@ Pick one. Don't make the last slide another single-feature hero — it wastes th
 
 Shrink the slide to ~160px wide (App Store search-result size). Squint. Can you read the headline? Can you tell what the app does in under a second? If not, the headline is too long, the type is too thin, or there's no contrast between text and background. Fix before exporting.
 
-## Step 4: Localization
+## Step 5: Localization
 
 **Always confirm the language list with the user before scaffolding** — even if they didn't volunteer it. Ask: _"Should screenshots be localized? If yes, which locales? (e.g. en, de, es, pt, ja)."_ Default to English-only if they say no or skip.
 
@@ -276,22 +321,26 @@ The editor stores headlines and labels per-locale on each slide — switch to a 
 - Re-check line breaks per locale; German/French/Portuguese often need shorter claims.
 - For RTL (`ar`, `he`, `fa`, `ur`), the template handles direction inversion through CSS — let the user verify each slide looks intentional, not just flipped.
 
-## Step 5: Export Time
+## Step 6: Export Time
 
 Inside the editor, the user picks a device, then hits **Export bundle**. A single zip downloads with every required size × every project locale for that device, organized as `<platform>/<device>/<WxH>/<locale>/NN-<layout>.png`. Repeat per device.
 
-Project locales come from `app-store-screenshots.json` `locales` field — set during scaffolding (Step 4). Single-locale projects produce a flat per-size structure with just the one locale folder.
+Project locales come from `app-store-screenshots.json` `locales` field — set during scaffolding (Step 5). Single-locale projects produce a flat per-size structure with just the one locale folder.
 
 If exports come out blank or with black screen rectangles:
 - Verify source screenshots are RGB (not RGBA). The template flattens via `objectFit: cover`, but truly transparent sources can still produce black regions.
 - Confirm preload completed — check the browser console for `preloadImages` errors.
 - The export double-call (`toPng` twice in a row) is built-in; do not remove it.
 
-## Step 6: Final QA Gate
+## Step 7: Final QA Gate
 
 ### Message Quality
 - One idea per slide
-- Hero slide communicates the main benefit in one second
+- Hero slide names the pain or after-state in one second
+- First three slides read in order: pain -> shift -> proof
+- Headlines still sell when the UI is covered
+- Feature labels have been rewritten into user outcomes
+- Headlines are 8 words or fewer unless the style intentionally calls for longer editorial copy
 - Readable at arm's length at thumbnail size
 
 ### Visual Quality
@@ -312,7 +361,7 @@ If exports come out blank or with black screen rectangles:
 | Edited `page.tsx` instead of using the editor | Roll back the edit; let users iterate in the browser |
 | Tried to rebuild device frames from scratch | They're in `src/components/editor/device-frames.tsx` — modify there |
 | Pasted screenshots into git directly | `public/screenshots/...` is fine to commit. Drop-target uploads are now also written to `public/screenshots/uploaded/<hash>.png` — commit both that folder **and** `app-store-screenshots.json` so collaborators reproduce your deck after `git clone`. |
-| Wrong directory layout for tablet screenshots | See Step 2 — `android/tablet-7/portrait/{locale}/...` etc. |
+| Wrong directory layout for tablet screenshots | See Step 3 — `android/tablet-7/portrait/{locale}/...` etc. |
 | Reset wiped the deck | Reset clears in-memory state and re-saves defaults to `app-store-screenshots.json`. Recover by `git checkout app-store-screenshots.json` if it was committed, or export first before resetting. |
 | Export is blank | Source PNGs probably have alpha — flatten to RGB |
 | `bun dev` port collision | Template defaults to `next dev`; let Next pick the next free port (3001+) |
@@ -369,7 +418,7 @@ When you finish scaffolding, **start the dev server** (`bun dev` / `pnpm dev` / 
    bun install   # only needed the first time, or after pulling new deps
    bun dev       # → http://localhost:3000
    ```
-   Substitute `pnpm` / `yarn` / `npm run` as appropriate for what was detected in Step 2.
+   Substitute `pnpm` / `yarn` / `npm run` as appropriate for what was detected in Step 3.
 3. Which platforms have starter decks seeded (iOS, Android, or both).
 4. Any user-supplied screenshots that didn't match the expected filenames (so they can rename or use the in-editor drop target).
 5. Point them at the **Export bundle** button once they're happy with the layouts.
