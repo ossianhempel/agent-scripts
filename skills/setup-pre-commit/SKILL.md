@@ -10,7 +10,7 @@ description: Set up Husky pre-commit hooks with lint-staged (Prettier), type che
 - **Husky** pre-commit hook
 - **lint-staged** running Prettier on all staged files
 - **Prettier** config (if missing)
-- **500 LOC per-file lint** for staged source files only
+- **500 LOC per-file lint** for staged source files only, excluding docs and skill packages
 - **typecheck** and **test** scripts in the pre-commit hook
 
 ## Steps
@@ -41,7 +41,7 @@ const { existsSync, readFileSync } = require("node:fs");
 
 const MAX_LINES = 500;
 const IGNORED_EXTENSIONS = new Set([".md", ".mdx"]);
-const IGNORED_DIRECTORIES = new Set(["docs"]);
+const IGNORED_DIRECTORIES = new Set(["docs", "skills"]);
 const SOURCE_EXTENSIONS = new Set([
   ".cjs",
   ".css",
@@ -181,4 +181,5 @@ This will run through the new pre-commit hooks — a good smoke test that everyt
 - Husky v9+ doesn't need shebangs in hook files
 - `prettier --ignore-unknown` skips files Prettier can't parse (images, etc.)
 - The LOC lint checks only newly staged source changes, not the whole repo
+- Docs and skill packages are intentionally excluded from the LOC lint
 - The pre-commit runs lint-staged first (fast, staged-only), then staged LOC lint, then full typecheck and tests

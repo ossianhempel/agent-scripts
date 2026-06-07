@@ -9,6 +9,9 @@ read_when:
 
 A running log of meaningful changes to this toolkit — skills, profiles, sync/audit behavior, AGENTS guidance. One section per change, reverse-chronological. Add an entry whenever you ship something another agent or future-you needs to know about. Curate with the `update-changelog` skill.
 
+## 2026-06-07 — Exclude skill packages from staged LOC lint
+- Tightened `setup-pre-commit` so the 500-line staged LOC guard applies only to source-code files outside `docs/` and `skills/`. Long docs, skill instructions, and skill helper packages no longer block commits created from this setup.
+
 ## 2026-06-06 — Add plan inbox skill
 - Added global skill `skills/plan-inbox/` with a bundled scanner for unfinished `docs/plans/` artifacts and optional unresolved `docs/brainstorms/` backlog. It supports current-project, `--project`, `--global`, and `--json` modes, treats `Completed`/`Superseded`/`Abandoned` plans as closed, and treats brainstorms linked to plans as already planned.
 
