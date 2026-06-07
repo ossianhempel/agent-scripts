@@ -12,6 +12,12 @@ A running log of meaningful changes to this toolkit — skills, profiles, sync/a
 ## 2026-06-07 — Exclude skill packages from staged LOC lint
 - Tightened `setup-pre-commit` so the 500-line staged LOC guard applies only to source-code files outside `docs/` and `skills/`. Long docs, skill instructions, and skill helper packages no longer block commits created from this setup.
 
+## 2026-06-07 — Use Codex hooks.json as the hook source
+- Moved Codex hook sync to `~/.codex/hooks.json` so Codex no longer sees duplicate hook definitions in both `hooks.json` and `config.toml`. The JSON hook file remains the single source for Codex auto-pull and skill-usage tracking.
+
+## 2026-06-07 — Remove unsupported Codex async hook config
+- Updated Codex hook sync to omit the unsupported `async` key and scrub it from existing Codex hook entries when rewriting `~/.codex/config.toml`. This stops Codex startup from warning that async hooks are skipped while keeping the skill-usage and auto-pull hooks installed.
+
 ## 2026-06-06 — Add plan inbox skill
 - Added global skill `skills/plan-inbox/` with a bundled scanner for unfinished `docs/plans/` artifacts and optional unresolved `docs/brainstorms/` backlog. It supports current-project, `--project`, `--global`, and `--json` modes, treats `Completed`/`Superseded`/`Abandoned` plans as closed, and treats brainstorms linked to plans as already planned.
 

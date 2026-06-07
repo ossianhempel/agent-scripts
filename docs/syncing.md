@@ -221,7 +221,7 @@ Commands/prompts (copied):
 
 Hooks:
 
-- Codex: `~/.codex/config.toml`
+- Codex: `~/.codex/hooks.json`
 - Claude Code: `~/.claude/settings.json`
 
 ## Overrides

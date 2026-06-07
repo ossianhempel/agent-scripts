@@ -35,7 +35,8 @@ agent listing what's available), not real use of each — those are tagged
 `skill_scan` and excluded from the report by default.
 
 The hook never blocks or fails the agent: parse/git errors degrade to a partial
-event or a silent skip, and it always exits 0. Codex runs it `async`.
+event or a silent skip, and it always exits 0. Codex currently runs it
+synchronously because async hooks are not supported yet.
 
 ### Event shape (schema 1)
 
@@ -84,8 +85,8 @@ while it's open. Close the window (or Ctrl-C) to stop the server.
 
 - **Claude Code** — `~/.claude/settings.json`, `hooks.PostToolUse`, matcher
   `Skill`, command `track-skill-usage.py claude`.
-- **Codex** — `~/.codex/config.toml`, `[hooks].PostToolUse`, matcher
-  `exec_command`, command `track-skill-usage.py codex`, `async`.
+- **Codex** — `~/.codex/hooks.json`, `hooks.PostToolUse`, matcher
+  `exec_command`, command `track-skill-usage.py codex`.
 
 Both reference the script by absolute path, so no skill sync is involved.
 

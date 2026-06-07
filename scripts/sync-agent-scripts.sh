@@ -207,50 +207,47 @@ sync_markdown_tree() {
 sync_codex_hook() {
   local codex_home="$1"
   local hook_command="$2"
-  local config_path="$codex_home/config.toml"
+  local hooks_path="$codex_home/hooks.json"
 
-  log_sub "Hooks -> $config_path"
+  log_sub "Hooks -> $hooks_path"
   if [[ "$DRY_RUN" -eq 1 ]]; then
-    log_action "$(action_verb "$config_path")" "SessionStart auto-pull hook" "$config_path"
+    log_action "$(action_verb "$hooks_path")" "SessionStart auto-pull hook" "$hooks_path"
     return 0
   fi
 
   mkdir -p "$codex_home"
-  python3 - "$config_path" "$hook_command" <<'PY'
+  python3 - "$hooks_path" "$hook_command" <<'PY'
+import json
 import os
 import sys
-import tomllib
 
 path = sys.argv[1]
 command = sys.argv[2]
 hook = {
     "type": "command",
     "command": command,
-    "async": False,
-    "timeoutSec": 30,
-    "statusMessage": "Pulling latest remote branch when safe",
+    "timeout": 30,
 }
 
-text = ""
-config = {}
+data = {}
 if os.path.exists(path):
-    with open(path, "rb") as f:
-        raw = f.read()
-    text = raw.decode("utf-8")
-    if raw.strip():
-        try:
-            config = tomllib.loads(text)
-        except tomllib.TOMLDecodeError as exc:
-            raise SystemExit(f"failed to parse {path}: {exc}") from exc
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            existing = json.load(f)
+        if isinstance(existing, dict):
+            data = existing
+    except json.JSONDecodeError:
+        data = {}
 
-data = config.get("hooks", {})
-if not isinstance(data, dict):
-    data = {}
+hooks_root = data.setdefault("hooks", {})
+if not isinstance(hooks_root, dict):
+    hooks_root = {}
+    data["hooks"] = hooks_root
 
-session_start = data.get("SessionStart")
+session_start = hooks_root.get("SessionStart")
 if not isinstance(session_start, list):
     session_start = []
-data["SessionStart"] = session_start
+hooks_root["SessionStart"] = session_start
 
 for item in session_start:
     if not isinstance(item, dict):
@@ -294,73 +291,9 @@ if not isinstance(hooks, list):
 
 hooks.append(hook)
 
-def strip_nulls(value):
-    if isinstance(value, dict):
-        return {
-            key: strip_nulls(item)
-            for key, item in value.items()
-            if item is not None
-        }
-    if isinstance(value, list):
-        return [strip_nulls(item) for item in value]
-    return value
-
-data = strip_nulls(data)
-
-def toml_scalar(value):
-    if isinstance(value, bool):
-        return "true" if value else "false"
-    if isinstance(value, int):
-        return str(value)
-    if isinstance(value, str):
-        escaped = (
-            value.replace("\\", "\\\\")
-            .replace('"', '\\"')
-            .replace("\n", "\\n")
-        )
-        return f'"{escaped}"'
-    raise TypeError(f"unsupported TOML scalar: {value!r}")
-
-def toml_inline(value):
-    if isinstance(value, dict):
-        parts = [f"{key} = {toml_inline(item)}" for key, item in value.items()]
-        return "{ " + ", ".join(parts) + " }"
-    if isinstance(value, list):
-        return "[" + ", ".join(toml_inline(item) for item in value) + "]"
-    return toml_scalar(value)
-
-def render_hooks_table(hooks_data):
-    lines = ["[hooks]"]
-    for event_name, groups in hooks_data.items():
-        if not isinstance(groups, list):
-            continue
-        lines.append(f"{event_name} = {toml_inline(groups)}")
-    return "\n".join(lines) + "\n"
-
-def remove_table_block(source, table_name):
-    lines = source.splitlines(keepends=True)
-    output = []
-    index = 0
-    target = f"[{table_name}]"
-    while index < len(lines):
-        if lines[index].strip() == target:
-            index += 1
-            while index < len(lines):
-                stripped = lines[index].strip()
-                if stripped.startswith("[") and stripped.endswith("]"):
-                    break
-                index += 1
-            continue
-        output.append(lines[index])
-        index += 1
-    return "".join(output).rstrip()
-
-base = remove_table_block(text, "hooks")
-rendered = render_hooks_table(data)
-next_text = f"{base}\n\n{rendered}" if base else rendered
-
 with open(path, "w", encoding="utf-8") as f:
-    f.write(next_text)
+    json.dump(data, f, indent=2)
+    f.write("\n")
 PY
 }
 
