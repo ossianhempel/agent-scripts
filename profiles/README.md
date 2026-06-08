@@ -11,6 +11,7 @@ letting focused projects pull in a curated bundle.
 profiles/
   _shared/skills/<skill>/          # canonical home for skills used by 2+ profiles
   swift-app-developer/skills/<skill>/
+  macos-swift-app-developer/skills/<skill>/
   rn-app-developer/skills/<skill>/
   swift-app-developer/mcp.json     # optional project-level MCP servers
 ```

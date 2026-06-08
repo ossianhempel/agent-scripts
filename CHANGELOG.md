@@ -9,6 +9,20 @@ read_when:
 
 A running log of meaningful changes to this toolkit — skills, profiles, sync/audit behavior, AGENTS guidance. One section per change, reverse-chronological. Add an entry whenever you ship something another agent or future-you needs to know about. Curate with the `update-changelog` skill.
 
+## 2026-06-08 — Add global teach skill
+- Added Matt Pocock's `teach` skill as a global skill, including its mission, resource, glossary, and learning-record format files. Synced it to the global agent skill roots.
+
+## 2026-06-08 — Add OpenAI macOS app skills to macOS profile
+- Added the OpenAI `build-macos-apps` skills to `profiles/macos-swift-app-developer/`: AppKit interop, build/run/debug, Liquid Glass, packaging/notarization, signing/entitlements, SwiftPM macOS, SwiftUI patterns, telemetry, test triage, view refactor, and window management.
+- Replaced the macOS profile's generic `swiftui-liquid-glass`, `swiftui-ui-patterns`, and `swiftui-view-refactor` links with the macOS-specific upstream skills to avoid duplicate SwiftUI triggers.
+
+## 2026-06-08 — Add Better Auth web profile skills
+- Added upstream Better Auth `organization` and `create-auth` skills to `profiles/web-app-developer/skills/`, alongside the existing `better-auth-best-practices` skill. The new skills cover organization/RBAC setup and full Better Auth scaffolding for TypeScript web apps.
+
+## 2026-06-08 — Add macOS Swift app profile
+- Added `profiles/macos-swift-app-developer/` for native macOS Swift apps and assigned `recalliq` plus `voice-to-text` to it. The profile includes shared SwiftUI/concurrency/build, App Store/legal/revenue skills, Convex/Clerk support, and the new `release-mac-app` Sparkle/notarization/GitHub release helper.
+- Promoted the shared Swift/Xcode skills from `swift-app-developer` into `_shared/skills/` so mobile Swift and macOS Swift profiles use one canonical copy. Synced the new profile into both assigned projects.
+
 ## 2026-06-08 — Add profile-scoped MCP sync
 - Extended the `profiles` provider so `profiles/<profile>/mcp.json` is merged into each assigned project's `.mcp.json`, preserving existing project servers and warning on same-name conflicts instead of overwriting. Added `swift-app-developer/mcp.json` with project-level `xcodebuildmcp` and RevenueCat, plus `rn-app-developer/mcp.json` with RevenueCat, so app-specific MCP startup can move out of global Codex config.
 
