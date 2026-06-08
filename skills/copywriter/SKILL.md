@@ -66,10 +66,17 @@ Ossian whether to add a new reference file.
 
 ## Core Principles (apply everywhere)
 
-1. **Specificity sells.** "Productivity app" is invisible. "Never lose a
-   meeting note again" is a reason to download. The more precisely you describe
-   the user's life *after* the product, the more they can see themselves using
-   it.
+1. **Specificity is the shortcut to the right reader.** Broad copy is confusing
+   because it competes with every broad alternative. Specific copy forces a
+   choice: the wrong person walks away, and the true target user feels "this is
+   exactly for me." Name the category, the reader, the concrete moment, and the
+   after-state.
+
+   Keep asking: "Could this be more specific?"
+
+   - Bad: "Productivity app."
+   - Better: "Never lose a meeting note again."
+   - Best: "Turn every client call into follow-up tasks before you leave Zoom."
 
 2. **Outcome first, feature second.** Lead with what changes for the user. The
    feature is the proof, not the promise.

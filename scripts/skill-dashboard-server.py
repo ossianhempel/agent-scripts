@@ -23,6 +23,7 @@ import webbrowser
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(HERE)
 HTML_PATH = os.path.join(REPO, "dashboard", "index.html")
+TRACK_SCRIPT = os.path.join(REPO, "hooks", "scripts", "track-skill-usage.py")
 
 
 def data_file() -> str:
@@ -35,7 +36,24 @@ def data_file() -> str:
     return os.path.join(base, "agent-skill-usage", "events.jsonl")
 
 
+def backfill_codex_events() -> None:
+    """Best-effort Codex transcript backfill before serving the dashboard."""
+    if not os.path.isfile(TRACK_SCRIPT):
+        return
+    try:
+        subprocess.run(
+            [sys.executable, TRACK_SCRIPT, "codex-backfill", "30d"],
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=120,
+        )
+    except Exception:
+        return
+
+
 def load_events() -> list:
+    backfill_codex_events()
     path = data_file()
     events = []
     if os.path.exists(path):

@@ -1,6 +1,6 @@
 ---
 name: create-onboarding-video
-description: Produce short, punchy iOS app onboarding videos in Remotion that showcase a feature in action by animating isolated pieces of the UI (cropped components, not full screens) with nice UI-like transitions. Use when the user asks to create, build, or generate an onboarding video, app preview, feature demo clip, App Store preview, or any short video that demonstrates a mobile app feature using supplied screenshots.
+description: Produce short, punchy iOS app onboarding videos in Remotion that showcase a feature in action by animating isolated pieces of the UI (cropped components, not full screens) with nice UI-like transitions. Use when the user asks to create, build, or generate an onboarding video, app preview, feature demo clip, App Store preview, or any short video that demonstrates a mobile app feature using screenshots supplied by the user or captured from a runnable simulator.
 ---
 
 # Create Onboarding Video
@@ -23,21 +23,22 @@ Follow this loop. **Do not skip the intake — guessing at flows produces generi
 
 For each onboarding screen the user wants to feature, collect:
 
-1. **Still shots (screenshots)** of the screen — ask for **2–4 stills per screen** so you can show interaction states:
+1. **Still shots (screenshots)** of the screen — get **2–4 stills per screen** so you can show interaction states:
    - resting state
    - mid-interaction (button pressed, field focused, sheet halfway up, etc.)
    - result state (data loaded, success, next screen)
    - any variant worth showing (empty vs. filled, light vs. dark, etc.)
 
-   **Two ways to obtain stills — ask the user which they prefer:**
-   - **User-supplied:** the user drops PNGs into `public/<screen-name>/` themselves. Best when the exact moments are hand-picked or the app isn't easily runnable from this workspace.
-   - **Agent-captured from the simulator:** if this is an iOS app the agent can boot and drive, offer to capture the stills automatically. Delegate to one of these skills depending on the app:
-     - **`baguette`** — preferred for iOS 26+ SwiftUI/Xcode/Expo apps; can boot a simulator headlessly, drive gestures, and snapshot exact states.
-     - **`ios-simulator`** — general-purpose simctl-based screenshotting and semantic UI navigation; good fallback when Baguette isn't set up.
-     - **`ios-marketing-capture`** — when the user wants the same moment captured across multiple locales/devices/appearances (rare for onboarding videos, but available).
-     - **`ios-debugger-agent`** — when the app needs to be built/launched via XcodeBuildMCP first before screenshots can be taken.
+   Ask the user which capture path they prefer:
+   - **User-supplied:** the user drops PNGs into `public/<screen-name>/`. Best when the exact moments are hand-picked, the app is not easily runnable from this workspace, or the flow requires private/manual setup.
+   - **Agent-captured from the simulator:** if the app is present and runnable, the agent can boot and drive the simulator, capture the stills, and save them into `public/<screen-name>/`.
 
-   Use `AskUserQuestion` with options *"I'll drop PNGs in"* vs *"You capture them from the simulator"*. If the user picks the agent path, invoke the relevant skill above to drive the simulator into each state and save the PNGs to `public/<screen-name>/<state>.png` before moving on to step 2.
+   If the user chooses agent capture, use this path:
+   - **`baguette`** — preferred for iOS 26+ SwiftUI/Xcode/Expo apps; boot the simulator, drive gestures, and snapshot exact states.
+   - **`ios-debugger-agent`** — use when the app needs to be built, installed, launched, inspected, or driven via XcodeBuildMCP before screenshots can be taken.
+   - **`app-store-screenshots`** — use after capture only when the task is to turn screenshots into App Store / Google Play marketing screenshot pages. It is an editor/export workflow, not the primary simulator capture mechanism for onboarding videos.
+
+   Save captured PNGs to `public/<screen-name>/<state>.png` before moving on to step 2. If automatic capture is blocked, ask the user for the missing setup or for PNGs in that same folder layout.
 2. **What the feature is** — one or two sentences on what this screen does for the user and what makes it feel good. This drives which detail to zoom into.
 3. **Order** — the sequence of screens in the onboarding flow.
 4. **Optional:** brand color / accent, font if non-standard, target aspect ratio (default 1080×1920 portrait for iOS), end-card text/CTA.
@@ -72,7 +73,7 @@ Render a preview, show it to the user, and ask which beats need to be slower, fa
 
 ## Operating rules
 
-- **Stills are required.** If the user hasn't provided screenshots, stop and ask — either request PNGs from the user or offer to capture them via `baguette` / `ios-simulator` / `ios-marketing-capture` / `ios-debugger-agent` (see Intake). Do not invent UI from descriptions.
+- **Stills are required.** If screenshots are missing, ask whether the user wants to provide PNGs or have the agent capture them from a runnable simulator via `baguette` and/or `ios-debugger-agent`. If agent capture is blocked, ask for the missing setup or request PNGs from the user. Do not invent UI from descriptions.
 - **Pieces of the UI, not the whole UI.** If you catch yourself rendering a full-screen mockup, stop and crop down to the component that carries the beat. The viewer should see the *feature in action*, not a tour of the app.
 - **One feature per video.** If the user describes 5 unrelated features, propose splitting them into 5 videos.
 - **Show, don't narrate.** No voiceover, no big text overlays explaining the feature — let the UI motion carry it. A short caption per beat is fine.

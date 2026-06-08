@@ -9,11 +9,17 @@ read_when:
 
 A running log of meaningful changes to this toolkit — skills, profiles, sync/audit behavior, AGENTS guidance. One section per change, reverse-chronological. Add an entry whenever you ship something another agent or future-you needs to know about. Curate with the `update-changelog` skill.
 
+## 2026-06-07 — Fix Codex skill-usage capture with unified_exec
+- Codex `PostToolUse` hooks do not fire for `unified_exec` / `exec_command` shell calls yet, so skill tracking missed every Codex session with `unified_exec = true`. Added a `Stop` hook that scans rollout transcripts for `SKILL.md` reads, a `codex-backfill` mode for historical catch-up, and `hooks/scripts/install-skill-usage-hooks.py` (wired into `sync-agent-scripts.sh --provider codex`). The dashboard now backfills on refresh.
+
 ## 2026-06-07 — Exclude skill packages from staged LOC lint
 - Tightened `setup-pre-commit` so the 500-line staged LOC guard applies only to source-code files outside `docs/` and `skills/`. Long docs, skill instructions, and skill helper packages no longer block commits created from this setup.
 
 ## 2026-06-07 — Use Codex hooks.json as the hook source
 - Moved Codex hook sync to `~/.codex/hooks.json` so Codex no longer sees duplicate hook definitions in both `hooks.json` and `config.toml`. The JSON hook file remains the single source for Codex auto-pull and skill-usage tracking.
+
+## 2026-06-07 — Add Git cleanup skill
+- Added global skill `skills/git-cleanup/` for cleaning up merged, stale, gone, or explicitly abandoned local branches and worktrees. It classifies safe branch deletes separately from unmerged work, checks dirty worktrees before removal, and verifies the final branch/worktree state.
 
 ## 2026-06-07 — Remove unsupported Codex async hook config
 - Updated Codex hook sync to omit the unsupported `async` key and scrub it from existing Codex hook entries when rewriting `~/.codex/config.toml`. This stops Codex startup from warning that async hooks are skipped while keeping the skill-usage and auto-pull hooks installed.

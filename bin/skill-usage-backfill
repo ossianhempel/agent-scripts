@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Backfill Codex skill reads from session transcripts into the local event log.
+set -euo pipefail
+here="$(cd "$(dirname "$0")/.." && pwd)"
+if [[ "$#" -eq 0 ]]; then
+  set -- 30d
+fi
+exec python3 "$here/hooks/scripts/track-skill-usage.py" codex-backfill "$@"

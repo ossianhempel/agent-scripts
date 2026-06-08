@@ -30,6 +30,8 @@ Define finishing criteria for yourself before you start: what does "done" look l
 ## Important Locations
 - Personal Website repo: ~/Developer/ossianhempel_com
 - Obsidian vault: /Users/ossianhempel/ossians-second-brain-sync
+- Claude app scheduled tasks (local routines): prompts in `~/.claude/scheduled-tasks/<name>/SKILL.md`; cron registry in `~/Library/Application Support/Claude/claude-code-sessions/<account>/<session>/scheduled-tasks.json` (cron in local time). Separate from remote routines (claude.ai/code/routines, managed via `/schedule`).
+- Codex scheduled jobs: no local storage — cloud-side only, managed in the Codex app UI
 
 ## Notes Lookup
 - If I say "check my notes", "read what I've written about this", "research this in my notes", or similar, search the Obsidian vault first. Use web search or other sources second unless I explicitly ask for them.

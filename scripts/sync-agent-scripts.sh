@@ -817,7 +817,15 @@ if want_provider "codex"; then
   done
   shopt -u nullglob
 
-  if [[ -f "$auto_pull_hook" ]]; then
+  skill_usage_hooks="$ROOT/hooks/scripts/install-skill-usage-hooks.py"
+  if [[ -f "$skill_usage_hooks" ]]; then
+    log_sub "Hooks -> skill usage (Codex + Claude)"
+    if [[ "$DRY_RUN" -eq 1 ]]; then
+      log_action "would run" "install-skill-usage-hooks.py" "$skill_usage_hooks"
+    else
+      python3 "$skill_usage_hooks"
+    fi
+  elif [[ -f "$auto_pull_hook" ]]; then
     sync_codex_hook "$CODEX_HOME" "$auto_pull_hook"
   else
     log_sub "Skipping hooks: missing $auto_pull_hook"
@@ -834,7 +842,15 @@ if want_provider "claude"; then
   log_sub "Commands -> $claude_commands_dir"
   sync_markdown_tree "$ROOT/slash-commands" "$claude_commands_dir"
 
-  if [[ -f "$auto_pull_hook" ]]; then
+  skill_usage_hooks="$ROOT/hooks/scripts/install-skill-usage-hooks.py"
+  if ! want_provider "codex" && [[ -f "$skill_usage_hooks" ]]; then
+    log_sub "Hooks -> skill usage (Claude + Codex)"
+    if [[ "$DRY_RUN" -eq 1 ]]; then
+      log_action "would run" "install-skill-usage-hooks.py" "$skill_usage_hooks"
+    else
+      python3 "$skill_usage_hooks"
+    fi
+  elif [[ -f "$auto_pull_hook" ]]; then
     sync_claude_hook "$CLAUDE_HOME/settings.json" "$auto_pull_hook"
   else
     log_sub "Skipping hooks: missing $auto_pull_hook"

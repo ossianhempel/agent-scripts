@@ -54,7 +54,8 @@ assert_contains "Skills -> $HOME_DIR/.gemini/antigravity-cli/skills"
 
 # Codex provider syncs prompts and hooks only (no skills)
 assert_contains "Prompts -> $HOME_DIR/.codex/prompts"
-assert_contains "Hooks -> $HOME_DIR/.codex/config.toml"
+assert_contains "Hooks -> skill usage (Codex + Claude)"
+assert_contains "- would run install-skill-usage-hooks.py -> $ROOT/hooks/scripts/install-skill-usage-hooks.py"
 assert_not_contains "Skills -> $HOME_DIR/.codex/skills"
 
 # Gemini provider sets contextFileName (slash-commands dir is empty, so command sync is skipped)
@@ -128,15 +129,14 @@ OUTPUT_FILE="$TMP_DIR/output-skip-identical.txt"
 python3 - "$HOME_DIR" "$ROOT/hooks/scripts/git-auto-pull-current-branch.sh" <<'PY'
 import json
 import sys
-import tomllib
 
 home = sys.argv[1]
 command = sys.argv[2]
 
-with open(f"{home}/.codex/config.toml", "rb") as f:
-    codex = tomllib.load(f)
+with open(f"{home}/.codex/hooks.json", "r", encoding="utf-8") as f:
+    codex = json.load(f)
 codex_hooks = codex["hooks"]["SessionStart"][0]["hooks"]
-assert any(h.get("command") == command and h.get("async") is False for h in codex_hooks)
+assert any(h.get("command") == command for h in codex_hooks)
 
 with open(f"{home}/.claude/settings.json", "r", encoding="utf-8") as f:
     claude = json.load(f)

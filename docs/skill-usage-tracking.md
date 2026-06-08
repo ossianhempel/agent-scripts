@@ -28,15 +28,21 @@ Detection is agent-aware because the runtimes expose skills differently:
 | Agent | Matcher | Signal | `source` |
 |-------|---------|--------|----------|
 | Claude Code | `Skill` | the `Skill` tool's `input.skill` | `skill_tool` |
-| Codex | `exec_command` | a `.../skills/<name>/SKILL.md` path in the command | `skill_md` (one) / `skill_scan` (many) |
+| Codex | `Stop` (transcript scan) | `exec_command` / `Bash` reads of `.../skills/<name>/SKILL.md` in the rollout JSONL | `skill_md` (one) / `skill_scan` (many) |
+| Codex | `Bash` (`PostToolUse`, optional) | same path pattern in `tool_input.command` when simple Bash hooks fire | `skill_md` / `skill_scan` |
 
 A single tool call that touches **many** `SKILL.md` files is a catalog scan (the
 agent listing what's available), not real use of each — those are tagged
 `skill_scan` and excluded from the report by default.
 
 The hook never blocks or fails the agent: parse/git errors degrade to a partial
-event or a silent skip, and it always exits 0. Codex currently runs it
-synchronously because async hooks are not supported yet.
+event or a silent skip, and it always exits 0.
+
+**Codex + `unified_exec`:** Codex's `PostToolUse` hooks do not fire for the
+`unified_exec` / `exec_command` shell path yet (only simple `Bash`). With
+`unified_exec = true` in `~/.codex/config.toml`, live Codex capture relies on a
+`Stop` hook that scans the session transcript for `SKILL.md` reads at the end of
+each turn. The dashboard also runs a lightweight transcript backfill on refresh.
 
 ### Event shape (schema 1)
 
@@ -85,8 +91,11 @@ while it's open. Close the window (or Ctrl-C) to stop the server.
 
 - **Claude Code** — `~/.claude/settings.json`, `hooks.PostToolUse`, matcher
   `Skill`, command `track-skill-usage.py claude`.
-- **Codex** — `~/.codex/hooks.json`, `hooks.PostToolUse`, matcher
-  `exec_command`, command `track-skill-usage.py codex`.
+- **Codex** — `~/.codex/hooks.json`:
+  - `Stop` → `track-skill-usage.py codex-transcript` (primary with `unified_exec`)
+  - `PostToolUse` matcher `Bash` → `track-skill-usage.py codex` (when simple Bash hooks fire)
+- Reinstall with `hooks/scripts/install-skill-usage-hooks.py` or
+  `scripts/sync-agent-scripts.sh --provider codex`.
 
 Both reference the script by absolute path, so no skill sync is involved.
 
@@ -104,3 +113,5 @@ Both reference the script by absolute path, so no skill sync is involved.
 - **Codex captures real skill *loads*, not a discrete "invoke".** Codex has no
   skill tool; it loads a skill by reading its `SKILL.md`. If a skill is used
   without re-reading the file, that reuse isn't separately counted.
+- **Historical Codex catch-up:** `bin/skill-usage-backfill` scans recent Codex
+  rollout JSONL files and appends any missing events (default last 30 days).
