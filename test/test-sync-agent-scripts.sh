@@ -104,6 +104,46 @@ OUTPUT_FILE="$TMP_DIR/output-project.txt"
 assert_contains "Project skills -> $WORKSPACE_DIR/.agents/skills"
 assert_contains "- create symlink -> $WORKSPACE_DIR/.agents/skills/copywriter -> "
 
+PROFILE_PROJECT="$TMP_DIR/profile-project"
+mkdir -p "$PROFILE_PROJECT/.codex"
+cat > "$PROFILE_PROJECT/.codex/config.toml" <<'EOF'
+[projects."/tmp/example"]
+trust_level = "trusted"
+EOF
+
+OUTPUT_FILE="$TMP_DIR/output-profile-mcp.txt"
+(
+  cd "$ROOT"
+  HOME="$HOME_DIR" \
+  "$ROOT/scripts/sync-agent-scripts.sh" --provider profiles --profile swift-app-developer --project "$PROFILE_PROJECT"
+) > "$OUTPUT_FILE"
+
+assert_contains "swift-app-developer MCP servers -> $PROFILE_PROJECT/.mcp.json"
+assert_contains "swift-app-developer Codex MCP servers -> $PROFILE_PROJECT/.codex/config.toml"
+
+python3 - "$PROFILE_PROJECT/.mcp.json" <<'PY'
+import json
+import sys
+
+with open(sys.argv[1], "r", encoding="utf-8") as f:
+    data = json.load(f)
+
+assert data["mcpServers"]["xcodebuildmcp"]["command"] == "npx"
+PY
+
+python3 - "$PROFILE_PROJECT/.codex/config.toml" <<'PY'
+import sys
+import tomllib
+
+with open(sys.argv[1], "rb") as f:
+    data = tomllib.load(f)
+
+assert data["projects"]["/tmp/example"]["trust_level"] == "trusted"
+servers = data["mcp_servers"]
+assert servers["xcodebuildmcp"]["command"] == "npx"
+assert servers["revenuecat"]["args"] == ["-y", "mcp-remote", "https://mcp.revenuecat.ai/mcp"]
+PY
+
 # --- Copilot default scope ---
 OUTPUT_FILE="$TMP_DIR/output-copilot-default.txt"
 

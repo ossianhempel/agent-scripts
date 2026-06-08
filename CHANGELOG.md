@@ -9,6 +9,9 @@ read_when:
 
 A running log of meaningful changes to this toolkit — skills, profiles, sync/audit behavior, AGENTS guidance. One section per change, reverse-chronological. Add an entry whenever you ship something another agent or future-you needs to know about. Curate with the `update-changelog` skill.
 
+## 2026-06-08 — Add profile-scoped MCP sync
+- Extended the `profiles` provider so `profiles/<profile>/mcp.json` is merged into each assigned project's `.mcp.json`, preserving existing project servers and warning on same-name conflicts instead of overwriting. Added `swift-app-developer/mcp.json` with project-level `xcodebuildmcp` and RevenueCat, plus `rn-app-developer/mcp.json` with RevenueCat, so app-specific MCP startup can move out of global Codex config.
+
 ## 2026-06-07 — Fix Codex skill-usage capture with unified_exec
 - Codex `PostToolUse` hooks do not fire for `unified_exec` / `exec_command` shell calls yet, so skill tracking missed every Codex session with `unified_exec = true`. Added a `Stop` hook that scans rollout transcripts for `SKILL.md` reads, a `codex-backfill` mode for historical catch-up, and `hooks/scripts/install-skill-usage-hooks.py` (wired into `sync-agent-scripts.sh --provider codex`). The dashboard now backfills on refresh.
 

@@ -12,10 +12,13 @@ profiles/
   _shared/skills/<skill>/          # canonical home for skills used by 2+ profiles
   swift-app-developer/skills/<skill>/
   rn-app-developer/skills/<skill>/
+  swift-app-developer/mcp.json     # optional project-level MCP servers
 ```
 
 - Each profile directory holds its skills under `skills/`, same `SKILL.md`
   format as a global skill.
+- Each profile may also hold `mcp.json`, whose `mcpServers` are merged into
+  each assigned project's `.mcp.json`.
 - A skill that belongs to **one** profile lives as a real directory inside that
   profile's `skills/`.
 - A skill shared by **multiple** profiles (but not global) lives once in
@@ -57,6 +60,18 @@ zero drift):
 
 Shared skills resolve through one more hop (profile entry is itself a symlink
 into `_shared/`).
+
+Profile MCP installs are conservative merges:
+
+```
+profiles/<profile>/mcp.json  ->  <project>/.mcp.json
+profiles/<profile>/mcp.json  ->  <project>/.codex/config.toml
+```
+
+Existing project MCP servers are preserved; missing profile servers are added;
+conflicting server names warn and keep the project-local value. Codex reads the
+`.codex/config.toml` output; `.mcp.json` is kept as the cross-tool project
+manifest.
 
 See `../docs/syncing.md` and the "Skill Sync & Audit" section of `../AGENTS.md`
 for full details.

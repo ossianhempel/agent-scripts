@@ -9,8 +9,9 @@ read_when:
 
 > **Note:** Slash commands (in `slash-commands/`) are deprecated in Codex. Use skills instead. Claude Code still supports slash commands, but skills work everywhere and are the recommended approach.
 
-Use `scripts/sync-agent-scripts.sh` to install the skills, slash commands, and
-agent hooks in this repo into each agent runtime's standard locations.
+Use `scripts/sync-agent-scripts.sh` to install the skills, slash commands,
+project MCP bundles, and agent hooks in this repo into each agent runtime's
+standard locations.
 
 ## Architecture
 
@@ -79,6 +80,7 @@ profiles/
   _shared/skills/<skill>/          # canonical home for skills used by 2+ profiles
   swift-app-developer/skills/<skill>/
   rn-app-developer/skills/<skill>/
+  swift-app-developer/mcp.json     # optional profile MCP servers
 profile-assignments.json           # project path -> profile(s)
 ```
 
@@ -124,9 +126,9 @@ or a list of names:
 
 ### Where profile skills land in a project
 
-Profile installs are a chain of **relative symlinks** back into agent-scripts —
-not copies. There is one canonical copy of each skill (in agent-scripts), and
-every assigned project links to it.
+Profile skill installs are a chain of **relative symlinks** back into
+agent-scripts — not copies. There is one canonical copy of each skill (in
+agent-scripts), and every assigned project links to it.
 
 ```
 <project>/.agents/skills/<skill>  -> ../../../agent-scripts/profiles/<profile>/skills/<skill>
@@ -146,6 +148,29 @@ Consequences:
 - **Sync = `ln -sfn`** — fast and idempotent.
 - **agent-scripts is a runtime dependency** of every assigned project. If you
   move or delete agent-scripts, every project's profile skills break.
+
+### Where profile MCPs land in a project
+
+If a profile contains `profiles/<profile>/mcp.json`, the profile sync merges its
+`mcpServers` into the assigned project's `.mcp.json` and Codex-native
+`.codex/config.toml`:
+
+```
+profiles/swift-app-developer/mcp.json  ->  <project>/.mcp.json
+profiles/swift-app-developer/mcp.json  ->  <project>/.codex/config.toml
+```
+
+The merge is conservative:
+
+- Existing project MCP servers are preserved.
+- Missing profile MCP servers are added.
+- If the project already defines the same server name differently, sync warns
+  and keeps the project value.
+
+Use this for project-level MCPs that should not spin up globally on every Codex
+launch. For example, `swift-app-developer` provides `xcodebuildmcp` and
+RevenueCat through project config instead of requiring them in global Codex
+config.
 
 ### Profile overrides
 

@@ -19,7 +19,8 @@ usage() {
   cat <<'USAGE'
 Usage: scripts/sync-agent-scripts.sh [options]
 
-Sync skills/ and slash-commands/ from this repo into supported agent runtimes.
+Sync skills/, slash-commands/, and project MCP bundles from this repo into
+supported agent runtimes.
 
 Skills install as relative symlinks into this repo's skills/ — one canonical
 copy, every runtime links to it (no duplication, no re-sync after edits). The
@@ -29,11 +30,11 @@ Cursor, Copilot, Windsurf), ~/.claude/skills (Claude Code only), and
 runtime dependency: move or delete it and the links break.
 Commands/prompts are copied to each tool's native location.
 
-Profiles (profiles/<name>/skills/) are project-scoped skill packages. They are
-NOT part of the default run — sync them with the 'profiles' provider, which
-installs into each assigned project's .agents/skills (real dirs) and
-.claude/skills (symlinks). Assignments come from profile-assignments.json or
-from --profile/--project for a one-off.
+Profiles (profiles/<name>/skills/ plus optional profiles/<name>/mcp.json) are
+project-scoped packages. They are NOT part of the default run — sync them with
+the 'profiles' provider, which installs into each assigned project's
+.agents/skills, .claude/skills, and .mcp.json. Assignments come from
+profile-assignments.json or from --profile/--project for a one-off.
 
 Options:
   --providers <list>          Comma-separated providers (agents,subagents,codex,claude,gemini,cursor,copilot,antigravity,profiles)
@@ -602,9 +603,10 @@ sync_profile_to_project() {
   local profile="$1"
   local project="$2"
   local src="$ROOT/profiles/$profile/skills"
+  local mcp_src="$ROOT/profiles/$profile/mcp.json"
 
-  if [[ ! -d "$src" ]]; then
-    log_sub "Skipping: missing profile '$profile' ($src)"
+  if [[ ! -d "$src" && ! -f "$mcp_src" ]]; then
+    log_sub "Skipping: missing profile '$profile' ($src or $mcp_src)"
     return 0
   fi
   # Never materialize a project root that doesn't exist — that would just
@@ -618,15 +620,166 @@ sync_profile_to_project() {
   local dest_claude="$project/.claude/skills"
   log_sub "$profile -> $project (relative symlinks into agent-scripts)"
 
-  shopt -s nullglob
-  for skill_dir in "$src"/*; do
-    # Accept both real dirs and symlinks (shared skills are profile-level symlinks).
-    [[ -d "$skill_dir" || -L "$skill_dir" ]] || continue
-    skill_name="$(basename "$skill_dir")"
-    make_relative_symlink "$dest_agents/$skill_name" "$skill_dir"
-    make_relative_symlink "$dest_claude/$skill_name" "$dest_agents/$skill_name"
-  done
-  shopt -u nullglob
+  if [[ -d "$src" ]]; then
+    shopt -s nullglob
+    for skill_dir in "$src"/*; do
+      # Accept both real dirs and symlinks (shared skills are profile-level symlinks).
+      [[ -d "$skill_dir" || -L "$skill_dir" ]] || continue
+      skill_name="$(basename "$skill_dir")"
+      make_relative_symlink "$dest_agents/$skill_name" "$skill_dir"
+      make_relative_symlink "$dest_claude/$skill_name" "$dest_agents/$skill_name"
+    done
+    shopt -u nullglob
+  fi
+
+  sync_profile_mcp_to_project "$profile" "$project" "$mcp_src"
+}
+
+sync_profile_mcp_to_project() {
+  local profile="$1"
+  local project="$2"
+  local src="$3"
+  local dest="$project/.mcp.json"
+  local codex_dest="$project/.codex/config.toml"
+
+  if [[ ! -f "$src" ]]; then
+    return 0
+  fi
+
+  log_action "$(action_verb "$dest")" "$profile MCP servers" "$dest"
+  log_action "$(action_verb "$codex_dest")" "$profile Codex MCP servers" "$codex_dest"
+  if [[ "$DRY_RUN" -eq 1 ]]; then
+    return 0
+  fi
+
+  python3 - "$src" "$dest" "$codex_dest" "$profile" <<'PY'
+import json
+import os
+import sys
+import tomllib
+
+src_path, dest_path, codex_dest_path, profile = sys.argv[1:5]
+
+with open(src_path, "r", encoding="utf-8") as f:
+    src = json.load(f)
+
+src_servers = src.get("mcpServers")
+if not isinstance(src_servers, dict):
+    raise SystemExit(f"{src_path} must contain an object at mcpServers")
+
+
+def to_codex_server(server):
+    if not isinstance(server, dict):
+        raise SystemExit("MCP server entries must be objects")
+    if "url" in server:
+        result = {"url": server["url"]}
+        if "bearer_token_env_var" in server:
+            result["bearer_token_env_var"] = server["bearer_token_env_var"]
+        return result
+    result = {}
+    for key in ("command", "args", "env", "startup_timeout_sec"):
+        if key in server:
+            result[key] = server[key]
+    if "command" not in result:
+        raise SystemExit("MCP stdio server entries must contain command")
+    return result
+
+
+def render_mcp_server_toml(name, server):
+    lines = [f"[mcp_servers.{name}]"]
+    for key, value in server.items():
+        if key == "env" and isinstance(value, dict):
+            continue
+        lines.append(f"{key} = {toml_value(value)}")
+    if isinstance(server.get("env"), dict):
+        lines.append("")
+        lines.append(f"[mcp_servers.{name}.env]")
+        for env_key, env_value in server["env"].items():
+            lines.append(f"{env_key} = {toml_value(env_value)}")
+    return "\n".join(lines)
+
+
+def toml_value(value):
+    if isinstance(value, bool):
+        return "true" if value else "false"
+    if isinstance(value, int) and not isinstance(value, bool):
+        return str(value)
+    if isinstance(value, list):
+        return "[" + ", ".join(toml_value(item) for item in value) + "]"
+    return json.dumps(str(value), ensure_ascii=False)
+
+dest = {}
+if os.path.exists(dest_path):
+    with open(dest_path, "r", encoding="utf-8") as f:
+        dest = json.load(f)
+    if not isinstance(dest, dict):
+        raise SystemExit(f"{dest_path} must contain a JSON object")
+
+dest_servers = dest.setdefault("mcpServers", {})
+if not isinstance(dest_servers, dict):
+    raise SystemExit(f"{dest_path} must contain an object at mcpServers")
+
+changed = False
+for name, server in src_servers.items():
+    if name not in dest_servers:
+        dest_servers[name] = server
+        changed = True
+        continue
+    if dest_servers[name] != server:
+        sys.stderr.write(
+            f"WARNING: {dest_path} already defines MCP server '{name}' "
+            f"differently; keeping project value instead of {profile} profile value.\n"
+        )
+
+if changed:
+    os.makedirs(os.path.dirname(dest_path), exist_ok=True)
+    with open(dest_path, "w", encoding="utf-8") as f:
+        json.dump(dest, f, indent=2, ensure_ascii=False)
+        f.write("\n")
+
+codex = {}
+if os.path.exists(codex_dest_path):
+    with open(codex_dest_path, "rb") as f:
+        codex = tomllib.load(f)
+    if not isinstance(codex, dict):
+        raise SystemExit(f"{codex_dest_path} must contain a TOML object")
+
+codex_servers = codex.setdefault("mcp_servers", {})
+if not isinstance(codex_servers, dict):
+    raise SystemExit(f"{codex_dest_path} must contain a table at mcp_servers")
+
+changed = False
+missing_sections = []
+for name, server in src_servers.items():
+    codex_server = to_codex_server(server)
+    if name not in codex_servers:
+        codex_servers[name] = codex_server
+        missing_sections.append((name, codex_server))
+        changed = True
+        continue
+    if codex_servers[name] != codex_server:
+        sys.stderr.write(
+            f"WARNING: {codex_dest_path} already defines MCP server '{name}' "
+            f"differently; keeping project value instead of {profile} profile value.\n"
+        )
+
+if changed:
+    os.makedirs(os.path.dirname(codex_dest_path), exist_ok=True)
+    existing = ""
+    if os.path.exists(codex_dest_path):
+        with open(codex_dest_path, "r", encoding="utf-8") as f:
+            existing = f.read()
+    with open(codex_dest_path, "a", encoding="utf-8") as f:
+        if existing and not existing.endswith("\n"):
+            f.write("\n")
+        if existing and missing_sections:
+            f.write("\n")
+        for index, (name, server) in enumerate(missing_sections):
+            if index > 0:
+                f.write("\n\n")
+            f.write(render_mcp_server_toml(name, server))
+            f.write("\n")
+PY
 }
 
 AGENTS_HOME_DEFAULT="$HOME/.agents"
