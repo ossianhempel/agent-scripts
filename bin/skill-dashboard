@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-# Launch the local skill-usage dashboard (localhost, reads the event log live).
-set -euo pipefail
-here="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-exec python3 "$here/scripts/skill-dashboard-server.py" "$@"

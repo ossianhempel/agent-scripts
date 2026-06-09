@@ -9,6 +9,29 @@ read_when:
 
 A running log of meaningful changes to this toolkit — skills, profiles, sync/audit behavior, AGENTS guidance. One section per change, reverse-chronological. Add an entry whenever you ship something another agent or future-you needs to know about. Curate with the `update-changelog` skill.
 
+## 2026-06-09 — Remove all agent hooks
+- Removed all agent hook infrastructure: `hooks/scripts/git-auto-pull-current-branch.sh`, `hooks/scripts/track-skill-usage.py`, `hooks/scripts/install-skill-usage-hooks.py`, and the `hooks/` directory.
+- Stripped `sync_codex_hook` and `sync_claude_hook` functions and all hook install code from `scripts/sync-agent-scripts.sh` (both Codex and Claude provider blocks). Sync no longer touches `~/.codex/hooks.json` or `~/.claude/settings.json` hooks.
+- Removed the skill-usage reporting toolchain (`scripts/skill-usage-report.py`, `scripts/skill-dashboard-server.py`, `bin/skill-usage*`, `bin/skill-dashboard`), dashboard UI (`dashboard/index.html`, `Skill Dashboard.command`), tracking docs (`docs/skill-usage-tracking.md`), and the auto-pull test (`test/test-git-auto-pull-current-branch.sh`).
+- Updated test assertions to reflect the removed hook output.
+
+## 2026-06-09 — Clean duplicate profile skills and tighten descriptions
+- Added `shadcn` and `turborepo` to the `web-app-developer` profile, assigned `ai-kanban`, `aso-screenshots`, and `company-brain` to that profile, and replaced copied project-local skill dirs with profile symlinks where they duplicated the profile source.
+- Removed local profile copies that duplicated bundled Codex plugin skills (`stripe-best-practices`, Expo profile skills, and overlapping Build iOS Apps SwiftUI/iOS debugger skills) and pruned the resulting managed dangling project links.
+- Shortened high-cost skill descriptions while preserving trigger nouns for planning, brainstorming, compounding, frontend, browser automation, Obsidian, shadcn, Turborepo, and related profile skills.
+
+## 2026-06-08 — Move grill-with-docs into development profiles
+- Moved `grill-with-docs` out of global skills and into `profiles/_shared/skills/grill-with-docs/`, then linked it into the Swift app, macOS Swift app, React Native app, and web app profiles. Updated active skill indexing and glossary-format references to the new shared profile path.
+- Replaced the stale `~/Developer/voice-to-text` macOS profile assignment with `~/Developer/agent-wispr`, and added `~/Developer/agent-wispr-cloud` to the web app profile.
+
+## 2026-06-08 — Archive Peekaboo global skill
+- Moved the global `peekaboo` skill to `archived-skills/peekaboo/` so it no longer syncs as an active global skill. Kept the CLI reference in `tools.md` and pointed it at the archived skill.
+
+## 2026-06-08 — Add TanStack Start web profile skill
+- Added `tanstack-start-best-practices` to `profiles/web-app-developer/skills/`, covering TanStack Start routing, server functions, middleware, server routes, auth, deployment, migration, and verification guidance based on official TanStack docs.
+- Assigned `~/Developer/tiktok-slides` to the `web-app-developer` profile so it receives the shared web app skills.
+- Assigned `~/Developer/completia` to the `macos-swift-app-developer` profile so it receives the shared macOS app skills.
+
 ## 2026-06-08 — Add global teach skill
 - Added Matt Pocock's `teach` skill as a global skill, including its mission, resource, glossary, and learning-record format files. Synced it to the global agent skill roots.
 

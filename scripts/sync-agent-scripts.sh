@@ -205,190 +205,6 @@ sync_markdown_tree() {
   done < <(find "$src_root" -type f -name '*.md' -print0)
 }
 
-sync_codex_hook() {
-  local codex_home="$1"
-  local hook_command="$2"
-  local hooks_path="$codex_home/hooks.json"
-
-  log_sub "Hooks -> $hooks_path"
-  if [[ "$DRY_RUN" -eq 1 ]]; then
-    log_action "$(action_verb "$hooks_path")" "SessionStart auto-pull hook" "$hooks_path"
-    return 0
-  fi
-
-  mkdir -p "$codex_home"
-  python3 - "$hooks_path" "$hook_command" <<'PY'
-import json
-import os
-import sys
-
-path = sys.argv[1]
-command = sys.argv[2]
-hook = {
-    "type": "command",
-    "command": command,
-    "timeout": 30,
-}
-
-data = {}
-if os.path.exists(path):
-    try:
-        with open(path, "r", encoding="utf-8") as f:
-            existing = json.load(f)
-        if isinstance(existing, dict):
-            data = existing
-    except json.JSONDecodeError:
-        data = {}
-
-hooks_root = data.setdefault("hooks", {})
-if not isinstance(hooks_root, dict):
-    hooks_root = {}
-    data["hooks"] = hooks_root
-
-session_start = hooks_root.get("SessionStart")
-if not isinstance(session_start, list):
-    session_start = []
-hooks_root["SessionStart"] = session_start
-
-for item in session_start:
-    if not isinstance(item, dict):
-        continue
-    existing_hooks = item.get("hooks")
-    if not isinstance(existing_hooks, list):
-        continue
-    item["hooks"] = [
-        existing_hook
-        for existing_hook in existing_hooks
-        if not (
-            isinstance(existing_hook, dict)
-            and existing_hook.get("command") == command
-        )
-    ]
-
-session_start[:] = [
-    item
-    for item in session_start
-    if not (
-        isinstance(item, dict)
-        and isinstance(item.get("hooks"), list)
-        and len(item["hooks"]) == 0
-    )
-]
-
-group = None
-for item in session_start:
-    if isinstance(item, dict) and "matcher" not in item:
-        group = item
-        break
-
-if group is None:
-    group = {"hooks": []}
-    session_start.append(group)
-
-hooks = group.setdefault("hooks", [])
-if not isinstance(hooks, list):
-    hooks = []
-    group["hooks"] = hooks
-
-hooks.append(hook)
-
-with open(path, "w", encoding="utf-8") as f:
-    json.dump(data, f, indent=2)
-    f.write("\n")
-PY
-}
-
-sync_claude_hook() {
-  local settings_path="$1"
-  local hook_command="$2"
-
-  log_sub "Hooks -> $settings_path"
-  if [[ "$DRY_RUN" -eq 1 ]]; then
-    log_action "$(action_verb "$settings_path")" "SessionStart auto-pull hook" "$settings_path"
-    return 0
-  fi
-
-  mkdir -p "$(dirname "$settings_path")"
-  python3 - "$settings_path" "$hook_command" <<'PY'
-import json
-import os
-import sys
-
-path = sys.argv[1]
-command = sys.argv[2]
-hook = {
-    "type": "command",
-    "command": command,
-    "timeout": 30,
-}
-
-data = {}
-if os.path.exists(path):
-    try:
-        with open(path, "r", encoding="utf-8") as f:
-            existing = json.load(f)
-        if isinstance(existing, dict):
-            data = existing
-    except json.JSONDecodeError:
-        data = {}
-
-hooks_root = data.setdefault("hooks", {})
-if not isinstance(hooks_root, dict):
-    hooks_root = {}
-    data["hooks"] = hooks_root
-
-session_start = hooks_root.setdefault("SessionStart", [])
-if not isinstance(session_start, list):
-    session_start = []
-    hooks_root["SessionStart"] = session_start
-
-for item in session_start:
-    if not isinstance(item, dict):
-        continue
-    existing_hooks = item.get("hooks")
-    if not isinstance(existing_hooks, list):
-        continue
-    item["hooks"] = [
-        existing_hook
-        for existing_hook in existing_hooks
-        if not (
-            isinstance(existing_hook, dict)
-            and existing_hook.get("command") == command
-        )
-    ]
-
-session_start[:] = [
-    item
-    for item in session_start
-    if not (
-        isinstance(item, dict)
-        and isinstance(item.get("hooks"), list)
-        and len(item["hooks"]) == 0
-    )
-]
-
-group = None
-for item in session_start:
-    if isinstance(item, dict) and "matcher" not in item:
-        group = item
-        break
-
-if group is None:
-    group = {"hooks": []}
-    session_start.append(group)
-
-hooks = group.setdefault("hooks", [])
-if not isinstance(hooks, list):
-    hooks = []
-    group["hooks"] = hooks
-
-hooks.append(hook)
-
-with open(path, "w", encoding="utf-8") as f:
-    json.dump(data, f, indent=2)
-    f.write("\n")
-PY
-}
 
 render_gemini_toml() {
   local src="$1"
@@ -956,10 +772,9 @@ if want_provider "subagents"; then
   fi
 fi
 
-# --- Codex: prompts + hooks (skills handled by agents provider) ---
+# --- Codex: prompts (skills handled by agents provider) ---
 if want_provider "codex"; then
   codex_prompts_dir="$CODEX_HOME/prompts"
-  auto_pull_hook="$ROOT/hooks/scripts/git-auto-pull-current-branch.sh"
 
   log_section "Codex"
   log_sub "Prompts -> $codex_prompts_dir"
@@ -969,45 +784,16 @@ if want_provider "codex"; then
     run_copy_file "$prompt" "$codex_prompts_dir/$(basename "$prompt")"
   done
   shopt -u nullglob
-
-  skill_usage_hooks="$ROOT/hooks/scripts/install-skill-usage-hooks.py"
-  if [[ -f "$skill_usage_hooks" ]]; then
-    log_sub "Hooks -> skill usage (Codex + Claude)"
-    if [[ "$DRY_RUN" -eq 1 ]]; then
-      log_action "would run" "install-skill-usage-hooks.py" "$skill_usage_hooks"
-    else
-      python3 "$skill_usage_hooks"
-    fi
-  elif [[ -f "$auto_pull_hook" ]]; then
-    sync_codex_hook "$CODEX_HOME" "$auto_pull_hook"
-  else
-    log_sub "Skipping hooks: missing $auto_pull_hook"
-  fi
 fi
 
-# --- Claude Code: skills + commands + hooks (does not support .agents/) ---
+# --- Claude Code: skills + commands (does not support .agents/) ---
 if want_provider "claude"; then
   claude_commands_dir="$CLAUDE_HOME/commands"
-  auto_pull_hook="$ROOT/hooks/scripts/git-auto-pull-current-branch.sh"
   log_section "Claude"
   sync_skills_to "$CLAUDE_SKILLS_DIR" "Skills"
 
   log_sub "Commands -> $claude_commands_dir"
   sync_markdown_tree "$ROOT/slash-commands" "$claude_commands_dir"
-
-  skill_usage_hooks="$ROOT/hooks/scripts/install-skill-usage-hooks.py"
-  if ! want_provider "codex" && [[ -f "$skill_usage_hooks" ]]; then
-    log_sub "Hooks -> skill usage (Claude + Codex)"
-    if [[ "$DRY_RUN" -eq 1 ]]; then
-      log_action "would run" "install-skill-usage-hooks.py" "$skill_usage_hooks"
-    else
-      python3 "$skill_usage_hooks"
-    fi
-  elif [[ -f "$auto_pull_hook" ]]; then
-    sync_claude_hook "$CLAUDE_HOME/settings.json" "$auto_pull_hook"
-  else
-    log_sub "Skipping hooks: missing $auto_pull_hook"
-  fi
 fi
 
 # --- Gemini: commands + settings only (skills handled by agents provider) ---
