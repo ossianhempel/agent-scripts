@@ -56,10 +56,11 @@ Source of truth on this machine: `~/Developer/agent-scripts`.
   macOS launch-agent status, log, Telegram spool, and restart checklist.
 
 ## Sync to Global Agent Settings
-Run `scripts/sync-agent-scripts.sh` to install skills (as relative symlinks
-into this repo — one source of truth, no re-sync after edits) plus slash
-commands and global agent hooks (copied) into local/global agent runtimes. See
-`docs/syncing.md` for details.
+Run `scripts/sync-agent-scripts.sh` to install global skills (as relative
+symlinks into this repo — one source of truth, no re-sync after edits) plus
+slash commands (copied) into local/global agent runtimes. Profile skills install
+into assigned project repos as self-contained copies, not symlinks (see
+`docs/syncing.md` for the why and the full model).
 
 Examples:
 ```sh
@@ -69,6 +70,25 @@ Examples:
 ./scripts/sync-agent-scripts.sh --provider agents --agents-scope both
 COPILOT_PROMPTS_DIR=~/my-repo/.github/prompts ./scripts/sync-agent-scripts.sh --provider copilot --copilot-scope workspace
 ```
+
+## Sync Public Plugins
+Public agent plugins (e.g. Every's `compound-engineering`) are installed through
+each tool's own marketplace machinery and **auto-update** there — nothing is
+vendored into this repo, only the enable-config. The non-default `plugins`
+provider applies `plugins.json` (global) and `profiles/<name>/plugins.json`
+(per-profile, Claude-only). Claude is fully declarative (`extraKnownMarketplaces`
++ `enabledPlugins` in `settings.json`); Codex registers the marketplace via CLI,
+writes `[plugins."name@marketplace"] enabled = true` into `config.toml`, and runs
+any per-plugin `installCommands`. See AGENTS.md → "Plugins" for the full schema.
+
+```sh
+./scripts/sync-agent-scripts.sh --provider plugins            # apply global plugins
+./scripts/sync-agent-scripts.sh --provider plugins --dry-run  # preview
+./scripts/sync-agent-scripts.sh --provider plugins --prune    # also disable plugins removed from the manifest
+```
+
+`--prune` only touches plugins under marketplaces the manifest declares — it
+never disables manually-installed plugins.
 
 ## Sync Agent Instructions to Repos
 Use `scripts/sync-agent-instructions.sh` to insert the shared pointer line into
@@ -152,10 +172,8 @@ Skills
 - `copywriter`
 - `frontend-design`
 - `grill-me`
-- `grill-with-docs`
 - `handoff`
 - `obsidian`
-- `peekaboo`
 - `plan`
 - `playwright`
 - `review-agent-md`
@@ -188,6 +206,11 @@ Tools
 - `gh`
 - `gog`
 - `things`
+
+Profile-shared development skills
+- `grill-with-docs`
+- `shadcn`
+- `turborepo`
 
 ## Contents Maintenance
 - Update the lists above when adding or removing items.

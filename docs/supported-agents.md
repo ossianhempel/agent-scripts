@@ -30,8 +30,9 @@ symlinks) into each runtime's skill root:
 Repo source of truth: `~/Developer/agent-scripts/skills` (this machine) or
 `~/repos/agent-scripts/skills` (varies by machine — see AGENTS.md).
 
-Project-scoped profile installs land in `<project>/.agents/skills` (real dirs) with
-`<project>/.claude/skills` symlinks. See the Profiles section in `AGENTS.md`.
+Project-scoped profile installs land as self-contained real-directory copies in
+both `<project>/.agents/skills` and `<project>/.claude/skills` (not symlinks —
+app repos stay portable). See the Profiles section in `AGENTS.md`.
 
 ## Session / transcript logs
 

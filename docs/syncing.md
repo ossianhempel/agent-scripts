@@ -27,7 +27,13 @@ links to it. The link targets are:
 Each link resolves like
 `~/.claude/skills/<skill> -> ../../Developer/agent-scripts/skills/<skill>`.
 
-Consequences (same model the profiles already use):
+This applies to **global** skills only (the home-dir installs above). They live
+in your home directory, are never committed, and have a stable path to
+agent-scripts, so a symlink is pure upside. **Profile** skills install into app
+repos and are **copied** instead — see "Where profile skills land in a project"
+below.
+
+Consequences (global skills):
 
 - **Zero duplication** — one copy on disk, period.
 - **No drift, no re-sync after edits** — change a skill in agent-scripts and
@@ -126,28 +132,38 @@ or a list of names:
 
 ### Where profile skills land in a project
 
-Profile skill installs are a chain of **relative symlinks** back into
-agent-scripts — not copies. There is one canonical copy of each skill (in
-agent-scripts), and every assigned project links to it.
+Profile skills install as **self-contained real-directory copies** — not
+symlinks. App repos must stay portable: a symlink pointing into agent-scripts
+breaks the moment the repo is cloned, run in CI, or opened on another machine,
+and some editors/indexers won't follow it.
 
 ```
-<project>/.agents/skills/<skill>  -> ../../../agent-scripts/profiles/<profile>/skills/<skill>
-<project>/.claude/skills/<skill>  -> ../../.agents/skills/<skill>
+<project>/.agents/skills/<skill>/   (real dir, copied from the profile)
+<project>/.claude/skills/<skill>/   (real dir, copied from the profile)
 ```
 
-Shared skills resolve through one more hop — the profile's `<skill>` entry is
-itself a symlink to `_shared/skills/<skill>`. The chain works because the
-symlinks are relative; agent-scripts only needs to be a sibling of the project
-under whatever parent dir each machine uses (`~/Developer/`, `~/repos/`, etc.).
+The in-repo `_shared/` model is still the single source of truth — a profile's
+`<skill>` entry may be a symlink to `_shared/skills/<skill>` — but the sync
+**dereferences** it (`cp -RL`) so the project always receives real files, never
+a link. agent-scripts is therefore NOT a runtime dependency of the project;
+each repo carries its own copies.
+
+The sync skips a skill whose project copy is already byte-identical (so it
+produces no git churn), and always replaces a stale symlink left by the old
+symlink-install model. Each dest dir keeps an `.agent-scripts-managed` manifest
+listing the skills the sync owns.
 
 Consequences:
 
-- **Zero duplication** — one copy on disk, period.
-- **No drift possible** — edit in agent-scripts, every project sees it
-  immediately. No need to re-run sync after a content change.
-- **Sync = `ln -sfn`** — fast and idempotent.
-- **agent-scripts is a runtime dependency** of every assigned project. If you
-  move or delete agent-scripts, every project's profile skills break.
+- **Portable** — a cloned repo / CI / another machine sees real skill files,
+  no broken links.
+- **Re-sync after edits** — editing a skill in agent-scripts does NOT update
+  projects until you re-run the profile sync (the deliberate tradeoff vs.
+  global symlinks). `_shared` keeps you editing each shared skill once.
+- **Safe prune** — removing a skill from a profile deletes its stale copy on the
+  next sync; project-authored skills (never in the manifest) are never touched.
+- **Broken-symlink cleanup** — any dangling link left in a dest dir by the old
+  model is removed on sync.
 
 ### Where profile MCPs land in a project
 
@@ -171,6 +187,15 @@ Use this for project-level MCPs that should not spin up globally on every Codex
 launch. For example, `swift-app-developer` provides `xcodebuildmcp` and
 RevenueCat through project config instead of requiring them in global Codex
 config.
+
+### Where profile plugins land in a project
+
+If a profile contains `profiles/<profile>/plugins.json`, the profile sync merges
+its `claude` section (`extraKnownMarketplaces` + `enabledPlugins`) into the
+assigned project's `.claude/settings.json`. Only Claude is targeted — Codex
+plugin enablement lives in global `~/.codex/config.toml`, so per-project Codex
+plugins aren't a thing. The merge is conservative (preserves existing keys, warns
+on a marketplace-source conflict). See the dedicated Plugins section below.
 
 ### Profile overrides
 
@@ -202,6 +227,74 @@ Two distinct categories matter for pruning:
 orphans from assigned project scopes, and only inside an assigned project's own
 `.agents/skills` / `.claude/skills`. Without `--profiles`, prune manages global
 scopes only and never touches project-local skills.
+
+## Plugins (public agent plugins)
+
+Public plugins (e.g. Every's `compound-engineering`) are installed through each
+tool's own marketplace machinery and **auto-update** there. We store only the
+*enable-config* — nothing is vendored, unlike skills. Two manifests:
+
+- `plugins.json` (repo root) — **global**, installed for the current user.
+- `profiles/<name>/plugins.json` — **per-profile**, Claude-only, merged into each
+  assigned project's `.claude/settings.json` by the `profiles` provider.
+
+Manifest shape (see the `_comment` in `plugins.json` for the authoritative spec):
+
+```jsonc
+{
+  "claude": {
+    "marketplaces": { "<mkt-name>": { "source": "github", "repo": "owner/repo" } },
+    "enabled": ["<plugin>@<mkt-name>"]
+  },
+  "codex": {
+    "marketplaces": ["owner/repo"],
+    "enabled": ["<plugin>@<mkt-name>"],
+    "installCommands": [["bunx", "…", "--to", "codex"]],
+    "manualSteps": ["…"]
+  }
+}
+```
+
+### Applying
+
+The default run **never** touches plugins. Use the non-default `plugins` provider:
+
+```sh
+scripts/sync-agent-scripts.sh --provider plugins            # apply global plugins.json
+scripts/sync-agent-scripts.sh --provider plugins --dry-run  # preview
+scripts/sync-agent-scripts.sh --provider plugins --prune    # also disable removed plugins
+```
+
+Per-profile plugins ride the normal `--provider profiles` run.
+
+### What each tool gets
+
+- **Claude** — fully declarative: `extraKnownMarketplaces` + `enabledPlugins`
+  merged into `~/.claude/settings.json` (global) or `<project>/.claude/settings.json`
+  (profile). Claude installs/updates the marketplace on launch.
+- **Codex** — `codex plugin marketplace add <repo>` (CLI), then
+  `[plugins."name@marketplace"] enabled = true` written into `~/.codex/config.toml`,
+  then any `installCommands` (e.g. CE's `bunx @every-env/compound-plugin …
+  --to codex` for the custom agents Codex can't yet register). No `/plugins` TUI.
+
+### Pruning
+
+`--prune` reconciles to the manifest, but **only within marketplaces the manifest
+declares**. Manually-installed plugins under other marketplaces
+(`swift-lsp@claude-plugins-official`, `@openai-curated` Codex plugins, …) are
+never modified. Claude prune removes the `enabledPlugins` entry; Codex prune sets
+`enabled = false`. Marketplace registrations are left in place (harmless once
+unreferenced) — remove a whole marketplace by hand or via
+`codex plugin marketplace remove`. Removing every plugin of a marketplace from
+the Codex manifest means its name can no longer be derived, so prune can't
+auto-disable it — keep at least one entry or disable it manually.
+
+### Updates
+
+Marketplace plugins auto-update through each tool's own flow
+(`/plugin marketplace update`, `codex plugin marketplace upgrade`). CE's
+bunx-installed Codex agents refresh on the next `--provider plugins` run, since
+the install command re-runs each time.
 
 ## Auto-sync via Git hooks (local only)
 
@@ -257,6 +350,7 @@ Hooks:
 - `--cursor-commands-dir`, `--cursor-scope`
 - `--copilot-prompts-dir`, `--copilot-user-prompts-dir`, `--copilot-scope`
 - `--profile`, `--project`, `--profiles-manifest` (profiles provider)
+- `--prune` (plugins provider — disable managed plugins removed from the manifest)
 - Or set env vars: `AGENTS_SCOPE`, `CURSOR_COMMANDS_DIR`, `CURSOR_SCOPE`,
   `COPILOT_PROMPTS_DIR`, `COPILOT_USER_PROMPTS_DIR`, `COPILOT_SCOPE`
 
@@ -277,4 +371,8 @@ Hooks:
 - The `profiles` provider is never in the default provider set, so a plain
   `sync-agent-scripts.sh` only ever syncs global `skills/`. Run it explicitly to
   push project-scoped profile bundles.
+- The `plugins` provider is likewise never in the default set — run
+  `--provider plugins` explicitly to apply `plugins.json`. Plugins are public
+  marketplace installs (declarative enable-config only, nothing vendored); see
+  the Plugins section above.
 - `--dry-run` prints every file that would be created or updated.

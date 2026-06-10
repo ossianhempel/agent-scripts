@@ -141,6 +141,49 @@ assert servers["xcodebuildmcp"]["command"] == "npx"
 assert servers["revenuecat"]["args"] == ["-y", "mcp-remote", "https://mcp.revenuecat.ai/mcp"]
 PY
 
+# Profile skills install as self-contained real-dir COPIES, not symlinks, so app
+# repos stay portable. A managed-set manifest is written per dest dir.
+assert_contains "self-contained copies"
+assert_contains "skill copy -> $PROFILE_PROJECT/.claude/skills/clerk"
+
+if [[ -L "$PROFILE_PROJECT/.claude/skills/clerk" ]]; then
+  echo "FAIL: profile skill installed as a symlink; expected a real directory" >&2
+  exit 1
+fi
+if [[ ! -f "$PROFILE_PROJECT/.claude/skills/clerk/SKILL.md" ]]; then
+  echo "FAIL: profile skill copy is missing SKILL.md" >&2
+  exit 1
+fi
+if [[ ! -f "$PROFILE_PROJECT/.claude/skills/.agent-scripts-managed" ]]; then
+  echo "FAIL: managed-set manifest was not written" >&2
+  exit 1
+fi
+if ! rg -F --quiet -- "clerk" "$PROFILE_PROJECT/.claude/skills/.agent-scripts-managed"; then
+  echo "FAIL: clerk not recorded in the managed manifest" >&2
+  exit 1
+fi
+
+# Prune is safe: a previously-managed skill that's gone gets removed, but a
+# project-authored skill (never in the manifest) is left untouched.
+mkdir -p "$PROFILE_PROJECT/.claude/skills/zzz-stale"
+echo "stale" > "$PROFILE_PROJECT/.claude/skills/zzz-stale/SKILL.md"
+printf 'zzz-stale\n' >> "$PROFILE_PROJECT/.claude/skills/.agent-scripts-managed"
+mkdir -p "$PROFILE_PROJECT/.claude/skills/zzz-mine"
+echo "mine" > "$PROFILE_PROJECT/.claude/skills/zzz-mine/SKILL.md"
+(
+  cd "$ROOT"
+  HOME="$HOME_DIR" \
+  "$ROOT/scripts/sync-agent-scripts.sh" --provider profiles --profile swift-app-developer --project "$PROFILE_PROJECT"
+) > "$OUTPUT_FILE"
+if [[ -e "$PROFILE_PROJECT/.claude/skills/zzz-stale" ]]; then
+  echo "FAIL: stale managed skill was not pruned" >&2
+  exit 1
+fi
+if [[ ! -e "$PROFILE_PROJECT/.claude/skills/zzz-mine" ]]; then
+  echo "FAIL: project-authored skill was wrongly pruned" >&2
+  exit 1
+fi
+
 # --- Copilot default scope ---
 OUTPUT_FILE="$TMP_DIR/output-copilot-default.txt"
 

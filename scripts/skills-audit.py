@@ -141,35 +141,27 @@ def profile_union_skills(profiles: list[str]) -> set[str]:
     return names
 
 
-def all_profile_skills() -> set[str]:
-    """Every skill name the repo's profile system knows about — across all
-    profiles plus the _shared store. A skill installed in a project that is NOT
-    in this set is project-native (authored in that project) and must never be
-    pruned by the profile tooling."""
-    names = profile_union_skills(list_profiles())
-    names.update(list_skills(PROFILES_ROOT / SHARED_PROFILE_DIR / "skills"))
-    return names
+MANAGED_MANIFEST = ".agent-scripts-managed"
 
 
-def is_managed_symlink(entry: Path) -> bool:
-    """True if entry is a symlink the profile sync created. Two shapes:
-
-    - `.claude/skills/<name>` -> `../../.agents/skills/<name>`
-    - `.agents/skills/<name>` -> `../../../agent-scripts/profiles/<profile>/skills/<name>`
-      (or anywhere into a `profiles/<profile>/skills/<name>` path — we match
-      lexically so dangling symlinks are still recognized)
-    """
-    if not entry.is_symlink():
-        return False
+def managed_names_in(scope: Path) -> set[str]:
+    """Skill names the profile sync installed into this project scope, read from
+    the scope's `.agent-scripts-managed` manifest. This is the authoritative
+    record of what the sync owns: only names in here are eligible for prune;
+    anything on disk but NOT listed is project-authored content the profile
+    tooling must never touch. (Profile skills install as real-directory copies,
+    not symlinks — the manifest is how we tell ours apart from the project's.)"""
+    manifest = scope / MANAGED_MANIFEST
+    if not manifest.is_file():
+        return set()
     try:
-        target = os.readlink(entry)
+        return {
+            line.strip()
+            for line in manifest.read_text(encoding="utf-8").splitlines()
+            if line.strip()
+        }
     except OSError:
-        return False
-    if target == f"../../.agents/skills/{entry.name}":
-        return True
-    # `.agents` side: any target that walks into a profile's skills dir and
-    # ends at the same skill name we're at. Lexical so we catch broken links.
-    return "/profiles/" in target and target.endswith(f"/skills/{entry.name}")
+        return set()
 
 
 def load_assignments() -> list[tuple[Path, list[str]]]:
@@ -362,7 +354,6 @@ def scan_profiles() -> bool:
     if not drift:
         print("  none")
 
-    managed = all_profile_skills()
     orphan_lines: list[str] = []
     native_lines: list[str] = []
     for project, names in assignments:
@@ -371,23 +362,25 @@ def scan_profiles() -> bool:
             scope = project / suffix
             if not scope.is_dir():
                 continue
+            owned = managed_names_in(scope)
             for installed in list_skills(scope):
                 if installed in expected:
                     continue
                 path = scope / installed
-                # A name-collision alone never makes something prunable —
-                # only entries that are OUR managed symlinks count as orphans
-                # the profile system can clean up. Real dirs and foreign
-                # symlinks are always project-native, even if the name happens
-                # to be in our managed set.
-                if installed in managed and is_managed_symlink(path):
+                # The .agent-scripts-managed manifest is the source of truth for
+                # what the sync installed here. A skill listed there but no longer
+                # in the assigned profiles is a prunable orphan; anything NOT in
+                # the manifest is project-authored content — never prune it, even
+                # if the name happens to collide with a repo skill.
+                if installed in owned:
                     orphan_lines.append(f"  {installed}: {path} (not in {', '.join(names)})")
                 else:
                     native_lines.append(f"  {installed}: {path}")
-            # Dangling managed symlinks left after a profile skill was removed.
+            # Broken symlinks left by the old symlink-install model are never
+            # legitimate content; flag them for cleanup.
             for entry in scope.iterdir():
-                if is_managed_symlink(entry) and not entry.exists():
-                    orphan_lines.append(f"  {entry.name}: {entry} (dangling managed symlink)")
+                if entry.is_symlink() and not entry.exists():
+                    orphan_lines.append(f"  {entry.name}: {entry} (dangling symlink)")
 
     print()
     print("== Profile orphans (managed by another profile — prunable with prune --profiles) ==")
@@ -489,7 +482,6 @@ def prune_profiles(args: argparse.Namespace) -> int:
         if (project / suffix).is_dir()
     ]
 
-    managed = all_profile_skills()
     targets: list[Path] = []
     for project, names in assignments:
         expected = profile_union_skills(names)
@@ -497,20 +489,17 @@ def prune_profiles(args: argparse.Namespace) -> int:
             scope = project / suffix
             if not scope.is_dir():
                 continue
+            owned = managed_names_in(scope)
             for installed in list_skills(scope):
-                # Only prune skills the profile system manages elsewhere. A skill
-                # the repo has never seen is project-native — never touch it.
-                if installed not in expected and installed in managed:
-                    path = scope / installed
-                    # Belt-and-braces: even when the name is known, only delete
-                    # if the on-disk entry is one of OUR symlinks. A real dir
-                    # with a colliding name is project-authored content; leave
-                    # it alone. Matches the safety guarantee documented in the
-                    # module docstring and AGENTS.md.
-                    if is_managed_symlink(path):
-                        targets.append(path)
+                # Only prune skills this scope's .agent-scripts-managed manifest
+                # records as ours. A skill not in the manifest is project-authored
+                # content — never touch it, even on a name collision. This is the
+                # safety guarantee documented in the module docstring and AGENTS.md.
+                if installed not in expected and installed in owned:
+                    targets.append(scope / installed)
+            # Broken symlinks (old-model leftovers) are never legitimate content.
             for entry in scope.iterdir():
-                if is_managed_symlink(entry) and not entry.exists():
+                if entry.is_symlink() and not entry.exists():
                     targets.append(entry)
 
     if not targets:

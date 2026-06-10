@@ -20,6 +20,10 @@ profiles/
   format as a global skill.
 - Each profile may also hold `mcp.json`, whose `mcpServers` are merged into
   each assigned project's `.mcp.json`.
+- Each profile may also hold `plugins.json` (a `claude` section only — Codex
+  plugin enablement is inherently global), whose marketplaces/enabled plugins
+  are merged into each assigned project's `.claude/settings.json`. Applied by the
+  same `--provider profiles` run. See AGENTS.md → "Plugins".
 - A skill that belongs to **one** profile lives as a real directory inside that
   profile's `skills/`.
 - A skill shared by **multiple** profiles (but not global) lives once in
@@ -51,16 +55,26 @@ scripts/sync-agent-scripts.sh --provider profiles \
   --profile swift-app-developer --project ~/Developer/platesnap
 ```
 
-Profile installs are relative symlinks back into agent-scripts (zero copies,
-zero drift):
+Profile skills install as **self-contained real-directory copies** into each
+project — not symlinks. App repos must stay portable: a symlink into
+agent-scripts breaks the moment the repo is cloned, run in CI, or opened on
+another machine, and some editors/indexers won't traverse it.
 
 ```
-<project>/.agents/skills/<skill>  -> ../../../agent-scripts/profiles/<profile>/skills/<skill>
-<project>/.claude/skills/<skill>  -> ../../.agents/skills/<skill>
+<project>/.agents/skills/<skill>/   (real dir, copied from the profile)
+<project>/.claude/skills/<skill>/   (real dir, copied from the profile)
 ```
 
-Shared skills resolve through one more hop (profile entry is itself a symlink
-into `_shared/`).
+The in-repo `_shared/` model is still the single source of truth — a profile's
+`<skill>` may be a symlink into `_shared/`, but the sync **dereferences** it
+(`cp -RL`) so the project always gets real files, never a link. Edit a shared
+skill once in `_shared/`; re-run the sync to fan the copy out. (Global skills,
+which install into the home directory and are never committed, stay symlinks —
+see `../AGENTS.md`.)
+
+Each dest dir carries an `.agent-scripts-managed` manifest listing the skills
+the sync owns. Removing a skill from a profile prunes its stale copy on the next
+sync; project-authored skills (never in the manifest) are never touched.
 
 Profile MCP installs are conservative merges:
 

@@ -4,6 +4,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 DRY_RUN=0
+PRUNE=0
 PROVIDERS=()
 SECTION_STARTED=0
 
@@ -30,14 +31,22 @@ Cursor, Copilot, Windsurf), ~/.claude/skills (Claude Code only), and
 runtime dependency: move or delete it and the links break.
 Commands/prompts are copied to each tool's native location.
 
-Profiles (profiles/<name>/skills/ plus optional profiles/<name>/mcp.json) are
-project-scoped packages. They are NOT part of the default run — sync them with
-the 'profiles' provider, which installs into each assigned project's
-.agents/skills, .claude/skills, and .mcp.json. Assignments come from
+Profiles (profiles/<name>/skills/ plus optional profiles/<name>/mcp.json and
+profiles/<name>/plugins.json) are project-scoped packages. They are NOT part of
+the default run — sync them with the 'profiles' provider, which installs into
+each assigned project's .agents/skills, .claude/skills, .mcp.json, and (Claude
+only) .claude/settings.json plugin config. Assignments come from
 profile-assignments.json or from --profile/--project for a one-off.
 
+Plugins (plugins.json at the repo root) are public agent plugins installed
+globally. They are NOT part of the default run — apply them with the 'plugins'
+provider. Nothing is vendored: the 'claude' section is merged declaratively into
+~/.claude/settings.json (extraKnownMarketplaces + enabledPlugins), and the
+'codex' section registers marketplaces via `codex plugin marketplace add`, writes
+enabled plugins into ~/.codex/config.toml, and runs any per-plugin installCommands.
+
 Options:
-  --providers <list>          Comma-separated providers (agents,subagents,codex,claude,gemini,cursor,copilot,antigravity,profiles)
+  --providers <list>          Comma-separated providers (agents,subagents,codex,claude,gemini,cursor,copilot,antigravity,profiles,plugins)
   --provider <name>           Add a single provider (repeatable)
   --agents-home <path>        Override agents home (default: ~/.agents)
   --agents-skills-dir <path>  Override agents skills directory (default: ~/.agents/skills)
@@ -56,6 +65,10 @@ Options:
   --project <path>            Target project root for a one-off profile sync
   --profiles-manifest <path>  Override assignments file (default: ./profile-assignments.json)
   --dry-run                   Print actions without writing files
+  --prune                     (plugins provider) Also DISABLE/REMOVE managed
+                              plugins no longer in the manifest. Only ever
+                              touches plugins under marketplaces the manifest
+                              declares — never manually-installed plugins.
   -h, --help                  Show this help
 
 Examples:
@@ -65,6 +78,8 @@ Examples:
   scripts/sync-agent-scripts.sh --provider copilot --copilot-scope workspace
   scripts/sync-agent-scripts.sh --provider profiles
   scripts/sync-agent-scripts.sh --provider profiles --profile swift-app-developer --project ~/Developer/platesnap
+  scripts/sync-agent-scripts.sh --provider plugins
+  scripts/sync-agent-scripts.sh --provider plugins --dry-run
 USAGE
 }
 
@@ -405,26 +420,103 @@ make_relative_symlink() {
   ln -s "$rel" "$link"
 }
 
-# Install one profile's skills into a project as relative symlinks pointing
-# back into agent-scripts. Zero duplication, zero drift — edits in agent-scripts
-# show up instantly in every assigned project.
-#
-#   <project>/.agents/skills/<name>  -> ../../../agent-scripts/profiles/<profile>/skills/<name>
-#   <project>/.claude/skills/<name>  -> ../../.agents/skills/<name>
-#
-# Shared skills resolve through profile->_shared symlink chains naturally;
-# we deliberately do NOT collapse the chain so moves between profiles only
-# touch one place.
-sync_profile_to_project() {
-  local profile="$1"
-  local project="$2"
-  local src="$ROOT/profiles/$profile/skills"
-  local mcp_src="$ROOT/profiles/$profile/mcp.json"
-
-  if [[ ! -d "$src" && ! -f "$mcp_src" ]]; then
-    log_sub "Skipping: missing profile '$profile' ($src or $mcp_src)"
+# Copy one skill dir into a project as a real, self-contained directory.
+# The source may itself be a profile->_shared symlink; cp -RL dereferences it so
+# the project NEVER carries a link into agent-scripts (which would break on
+# clone/CI/another machine, and which some tools don't traverse). Skips when the
+# existing copy is already byte-identical (no git churn), and always replaces a
+# stale symlink left by the old symlink-install model. Returns 0 if it wrote, 1
+# if it skipped an identical copy.
+copy_skill_dir() {
+  local src="$1"
+  local dest="$2"
+  # diff follows a top-level symlink given as an argument, so this compares the
+  # resolved _shared content against the project copy. A real, identical dir is
+  # left untouched; a symlink dest (old model) fails the `! -L` guard and is
+  # replaced with a copy below.
+  if [[ -d "$dest" && ! -L "$dest" ]] && diff -qr "$src" "$dest" >/dev/null 2>&1; then
+    return 1
+  fi
+  log_action "$(action_verb "$dest")" "skill copy" "$dest"
+  if [[ "$DRY_RUN" -eq 1 ]]; then
     return 0
   fi
+  rm -rf "$dest"
+  mkdir -p "$(dirname "$dest")"
+  cp -RL "$src" "$dest"
+  return 0
+}
+
+# Remove skill dirs this sync previously managed but no longer does, plus any
+# broken symlinks left behind by the old symlink-install model. NEVER deletes
+# project-authored skills: only names recorded in the dest's
+# .agent-scripts-managed manifest are eligible for prune. Rewrites the manifest
+# to the current managed set.
+prune_managed_skills() {
+  local dest_root="$1"
+  shift
+  local current=("$@")
+  local manifest="$dest_root/.agent-scripts-managed"
+  if [[ ! -d "$dest_root" ]]; then
+    return 0
+  fi
+
+  # Clean dangling symlinks (migration leftovers) regardless of the manifest —
+  # a broken link is never legitimate project content.
+  local entry
+  shopt -s nullglob
+  for entry in "$dest_root"/*; do
+    if [[ -L "$entry" && ! -e "$entry" ]]; then
+      log_action "remove" "broken symlink" "$entry"
+      if [[ "$DRY_RUN" -ne 1 ]]; then
+        rm -f "$entry"
+      fi
+    fi
+  done
+  shopt -u nullglob
+
+  # Prune previously-managed names that are no longer in the current set.
+  if [[ -f "$manifest" ]]; then
+    local name in_current j
+    while IFS= read -r name; do
+      if [[ -z "$name" ]]; then
+        continue
+      fi
+      in_current=0
+      for ((j = 0; j < ${#current[@]}; j++)); do
+        if [[ "${current[$j]}" == "$name" ]]; then
+          in_current=1
+          break
+        fi
+      done
+      if [[ "$in_current" -eq 0 && -e "$dest_root/$name" ]]; then
+        log_action "remove" "stale skill" "$dest_root/$name"
+        if [[ "$DRY_RUN" -ne 1 ]]; then
+          rm -rf "$dest_root/$name"
+        fi
+      fi
+    done < "$manifest"
+  fi
+
+  # Record the new managed set so the next sync can prune accurately.
+  if [[ "$DRY_RUN" -ne 1 && ${#current[@]} -gt 0 ]]; then
+    mkdir -p "$dest_root"
+    printf '%s\n' "${current[@]}" > "$manifest"
+  fi
+}
+
+# Install one or more profiles' skills into a project as self-contained COPIES
+# (not symlinks). App repos must stay portable: a symlink into agent-scripts
+# breaks the moment the repo is cloned, run in CI, or opened on another machine,
+# and some editors/indexers won't traverse it. The in-repo _shared model still
+# gives a single source of truth; we dereference it at install time so the
+# project gets real files. When a project maps to several profiles, their skills
+# are unioned (first profile wins a name clash) so the prune pass is correct.
+sync_profiles_to_project() {
+  local project="$1"
+  shift
+  local profiles=("$@")
+
   # Never materialize a project root that doesn't exist — that would just
   # create an empty <name>/.agents/skills/ tree out of nowhere.
   if [[ ! -d "$project" ]]; then
@@ -434,21 +526,59 @@ sync_profile_to_project() {
 
   local dest_agents="$project/.agents/skills"
   local dest_claude="$project/.claude/skills"
-  log_sub "$profile -> $project (relative symlinks into agent-scripts)"
 
-  if [[ -d "$src" ]]; then
-    shopt -s nullglob
-    for skill_dir in "$src"/*; do
-      # Accept both real dirs and symlinks (shared skills are profile-level symlinks).
-      [[ -d "$skill_dir" || -L "$skill_dir" ]] || continue
-      skill_name="$(basename "$skill_dir")"
-      make_relative_symlink "$dest_agents/$skill_name" "$skill_dir"
-      make_relative_symlink "$dest_claude/$skill_name" "$dest_agents/$skill_name"
+  # Union of skill_name -> source path across every profile for this project.
+  local skill_names=()
+  local skill_srcs=()
+  local profile src mcp_src plugins_src skill_dir skill_name i found
+  for profile in "${profiles[@]}"; do
+    src="$ROOT/profiles/$profile/skills"
+    mcp_src="$ROOT/profiles/$profile/mcp.json"
+    plugins_src="$ROOT/profiles/$profile/plugins.json"
+
+    if [[ ! -d "$src" && ! -f "$mcp_src" && ! -f "$plugins_src" ]]; then
+      log_sub "Skipping: missing profile '$profile' ($src, $mcp_src, or $plugins_src)"
+      continue
+    fi
+    log_sub "$profile -> $project (self-contained copies)"
+
+    if [[ -d "$src" ]]; then
+      shopt -s nullglob
+      for skill_dir in "$src"/*; do
+        # Accept both real dirs and symlinks (shared skills are profile-level symlinks).
+        [[ -d "$skill_dir" || -L "$skill_dir" ]] || continue
+        skill_name="$(basename "$skill_dir")"
+        found=0
+        for ((i = 0; i < ${#skill_names[@]}; i++)); do
+          if [[ "${skill_names[$i]}" == "$skill_name" ]]; then
+            found=1
+            break
+          fi
+        done
+        if [[ "$found" -eq 1 ]]; then
+          log_sub "  note: '$skill_name' provided by multiple profiles; keeping first"
+          continue
+        fi
+        skill_names+=("$skill_name")
+        skill_srcs+=("$skill_dir")
+      done
+      shopt -u nullglob
+    fi
+
+    sync_profile_mcp_to_project "$profile" "$project" "$mcp_src"
+    # Per-project plugins are Claude-only (Codex plugins are inherently global);
+    # merge into this project's .claude/settings.json.
+    sync_claude_plugins "$plugins_src" "$project/.claude/settings.json" "$profile"
+  done
+
+  # Install the union as copies into both dest dirs, then prune each.
+  local d
+  for d in "$dest_agents" "$dest_claude"; do
+    for ((i = 0; i < ${#skill_names[@]}; i++)); do
+      copy_skill_dir "${skill_srcs[$i]}" "$d/${skill_names[$i]}" || true
     done
-    shopt -u nullglob
-  fi
-
-  sync_profile_mcp_to_project "$profile" "$project" "$mcp_src"
+    prune_managed_skills "$d" "${skill_names[@]}"
+  done
 }
 
 sync_profile_mcp_to_project() {
@@ -598,6 +728,223 @@ if changed:
 PY
 }
 
+# Merge a plugins manifest's `claude` section into a Claude settings.json:
+#   extraKnownMarketplaces <- claude.marketplaces (each wrapped as {"source": <entry>})
+#   enabledPlugins         <- claude.enabled[] as {name: true}
+# Declarative and idempotent — Claude Code resolves/installs the marketplace on
+# next launch, so no files are vendored. Preserves unrelated settings; warns
+# (never clobbers) on a marketplace-source conflict. Reusable for both the global
+# manifest (~/.claude/settings.json) and per-profile manifests (project settings).
+sync_claude_plugins() {
+  local manifest="$1"
+  local settings_path="$2"
+  local label="$3"
+
+  [[ -f "$manifest" ]] || return 0
+  # Nothing to do if the manifest has no claude section.
+  python3 -c 'import json,sys; sys.exit(0 if (json.load(open(sys.argv[1])).get("claude") or {}) else 1)' "$manifest" || return 0
+
+  log_action "$(action_verb "$settings_path")" "$label Claude plugins$([[ "$PRUNE" -eq 1 ]] && echo ' (+prune)')" "$settings_path"
+  if [[ "$DRY_RUN" -eq 1 ]]; then
+    return 0
+  fi
+
+  python3 - "$manifest" "$settings_path" "$PRUNE" <<'PY'
+import json, os, sys
+
+manifest_path, settings_path, prune_arg = sys.argv[1:4]
+prune = prune_arg == "1"
+
+with open(manifest_path, "r", encoding="utf-8") as f:
+    manifest = json.load(f)
+
+claude = manifest.get("claude") or {}
+marketplaces = claude.get("marketplaces") or {}
+enabled = claude.get("enabled") or []
+
+settings = {}
+if os.path.exists(settings_path):
+    with open(settings_path, "r", encoding="utf-8") as f:
+        text = f.read().strip()
+    if text:
+        settings = json.loads(text)
+    if not isinstance(settings, dict):
+        raise SystemExit(f"{settings_path} must contain a JSON object")
+
+changed = False
+
+known = settings.setdefault("extraKnownMarketplaces", {})
+if not isinstance(known, dict):
+    raise SystemExit(f"{settings_path} extraKnownMarketplaces must be an object")
+for name, src in marketplaces.items():
+    entry = {"source": src}
+    if name not in known:
+        known[name] = entry
+        changed = True
+    elif known[name] != entry:
+        sys.stderr.write(
+            f"WARNING: {settings_path} already defines marketplace '{name}' "
+            f"differently; keeping existing value.\n"
+        )
+
+enabled_plugins = settings.setdefault("enabledPlugins", {})
+if not isinstance(enabled_plugins, dict):
+    raise SystemExit(f"{settings_path} enabledPlugins must be an object")
+for plugin in enabled:
+    if enabled_plugins.get(plugin) is not True:
+        enabled_plugins[plugin] = True
+        changed = True
+
+# Prune: within marketplaces THIS manifest manages, drop any enabled plugin that
+# is no longer declared. Scoped to managed marketplaces so manually-installed
+# plugins (e.g. swift-lsp@claude-plugins-official) are never touched. Marketplace
+# registrations are left in place (harmless once no plugin references them).
+if prune:
+    managed = set(marketplaces.keys())
+    desired = set(enabled)
+    for key in list(enabled_plugins.keys()):
+        mkt = key.split("@", 1)[1] if "@" in key else None
+        if mkt in managed and key not in desired:
+            del enabled_plugins[key]
+            changed = True
+            sys.stderr.write(f"  pruned (disabled) plugin '{key}'\n")
+
+if changed:
+    os.makedirs(os.path.dirname(settings_path) or ".", exist_ok=True)
+    with open(settings_path, "w", encoding="utf-8") as f:
+        json.dump(settings, f, indent=2, ensure_ascii=False)
+        f.write("\n")
+    print(f"  updated {settings_path}")
+else:
+    print(f"  no change {settings_path}")
+PY
+}
+
+# Apply a plugins manifest's `codex` section (Codex plugins are inherently global):
+#   1. Register each marketplace via `codex plugin marketplace add <repo>` (the
+#      docs say use the CLI, not hand-edited config.toml). Idempotent / tolerant.
+#   2. Enable each plugin declaratively in ~/.codex/config.toml as
+#      [plugins."name@marketplace"] enabled = true — the documented on/off store,
+#      so no interactive /plugins TUI is required.
+#   3. Run any installCommands (e.g. CE's bunx installer for custom agents).
+#   4. Print manualSteps as a fallback note.
+sync_codex_plugins() {
+  local manifest="$1"
+  [[ -f "$manifest" ]] || return 0
+  python3 -c 'import json,sys; sys.exit(0 if (json.load(open(sys.argv[1])).get("codex") or {}) else 1)' "$manifest" || return 0
+
+  local codex_config="$CODEX_HOME/config.toml"
+  log_sub "Codex plugins -> $codex_config (+ CLI marketplace registration)"
+
+  # 1. Register marketplaces via the Codex CLI.
+  if command -v codex >/dev/null 2>&1; then
+    while IFS= read -r repo; do
+      [[ -n "$repo" ]] || continue
+      log_action "run" "codex marketplace" "codex plugin marketplace add $repo"
+      [[ "$DRY_RUN" -eq 1 ]] || codex plugin marketplace add "$repo" \
+        || log_sub "  (marketplace add returned non-zero — likely already registered)"
+    done < <(python3 -c 'import json,sys; [print(r) for r in (json.load(open(sys.argv[1])).get("codex",{}).get("marketplaces") or [])]' "$manifest")
+  else
+    log_sub "  Skipping marketplace registration: 'codex' CLI not found"
+  fi
+
+  # 2. Enable plugins declaratively in config.toml (and, with --prune, disable
+  #    managed-marketplace plugins no longer in the manifest).
+  if [[ "$DRY_RUN" -eq 1 ]]; then
+    log_action "would-write" "codex enabledPlugins$([[ "$PRUNE" -eq 1 ]] && echo ' (+prune)')" "$codex_config"
+  else
+    python3 - "$manifest" "$codex_config" "$PRUNE" <<'PY'
+import json, os, re, sys
+
+manifest_path, config_path, prune_arg = sys.argv[1:4]
+prune = prune_arg == "1"
+
+enabled = (json.load(open(manifest_path)).get("codex") or {}).get("enabled") or []
+# With nothing declared we can't derive which marketplaces are "managed", so
+# there's nothing to enable and nothing safe to prune.
+if not enabled:
+    raise SystemExit(0)
+
+text = ""
+if os.path.exists(config_path):
+    with open(config_path, "r", encoding="utf-8") as f:
+        text = f.read()
+
+def set_state(text, plugin, value, create=True):
+    """Set [plugins."plugin"] enabled=value, flipping an existing table or (when
+    create) appending a new one. Never creates a duplicate table (TOML forbids
+    it). Returns (text, changed)."""
+    val = "true" if value else "false"
+    pat = re.compile(r'(\[plugins\."' + re.escape(plugin) + r'"\]\n)(.*?)(?=\n\[|\Z)', re.S)
+    m = pat.search(text)
+    if not m:
+        if not create:
+            return text, False
+        return text.rstrip("\n") + ("\n\n" if text.strip() else "") + f'[plugins."{plugin}"]\nenabled = {val}\n', True
+    body = m.group(2)
+    if re.search(r'^\s*enabled\s*=', body, re.M):
+        new_body = re.sub(r'^(\s*enabled\s*=\s*)(?:true|false)\b', r'\1' + val, body, flags=re.M)
+    else:
+        new_body = f"enabled = {val}\n" + body
+    if new_body == body:
+        return text, False
+    return text[:m.start(2)] + new_body + text[m.end(2):], True
+
+changed_any = False
+for plugin in enabled:
+    text, changed = set_state(text, plugin, True, create=True)
+    changed_any = changed_any or changed
+
+if prune:
+    # Managed marketplaces = the marketplace suffixes this manifest declares.
+    # Only plugins under those are eligible — manually-installed plugins under
+    # other marketplaces (e.g. @openai-curated) are never touched.
+    managed = {p.split("@", 1)[1] for p in enabled if "@" in p}
+    desired = set(enabled)
+    keys = [m.group(1) for m in re.finditer(r'\[plugins\."([^"]+)"\]', text)]
+    for key in keys:
+        mkt = key.split("@", 1)[1] if "@" in key else None
+        if mkt in managed and key not in desired:
+            text, changed = set_state(text, key, False, create=False)
+            if changed:
+                changed_any = True
+                sys.stderr.write(f"  pruned (disabled) codex plugin '{key}'\n")
+
+if changed_any:
+    os.makedirs(os.path.dirname(config_path) or ".", exist_ok=True)
+    with open(config_path, "w", encoding="utf-8") as f:
+        f.write(text if text.endswith("\n") else text + "\n")
+    print(f"  wrote {config_path}")
+else:
+    print(f"  no change {config_path}")
+PY
+  fi
+
+  # 3. Run extra install commands (e.g. bunx for CE custom agents).
+  while IFS=$'\t' read -r -a cmd; do
+    [[ ${#cmd[@]} -gt 0 ]] || continue
+    if ! command -v "${cmd[0]}" >/dev/null 2>&1; then
+      log_sub "  Skipping install command ('${cmd[0]}' not found): ${cmd[*]}"
+      continue
+    fi
+    log_action "run" "codex install" "${cmd[*]}"
+    [[ "$DRY_RUN" -eq 1 ]] || "${cmd[@]}" || log_sub "  (command returned non-zero: ${cmd[*]})"
+  done < <(python3 -c '
+import json, sys
+for c in (json.load(open(sys.argv[1])).get("codex",{}).get("installCommands") or []):
+    print("\t".join(str(a) for a in c))
+' "$manifest")
+
+  # 4. Surface any manual fallback steps.
+  while IFS= read -r step; do
+    [[ -n "$step" ]] && log_sub "  NOTE: $step"
+  done < <(python3 -c '
+import json, sys
+for s in (json.load(open(sys.argv[1])).get("codex",{}).get("manualSteps") or []):
+    print(s)
+' "$manifest")
+}
+
 AGENTS_HOME_DEFAULT="$HOME/.agents"
 CODEX_HOME_DEFAULT="$HOME/.codex"
 CLAUDE_HOME_DEFAULT="$HOME/.claude"
@@ -624,6 +971,10 @@ while [[ $# -gt 0 ]]; do
   case "$1" in
     --dry-run)
       DRY_RUN=1
+      shift
+      ;;
+    --prune)
+      PRUNE=1
       shift
       ;;
     --providers)
@@ -852,12 +1203,34 @@ if want_provider "profiles"; then
     fi
   fi
 
-  for pair in "${profile_pairs[@]}"; do
-    profile_project="${pair%%$'\t'*}"
-    profile_name="${pair#*$'\t'}"
-    profile_project="${profile_project/#\~/$HOME}"
-    sync_profile_to_project "$profile_name" "$profile_project"
-  done
+  # Group profiles by project so each project receives the UNION of its
+  # assigned profiles' skills and exactly one (correct) prune pass.
+  if [[ ${#profile_pairs[@]} -gt 0 ]]; then
+    profile_projects="$(printf '%s\n' "${profile_pairs[@]}" | cut -f1 | awk '!seen[$0]++')"
+    while IFS= read -r profile_project; do
+      [[ -n "$profile_project" ]] || continue
+      profile_names_for_project=()
+      for pair in "${profile_pairs[@]}"; do
+        if [[ "${pair%%$'\t'*}" == "$profile_project" ]]; then
+          profile_names_for_project+=("${pair#*$'\t'}")
+        fi
+      done
+      sync_profiles_to_project "${profile_project/#\~/$HOME}" "${profile_names_for_project[@]}"
+    done <<< "$profile_projects"
+  fi
+fi
+
+# --- Plugins: public agent plugins (declarative config, no files vendored) ---
+if want_provider "plugins"; then
+  log_section "Plugins"
+  plugins_manifest="$ROOT/plugins.json"
+  if [[ ! -f "$plugins_manifest" ]]; then
+    log_sub "Skipping: no plugins.json at repo root"
+  else
+    log_sub "Manifest -> $plugins_manifest"
+    sync_claude_plugins "$plugins_manifest" "$CLAUDE_HOME/settings.json" "global"
+    sync_codex_plugins "$plugins_manifest"
+  fi
 fi
 
 # --- Cursor: commands only (skills handled by agents provider) ---
