@@ -9,6 +9,10 @@ read_when:
 
 A running log of meaningful changes to this toolkit — skills, profiles, sync/audit behavior, AGENTS guidance. One section per change, reverse-chronological. Add an entry whenever you ship something another agent or future-you needs to know about. Curate with the `update-changelog` skill.
 
+## 2026-06-10 — Add data-analytics profile (build-web-data-visualization)
+- New `profiles/data-analytics/` profile for data analytics / data-science / data-viz work. Vendored all 18 skills from the `build-web-data-visualization` OpenAI plugin as real dirs with `metadata.source` (119 files): `data-visualization` (router), `d3-`, `threejs-`, `canvas2d-`, `react-and-nextjs-`, `geospatial-`, `statistical-and-uncertainty-`, `grammar-of-graphics-`, `node-link-and-diagram-layout`, `gantt-chart-`, `uml-and-software-architecture-`, `dashboards-and-real-time-`, `scrollytelling-and-parallax-`, `accessibility-and-inclusive-`, `reports-pdfs-and-slide-automation`, `testing-data-visualizations`, `typescript-data-visualization-engineering`, `visualization-strategy-and-critique`.
+- Not yet assigned to any project in `profile-assignments.json` (no target project given) — assign it there to start syncing.
+
 ## 2026-06-10 — Profile skills install as copies, not symlinks
 - **Reverted profile install from symlinks back to self-contained copies.** Project-scoped profile skills now land in `<project>/.agents/skills/<skill>/` and `<project>/.claude/skills/<skill>/` as real directories (`cp -RL`, dereferencing the in-repo `_shared` symlinks) instead of relative symlinks into agent-scripts. Reason: symlinks into agent-scripts break the moment an app repo is cloned, run in CI, or opened on another machine, and some editors/indexers won't traverse them. agent-scripts is no longer a runtime dependency of assigned projects. Tradeoff: editing a skill now requires a re-sync to push it. **Global skills are unchanged — they stay symlinks** (home dir, never committed, no portability problem). AGENTS.md↔CLAUDE.md symlinks unchanged.
 - **In-repo `_shared` model kept** as the single source of truth; the sync dereferences it at install time. Edit a shared skill once.
