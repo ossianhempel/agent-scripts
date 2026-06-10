@@ -1,6 +1,6 @@
 ---
 name: convex-performance-audit
-description: Audit and optimize Convex performance across hot-path reads, write contention, subscription cost, and function limits. Use when a Convex feature is slow or expensive, convex insights shows high reads, OCC conflicts or mutation retries appear, functions hit limits, or the user mentions latency, read amplification, or invalidation.
+description: "Audit Convex performance: slow/expensive features, hot reads, subscription cost, OCC conflicts, retries, function limits, latency, read amplification, invalidation."
 ---
 
 # Convex Performance Audit

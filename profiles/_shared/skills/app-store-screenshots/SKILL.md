@@ -1,6 +1,6 @@
 ---
 name: app-store-screenshots
-description: Use when building App Store or Google Play screenshot pages, generating exportable marketing screenshots for iOS and/or Android apps, or scaffolding a screenshot editor with Next.js. Triggers on app store, play store, screenshots, marketing assets, html-to-image, phone mockup, android screenshots, feature graphic.
+description: "Build App Store/Google Play screenshot pages and editors. Triggers: screenshots, marketing assets, iOS/Android, html-to-image, phone mockup, feature graphic."
 ---
 
 # App Store & Google Play Screenshots Generator

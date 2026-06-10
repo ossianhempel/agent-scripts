@@ -1,6 +1,6 @@
 ---
 name: summarize
-description: Summarize and extract content from URLs, articles, PDFs, local files, YouTube videos, videos, podcasts, transcripts, and clipboard/stdin text using the summarize CLI. Use this skill whenever the user asks what a link/video/article/PDF is about, asks for a summary or transcript, wants markdown extraction, or explicitly mentions summarize.sh.
+description: "Summarize or extract URLs, articles, PDFs, files, YouTube/videos, podcasts, transcripts, clipboard/stdin via summarize CLI. Triggers: summary, transcript, markdown extraction, summarize.sh."
 homepage: https://summarize.sh
 metadata:
   openclaw:

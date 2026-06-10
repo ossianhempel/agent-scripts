@@ -1,6 +1,6 @@
 ---
 name: baguette
-description: Use Baguette to boot, view, drive, screenshot, and integration-test iOS 26 simulators without opening Simulator.app. Trigger this skill when working on Swift, SwiftUI, Xcode, or Expo iOS apps and the task asks for headless simulator development, live simulator viewing, Baguette setup, simulator farms, gesture injection, screenshot capture, smoke tests, or host-driven integration tests.
+description: "Use Baguette for headless iOS 26 simulators: boot, view, drive, gesture, screenshot, smoke test, and integration-test Swift/SwiftUI/Xcode/Expo apps."
 ---
 
 # Baguette

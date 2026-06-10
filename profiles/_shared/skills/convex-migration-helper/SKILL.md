@@ -1,6 +1,6 @@
 ---
 name: convex-migration-helper
-description: Plan and run safe Convex schema/data migrations via the widen-migrate-narrow workflow and @convex-dev/migrations. Use when a deploy fails schema validation, documents need backfilling, fields or tables change shape, or a zero-downtime migration, breaking schema change, or multi-deploy rollout is needed.
+description: "Plan/run Convex migrations: widen-migrate-narrow, @convex-dev/migrations, schema deploy failures, backfills, table/field shape changes, zero-downtime rollouts."
 ---
 
 # Convex Migration Helper

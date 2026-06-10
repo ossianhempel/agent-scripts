@@ -1,6 +1,6 @@
 ---
 name: plan-inbox
-description: Find saved implementation plans and brainstorm requirements docs that still need attention. Use this whenever the user asks about unimplemented plans, unfinished saved plans, stale plan docs, open brainstorms, planning backlog, docs/plans status, docs/brainstorms status, or wants to run a project or global inventory of plan/brainstorm artifacts.
+description: "Find unfinished docs/plans and docs/brainstorms. Triggers: unimplemented plans, stale plans, open brainstorms, planning backlog, plan status, project/global inventory."
 ---
 
 # Plan Inbox

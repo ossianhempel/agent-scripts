@@ -163,7 +163,7 @@ peekaboo list apps --json
 peekaboo click --on B1
 ```
 
-Companion skill: `skills/peekaboo`.
+Archived companion skill: `archived-skills/peekaboo`.
 
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: git-cleanup
-description: Clean up local Git branches and worktrees that are merged, stale, gone on the remote, or explicitly abandoned. Use this whenever the user asks to clean up merged branches, remove gone branches, tidy local branches, prune old worktrees, delete abandoned work, clean local git clutter, or inspect what branches/worktrees can safely be removed.
+description: "Clean local Git branches/worktrees: merged, stale, gone remote, abandoned. Triggers: clean branches, gone branches, prune worktrees, delete abandoned work, local git clutter."
 argument-hint: "[optional: --dry-run | --force-abandoned | branch/worktree names]"
 ---
 

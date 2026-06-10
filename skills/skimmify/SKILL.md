@@ -1,6 +1,6 @@
 ---
 name: skimmify
-description: Make code more readable by applying code quality rules. Use this skill when the user wants to clean up, simplify, or beautify code — especially code in a PR, branch diff, or recent changes. Applies when they say things like "skimmify this", "make this readable", "clean up this code", "simplify this", "refactor for readability", "beautify", or ask to review or improve code readability.
+description: "Improve code readability in a PR, branch diff, or recent changes. Triggers: skimmify, make readable, clean up code, simplify, beautify, refactor for readability."
 ---
 
 You are given code to make beautiful by applying the rules below.

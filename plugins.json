@@ -1,0 +1,26 @@
+{
+  "_comment": "Public agent plugins, managed declaratively. Apply with: scripts/sync-agent-scripts.sh --provider plugins. NOTHING is vendored here — only the enable-config. CLAUDE is fully declarative: the 'claude' section merges into ~/.claude/settings.json (extraKnownMarketplaces + enabledPlugins); Claude Code resolves/installs the marketplace on next launch. CODEX is mostly declarative: marketplaces are registered via the `codex plugin marketplace add` CLI (the docs say use it rather than hand-editing config.toml), and 'enabled' plugins are written declaratively into ~/.codex/config.toml as [plugins.\"name@marketplace\"] enabled=true — no /plugins TUI needed. 'installCommands' run extra per-plugin steps (e.g. CE's bunx installer for custom agents Codex can't register yet). Per-profile (per-project) plugins live in profiles/<name>/plugins.json with a 'claude' section, merged into each assigned project's .claude/settings.json (Codex plugins are inherently global).",
+  "claude": {
+    "marketplaces": {
+      "compound-engineering-plugin": { "source": "github", "repo": "EveryInc/compound-engineering-plugin" },
+      "last30days-skill": { "source": "github", "repo": "mvanhorn/last30days-skill" }
+    },
+    "enabled": [
+      "compound-engineering@compound-engineering-plugin",
+      "last30days@last30days-skill"
+    ]
+  },
+  "codex": {
+    "marketplaces": ["EveryInc/compound-engineering-plugin", "mvanhorn/last30days-skill"],
+    "enabled": [
+      "compound-engineering@compound-engineering-plugin",
+      "last30days@last30days-skill"
+    ],
+    "installCommands": [
+      ["bunx", "@every-env/compound-plugin", "install", "compound-engineering", "--to", "codex"]
+    ],
+    "manualSteps": [
+      "If skills don't show up after sync, run /plugins in Codex once to confirm 'compound-engineering' is installed under the Compound Engineering marketplace, then restart Codex."
+    ]
+  }
+}

@@ -1,6 +1,6 @@
 ---
 name: privacy-policy
-description: Generate privacy policies, terms of service, and EULAs for Apple platform apps. Detects data collection patterns, third-party SDKs, and generates region-specific legal documents with Apple Privacy Nutrition Label mapping. Use when user needs legal documents or data collection disclosure for App Store submission.
+description: Generate app privacy policies, terms, EULAs, App Store data disclosures, Privacy Nutrition Label mapping, SDK/data collection checks, region-specific legal docs.
 ---
 
 # Privacy Policy & Legal Document Generator

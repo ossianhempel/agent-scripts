@@ -1,6 +1,6 @@
 ---
 name: create-onboarding-video
-description: Produce short, punchy iOS app onboarding videos in Remotion that showcase a feature in action by animating isolated pieces of the UI (cropped components, not full screens) with nice UI-like transitions. Use when the user asks to create, build, or generate an onboarding video, app preview, feature demo clip, App Store preview, or any short video that demonstrates a mobile app feature using screenshots supplied by the user or captured from a runnable simulator.
+description: Create short Remotion iOS onboarding videos/App Store previews from screenshots or simulator captures, using cropped UI pieces and transitions to show a feature in action.
 ---
 
 # Create Onboarding Video

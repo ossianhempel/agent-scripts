@@ -18,11 +18,15 @@
     "~/Developer/top-of-class": "swift-app-developer",
 
     "~/Developer/recalliq": "macos-swift-app-developer",
-    "~/Developer/voice-to-text": "macos-swift-app-developer",
+    "~/Developer/agent-wispr": "macos-swift-app-developer",
+    "~/Developer/completia": "macos-swift-app-developer",
 
     "~/Developer/gainslog": "rn-app-developer",
     "~/Developer/chat-analytics": "rn-app-developer",
 
+    "~/Developer/ai-kanban": "web-app-developer",
+    "~/Developer/aso-screenshots": "web-app-developer",
+    "~/Developer/company-brain": "web-app-developer",
     "~/Developer/gainslog-web": "web-app-developer",
     "~/Developer/mina-recept.se": "web-app-developer",
     "~/Developer/ossianhempel_com": "web-app-developer",
@@ -32,6 +36,8 @@
     "~/Developer/St-rkande_tr-ning": "web-app-developer",
     "~/Developer/walkmon-web": "web-app-developer",
     "~/Developer/platesnap-web": "web-app-developer",
-    "~/Developer/resume-builder": "web-app-developer"
+    "~/Developer/resume-builder": "web-app-developer",
+    "~/Developer/tiktok-slides": "web-app-developer",
+    "~/Developer/agent-wispr-cloud": "web-app-developer"
   }
 }

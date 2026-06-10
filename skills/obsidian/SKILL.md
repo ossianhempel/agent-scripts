@@ -1,6 +1,6 @@
 ---
 name: obsidian
-description: Work in Ossian's Obsidian vault — a PARA + Zettelkasten "second brain" of markdown notes — directly as files. Read, search, create, link, and organize notes, daily notes, MOCs, and atomic Zettelkasten notes. Use when the user asks to capture, find, or edit a note, add to today's daily note, create an atomic/MOC note, or work with their vault / second brain.
+description: "Work directly in Ossian's Obsidian markdown vault. Triggers: check/read my notes, capture/find/edit a note, daily note, MOC, Zettelkasten, second brain."
 ---
 
 # Obsidian (second brain)

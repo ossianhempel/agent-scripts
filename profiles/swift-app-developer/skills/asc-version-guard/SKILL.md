@@ -1,6 +1,6 @@
 ---
 name: asc-version-guard
-description: Install, repair, or diagnose the App Store Connect version/build-number guard for Xcode Cloud iOS apps so a wrong MARKETING_VERSION or colliding build number never reaches App Store Connect. Use when setting up release guards in a new iOS repo, fixing a missing or drifted pre-push/CI version check, or diagnosing why Xcode Cloud rejected a build for version/build-number reasons. Triggers include "add the version guard", "set up release hooks", "why did Xcode Cloud reject this build", "version check", "build number collision", MARKETING_VERSION.
+description: "Install, repair, or diagnose App Store Connect version/build-number guards for Xcode Cloud iOS apps. Triggers: version guard, release hooks, Xcode Cloud rejection, MARKETING_VERSION, build number collision."
 ---
 
 # ASC version guard

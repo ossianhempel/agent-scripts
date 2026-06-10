@@ -1,6 +1,6 @@
 ---
 name: app-icon-optimization
-description: When the user wants to design, test, or improve their app icon to increase tap-through rate and conversions in App Store search and browse. Use when the user mentions "app icon", "icon design", "icon A/B test", "icon variants", "tap-through rate", "icon conversion", "icon refresh", or wants to know what makes a good app icon. For screenshot optimization, see screenshot-optimization. For full listing A/B tests, see ab-test-store-listing.
+description: "Design, test, or improve App Store app icons for tap-through and conversion. Triggers: app icon, icon design, A/B test, variants, tap-through rate, icon refresh."
 metadata:
   version: 1.0.0
 ---

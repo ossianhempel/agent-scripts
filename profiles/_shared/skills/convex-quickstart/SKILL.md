@@ -1,6 +1,6 @@
 ---
 name: convex-quickstart
-description: Initialize a new Convex project or add Convex to an existing app. Use when scaffolding with npm create convex, wiring up ConvexProvider in React, Next.js, Vue, or Svelte, configuring the deployment URL, or running convex dev for the first time — even if the user just says "set up Convex" or "add a backend."
+description: "Initialize Convex or add it to an app. Triggers: npm create convex, ConvexProvider, React/Next/Vue/Svelte setup, deployment URL, convex dev, add backend."
 ---
 
 # Convex Quickstart
