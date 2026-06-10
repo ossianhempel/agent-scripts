@@ -9,6 +9,9 @@ read_when:
 
 A running log of meaningful changes to this toolkit — skills, profiles, sync/audit behavior, AGENTS guidance. One section per change, reverse-chronological. Add an entry whenever you ship something another agent or future-you needs to know about. Curate with the `update-changelog` skill.
 
+## 2026-06-10 — Add 3 build-web-apps skills to web-app-developer
+- Vendored `frontend-app-builder`, `frontend-testing-debugging`, and `stripe-best-practices` from the OpenAI `build-web-apps` plugin into `profiles/web-app-developer/skills/` (11 files) with `metadata.source`. Skipped `react-best-practices` and `shadcn-best-practices` (duplicates of existing `vercel-react-best-practices` / `shadcn`) and `supabase-best-practices` (not wanted). `stripe-best-practices` was previously dropped as Codex-bundled; re-added by request so all tools get it.
+
 ## 2026-06-10 — Add Expo plugin skills to rn-app-developer
 - Vendored all 13 skills from the OpenAI `expo` plugin into `profiles/rn-app-developer/skills/` as real dirs (61 files) with `metadata.source`: `building-native-ui`, `codex-expo-run-actions`, `expo-api-routes`, `expo-cicd-workflows`, `expo-deployment`, `expo-dev-client`, `expo-module`, `expo-tailwind-setup`, `expo-ui-jetpack-compose`, `expo-ui-swift-ui`, `native-data-fetching`, `upgrading-expo`, `use-dom`. (These were dropped in an earlier restructure as Codex-plugin-bundled; re-vendored so all tools — incl. Claude — get them. Coexist with the Convex/project-specific `react-native-skills`/`convex-expo-skill`.)
 
