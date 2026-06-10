@@ -16,6 +16,37 @@ profiles/
   swift-app-developer/mcp.json     # optional project-level MCP servers
 ```
 
+### Web profiles are composable
+
+The native-app profiles (`swift-app-developer`, `rn-app-developer`, …) are
+single coarse bundles because those stacks are uniform. Web apps vary per repo
+(Clerk vs Better Auth, Next.js vs TanStack Start, monorepo or not), so the web
+side is split into small composable profiles and a project lists the ones it
+uses:
+
+| Profile | Skills |
+|---|---|
+| `web-base` | shadcn, frontend-app-builder, frontend-testing-debugging, privacy-policy, grill-with-docs (every web repo) |
+| `fw-nextjs` | vercel-react-best-practices, vercel-composition-patterns |
+| `fw-tanstack` | tanstack-start-best-practices |
+| `auth-clerk` | clerk, clerk-cli, clerk-setup, clerk-custom-ui |
+| `auth-better-auth` | better-auth-best-practices, better-auth-create-auth, better-auth-organization |
+| `web-monorepo` | hono, turborepo |
+| `payments-stripe` | stripe-best-practices |
+| `web-tooling` | mcp-builder, create-cli |
+| `convex` | the convex-* cluster |
+
+```jsonc
+// profile-assignments.json
+"~/Developer/gainslog-web": ["web-base", "auth-clerk", "fw-nextjs", "payments-stripe"],
+"~/Developer/mejla":        ["web-base", "auth-better-auth", "fw-tanstack"]
+```
+
+When a project lists several profiles, the sync **unions** their skills (first
+profile wins a name clash) and prunes against that union — so a repo only ever
+gets the skills its combination declares. To change what a repo gets, edit its
+profile list, not its installed copies.
+
 - Each profile directory holds its skills under `skills/`, same `SKILL.md`
   format as a global skill.
 - Each profile may also hold `mcp.json`, whose `mcpServers` are merged into
