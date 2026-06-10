@@ -9,6 +9,9 @@ read_when:
 
 A running log of meaningful changes to this toolkit — skills, profiles, sync/audit behavior, AGENTS guidance. One section per change, reverse-chronological. Add an entry whenever you ship something another agent or future-you needs to know about. Curate with the `update-changelog` skill.
 
+## 2026-06-10 — Add Expo plugin skills to rn-app-developer
+- Vendored all 13 skills from the OpenAI `expo` plugin into `profiles/rn-app-developer/skills/` as real dirs (61 files) with `metadata.source`: `building-native-ui`, `codex-expo-run-actions`, `expo-api-routes`, `expo-cicd-workflows`, `expo-deployment`, `expo-dev-client`, `expo-module`, `expo-tailwind-setup`, `expo-ui-jetpack-compose`, `expo-ui-swift-ui`, `native-data-fetching`, `upgrading-expo`, `use-dom`. (These were dropped in an earlier restructure as Codex-plugin-bundled; re-vendored so all tools — incl. Claude — get them. Coexist with the Convex/project-specific `react-native-skills`/`convex-expo-skill`.)
+
 ## 2026-06-10 — Add data-analytics profile (build-web-data-visualization)
 - New `profiles/data-analytics/` profile for data analytics / data-science / data-viz work. Vendored all 18 skills from the `build-web-data-visualization` OpenAI plugin as real dirs with `metadata.source` (119 files): `data-visualization` (router), `d3-`, `threejs-`, `canvas2d-`, `react-and-nextjs-`, `geospatial-`, `statistical-and-uncertainty-`, `grammar-of-graphics-`, `node-link-and-diagram-layout`, `gantt-chart-`, `uml-and-software-architecture-`, `dashboards-and-real-time-`, `scrollytelling-and-parallax-`, `accessibility-and-inclusive-`, `reports-pdfs-and-slide-automation`, `testing-data-visualizations`, `typescript-data-visualization-engineering`, `visualization-strategy-and-critique`.
 - Not yet assigned to any project in `profile-assignments.json` (no target project given) — assign it there to start syncing.
