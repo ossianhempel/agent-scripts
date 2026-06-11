@@ -17,9 +17,9 @@
     "~/Developer/gainslog-ios": "swift-app-developer",
     "~/Developer/top-of-class": "swift-app-developer",
 
-    "~/Developer/recalliq": "macos-swift-app-developer",
+    "~/Developer/recalliq": ["macos-swift-app-developer", "payments-stripe"],
     "~/Developer/agent-wispr": "macos-swift-app-developer",
-    "~/Developer/completia": "macos-swift-app-developer",
+    "~/Developer/completia": ["macos-swift-app-developer", "payments-stripe"],
 
     "~/Developer/gainslog": "rn-app-developer",
     "~/Developer/chat-analytics": "rn-app-developer",
@@ -39,6 +39,6 @@
     "~/Developer/resume-builder": ["web-base", "auth-clerk", "web-monorepo", "payments-stripe"],
     "~/Developer/tiktok-slides": ["web-base"],
     "~/Developer/agent-wispr-cloud": ["web-base"],
-    "~/Developer/mejla": ["web-base", "auth-better-auth", "fw-tanstack"]
+    "~/Developer/mejla": ["web-base", "auth-better-auth", "fw-tanstack", "payments-stripe"]
   }
 }
