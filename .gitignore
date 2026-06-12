@@ -5,6 +5,10 @@
 /tools/agent-readiness/node_modules/
 /tools/agent-readiness/dist/
 
+# Playwright skill
+skills/playwright/node_modules/
+skills/playwright/.temp-execution-*
+
 # Python
 __pycache__/
 *.pyc
