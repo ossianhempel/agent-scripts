@@ -1,6 +1,7 @@
 # Global Agent Instructions
 
 Ossian owns this. Work style: telegraph; noun-phrases ok; min tokens.
+Default web stack: TanStack Start, PGlite/SQLite → PG when needed, single-container fullstack, deploy to Coolify. Avoid Next.js (Vercel lock-in).
 
 When communicating your results back to me, explain what you did and what happened in plain, clear English. Avoid jargon, technical implementation details, and code-speak in your final responses. Write as if you're explaining to a smart person who isn't looking at the code. Your actual work (how you think, plan, write code, debug, and solve problems) should stay fully technical and rigorous. This only applies to how you talk to me about it.
 
@@ -75,7 +76,9 @@ Define finishing criteria for yourself before you start: what does "done" look l
 
 See `tools.md` for full CLI tool reference (oracle, summarize, peekaboo, gh, gog, committer, trash, docs-list, browser-tools, things, obsidian).
 
-### Clawdbot
+### Peekaboo — macOS screen capture and UI automation: annotated screenshots, click/type/scroll/menu control, and visual verification of native apps outside the browser.
+
+### OpenClaw
 - Don't edit/touch source code; keep it vanilla for upstream updates.
 - Personal AI assistant on Mac Mini.
 - Current service is the OpenClaw launch agent `ai.openclaw.gateway`; runtime
@@ -111,6 +114,8 @@ Use these instead of `rm -rf` on cached skill directories.
 
 #### Profiles (project-scoped skill packages)
 The skills in `skills/` are **global** — synced to every runtime everywhere. To keep that set small, focused skills live in **profiles** and install only into the projects that need them.
+
+Keep platform profiles lean — only core platform skills. Optional services (Clerk, Convex, RevenueCat, Stripe) live in their own profiles; projects opt in individually via `profile-assignments.json`.
 
 - **Layout:** `profiles/<name>/skills/<skill>/` (e.g. `swift-app-developer`, `rn-app-developer`). Same `SKILL.md` format as a global skill.
 - **Shared skills use symlinks.** A skill that belongs to two-plus profiles but not global lives once in `profiles/_shared/skills/<skill>/`; each profile that uses it holds a symlink `profiles/<profile>/skills/<skill> -> ../../_shared/skills/<skill>`. One source of truth, no duplication. Sync resolves the symlink and copies the real contents into the target project. Prefer this over copying a skill into multiple profiles.
