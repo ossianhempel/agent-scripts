@@ -9,6 +9,15 @@ read_when:
 
 A running log of meaningful changes to this toolkit — skills, profiles, sync/audit behavior, AGENTS guidance. One section per change, reverse-chronological. Add an entry whenever you ship something another agent or future-you needs to know about. Curate with the `update-changelog` skill.
 
+## 2026-06-14 — Add `release-ios-app` global skill
+
+- New global `skills/release-ios-app/` orchestrating the iOS/Expo release flow (version-bump policy, `develop`→`main` promotion PR, Xcode Cloud vs EAS build, version-must-exceed-live gate, promote-the-validated-build golden rule, Convex backend-deploy safeguard, App Store submission via the `asc` flow). Mirrors `release-mac-app`: global skill + repo-owned `.ios-release.env` manifest.
+- Ships `references/{manifest,native-xcodecloud,expo-eas}.md` and an executable `scripts/ios-release`. Hands off final readiness/submission to `asc-release` and What's New to `asc-whats-new-writer`.
+
+## 2026-06-14 — Add `zoom-out` skill
+
+- Added `skills/zoom-out/` (from Matt Pocock). Backfilled this CHANGELOG entry — the skill reached `main` without one.
+
 ## 2026-06-14 — Tighten global AGENTS guidance
 
 - Condensed verbose handoff and verification rules into shorter operational bullets.
