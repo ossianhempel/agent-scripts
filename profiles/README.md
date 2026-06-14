@@ -29,12 +29,12 @@ uses:
 | `web-base` | shadcn, frontend-app-builder, frontend-testing-debugging, privacy-policy, grill-with-docs (every web repo) |
 | `fw-nextjs` | vercel-react-best-practices, vercel-composition-patterns |
 | `fw-tanstack` | tanstack-start-best-practices |
-| `auth-clerk` | clerk, clerk-cli, clerk-setup, clerk-custom-ui |
+| `auth-clerk` | clerk, clerk-setup, clerk-custom-ui (+ global `clerk-cli`) |
 | `auth-better-auth` | better-auth-best-practices, better-auth-create-auth, better-auth-organization |
 | `web-monorepo` | hono, turborepo |
 | `payments-stripe` | stripe-best-practices |
 | `web-tooling` | mcp-builder, create-cli |
-| `convex` | the convex-* cluster (incl. `convex-cli` for `npx convex` ops) |
+| `convex` | the convex-* cluster (CLI ops: global `convex-cli`) |
 
 ```jsonc
 // profile-assignments.json

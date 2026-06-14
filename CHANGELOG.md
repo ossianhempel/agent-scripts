@@ -15,6 +15,27 @@ A running log of meaningful changes to this toolkit — skills, profiles, sync/a
 - Added confidentiality, secrets, public GitHub body, repo package-manager/runtime, and skill-frontmatter hygiene rules.
 - Replaced the long inline sync/profile/plugin manual with pointers to `docs/syncing.md`, `docs/supported-agents.md`, and `docs/subagents.md`.
 
+## 2026-06-14 — Promote `clerk-cli` and `convex-cli` to global skills
+
+- Moved `clerk-cli` and `convex-cli` from `profiles/_shared/skills/` to `skills/` so operational CLI guidance is always available (matches `readwise-cli` / AGENTS.md tools pattern).
+- Removed profile symlinks from `auth-clerk`, `convex`, `swift-app-developer`, and `rn-app-developer`; profile sync prunes stale project copies.
+- Added `tools.md` entries for both CLIs. Setup/auth/framework Convex and Clerk skills stay profile-scoped.
+
+## 2026-06-14 — Consolidate 9 ASC skills into 3 (release / metadata / pricing)
+
+- Merged the App Store Connect skill fleet from 11 → 4. Nine `asc-*` skills collapsed into three router skills under `profiles/_shared/skills/`, each a short `SKILL.md` that routes to the original bodies moved **verbatim** into `reference/`:
+  - `asc-release` ← `asc-cli-usage` + `asc-xcode-build` + `asc-release-flow` + `asc-workflow`
+  - `asc-metadata` ← `asc-aso-audit` (+ `aso_rules.md`, `experiments.md`) + `asc-localize-metadata` + `asc-whats-new-writer` (+ `release_notes_guidelines.md`)
+  - `asc-pricing` ← `asc-ppp-pricing` + `asc-revenuecat-catalog-sync` (+ `examples.md`, `references.md`)
+- `asc-version-guard` kept standalone — it's runnable install infra (shell lib + CI scripts), not guidance.
+- Motivation: skills audit showed the always-loaded description budget at ~105% of the Codex 2% cap. Collapsing 9 descriptions → 3 reclaims budget; no body content lost (progressive disclosure via reference files).
+- Profile wiring: `asc` profile gets `asc-release` + `asc-metadata` (never had pricing); `swift-app-developer` and `rn-app-developer` get all three. Symlinks repointed; old shared dirs removed.
+
+## 2026-06-14 — Add `release-mac-app` global skill
+
+- Added global `skills/release-mac-app/`, adapted from Peter Steinberger's macOS release helper, for Sparkle appcasts, Developer ID signing, notarization, GitHub Release assets, appcast verification, and release closeout.
+- Adapted the launcher for Ossian's `~/Developer/agent-scripts` layout, repo-local SwiftPM Sparkle tools, system Python appcast parsing, and Homebrew Bash re-exec when needed.
+
 ## 2026-06-14 — Add `convex-cli` skill
 
 - New `profiles/_shared/skills/convex-cli/` for operating `npx convex` (dev/deploy/run/data/env/logs/insights/import/export). Mirrors the `clerk-cli` pattern — operational CLI work, not backend code authoring.

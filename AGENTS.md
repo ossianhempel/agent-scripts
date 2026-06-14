@@ -41,6 +41,7 @@ Default web stack: TanStack Start, PGlite/SQLite → PG when needed, single-cont
 
 ## Docs
 - Start: run docs list (docs:list script, or bin/docs-list here if present; ignore if not installed); open docs before coding.
+- Repos with docs should vendor `scripts/docs-list.ts` and expose `docs:list` in `package.json` when they have Node scripts, so repo-local docs discovery works without reaching back into `agent-scripts`.
 - Keep notes short; update docs when behavior/API changes.
 - Add read_when hints on cross-cutting docs.
 

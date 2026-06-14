@@ -167,6 +167,51 @@ Archived companion skill: `archived-skills/peekaboo`.
 
 ---
 
+## clerk
+Clerk CLI for auth, users, orgs, instance config, and Backend/Platform API calls.
+
+**Install**:
+```bash
+# Prefer project-local via package runner; global install optional
+npx -y clerk@latest --version
+```
+
+**Usage**:
+```bash
+clerk doctor --json
+clerk auth login
+clerk env pull
+clerk api ls users
+clerk api /users --json
+```
+
+Companion skill: `skills/clerk-cli`.
+
+---
+
+## convex
+Convex CLI for dev sync, deploy, run functions, inspect data, env vars, logs, and exports.
+
+**Install**:
+```bash
+npm install convex   # or use npx in any repo
+npx convex --version
+```
+
+**Usage**:
+```bash
+npx convex dev --once
+npx convex deploy
+npx convex run tasks:list
+npx convex data
+npx convex env list
+npx convex insights --details
+```
+
+Companion skill: `skills/convex-cli`.
+
+---
+
 ## gh
 GitHub CLI for PRs, issues, CI, releases.
 
