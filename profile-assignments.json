@@ -17,7 +17,7 @@
     "~/Developer/gainslog-ios": "swift-app-developer",
     "~/Developer/top-of-class": "swift-app-developer",
 
-    "~/Developer/recalliq": ["macos-swift-app-developer", "payments-stripe"],
+    "~/Developer/recalliq": ["macos-swift-app-developer", "payments-stripe", "auth-clerk", "convex"],
     "~/Developer/agent-wispr": "macos-swift-app-developer",
     "~/Developer/completia": ["macos-swift-app-developer", "payments-stripe"],
 

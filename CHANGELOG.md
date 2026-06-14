@@ -9,6 +9,11 @@ read_when:
 
 A running log of meaningful changes to this toolkit — skills, profiles, sync/audit behavior, AGENTS guidance. One section per change, reverse-chronological. Add an entry whenever you ship something another agent or future-you needs to know about. Curate with the `update-changelog` skill.
 
+## 2026-06-14 — Add `convex-cli` skill
+
+- New `profiles/_shared/skills/convex-cli/` for operating `npx convex` (dev/deploy/run/data/env/logs/insights/import/export). Mirrors the `clerk-cli` pattern — operational CLI work, not backend code authoring.
+- Symlinked into `convex`, `swift-app-developer`, and `rn-app-developer` profiles. Never existed before; CLI bits were scattered across `convex-quickstart` and `convex-performance-audit` only.
+
 ## 2026-06-10 — Add 3 build-web-apps skills to web-app-developer
 - Vendored `frontend-app-builder`, `frontend-testing-debugging`, and `stripe-best-practices` from the OpenAI `build-web-apps` plugin into `profiles/web-app-developer/skills/` (11 files) with `metadata.source`. Skipped `react-best-practices` and `shadcn-best-practices` (duplicates of existing `vercel-react-best-practices` / `shadcn`) and `supabase-best-practices` (not wanted). `stripe-best-practices` was previously dropped as Codex-bundled; re-added by request so all tools get it.
 

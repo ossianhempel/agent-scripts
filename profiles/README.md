@@ -34,7 +34,7 @@ uses:
 | `web-monorepo` | hono, turborepo |
 | `payments-stripe` | stripe-best-practices |
 | `web-tooling` | mcp-builder, create-cli |
-| `convex` | the convex-* cluster |
+| `convex` | the convex-* cluster (incl. `convex-cli` for `npx convex` ops) |
 
 ```jsonc
 // profile-assignments.json
