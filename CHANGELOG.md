@@ -9,6 +9,12 @@ read_when:
 
 A running log of meaningful changes to this toolkit — skills, profiles, sync/audit behavior, AGENTS guidance. One section per change, reverse-chronological. Add an entry whenever you ship something another agent or future-you needs to know about. Curate with the `update-changelog` skill.
 
+## 2026-06-14 — Tighten global AGENTS guidance
+
+- Condensed verbose handoff and verification rules into shorter operational bullets.
+- Added confidentiality, secrets, public GitHub body, repo package-manager/runtime, and skill-frontmatter hygiene rules.
+- Replaced the long inline sync/profile/plugin manual with pointers to `docs/syncing.md`, `docs/supported-agents.md`, and `docs/subagents.md`.
+
 ## 2026-06-14 — Add `convex-cli` skill
 
 - New `profiles/_shared/skills/convex-cli/` for operating `npx convex` (dev/deploy/run/data/env/logs/insights/import/export). Mirrors the `clerk-cli` pattern — operational CLI work, not backend code authoring.
