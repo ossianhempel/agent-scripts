@@ -9,6 +9,10 @@ read_when:
 
 A running log of meaningful changes to this toolkit — skills, profiles, sync/audit behavior, AGENTS guidance. One section per change, reverse-chronological. Add an entry whenever you ship something another agent or future-you needs to know about. Curate with the `update-changelog` skill.
 
+## 2026-06-15 — Restore `oracle` global skill
+
+- Restored `skills/oracle/` to global skills (moved from `archived-skills/oracle/`) and updated it with the latest upstream changes from `@steipete/oracle`.
+
 ## 2026-06-14 — Add `release-ios-app` global skill
 
 - New global `skills/release-ios-app/` orchestrating the iOS/Expo release flow (version-bump policy, `develop`→`main` promotion PR, Xcode Cloud vs EAS build, version-must-exceed-live gate, promote-the-validated-build golden rule, Convex backend-deploy safeguard, App Store submission via the `asc` flow). Mirrors `release-mac-app`: global skill + repo-owned `.ios-release.env` manifest.
