@@ -9,6 +9,12 @@ read_when:
 
 A running log of meaningful changes to this toolkit — skills, profiles, sync/audit behavior, AGENTS guidance. One section per change, reverse-chronological. Add an entry whenever you ship something another agent or future-you needs to know about. Curate with the `update-changelog` skill.
 
+## 2026-06-15 — Add `bin/browser-tools` shim
+
+- Added `bin/browser-tools` bash shim that executes the underlying `scripts/browser-tools.ts` DevTools helper using `tsx`, `bun`, or `npx` automatically.
+- Updated `tools.md` to point to `bin/browser-tools` as the canonical location and entrypoint.
+- Added a `### Browser Control` section to the global `AGENTS.md` instructions file directing agents to use `bin/browser-tools` for lightweight browser tasks.
+
 ## 2026-06-15 — Restore `oracle` global skill
 
 - Restored `skills/oracle/` to global skills (moved from `archived-skills/oracle/`) and updated it with the latest upstream changes from `@steipete/oracle`.

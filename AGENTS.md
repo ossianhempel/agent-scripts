@@ -95,6 +95,9 @@ See `tools.md` for full CLI tool reference (oracle, summarize, peekaboo, gh, gog
 ### Docs Discovery
 At session start in this repo, run `bin/docs-list` (or `tsx scripts/docs-list.ts`). New docs MUST carry `summary:` + `read_when:` frontmatter to show up.
 
+### Browser Control
+For lightweight browser control (navigation, JS evaluation, screenshots, element picking, process inspection, or console tailing), run `bin/browser-tools`.
+
 ### Changelog
 `CHANGELOG.md` at the repo root logs meaningful changes (skills added/removed/renamed, sync/audit behavior, AGENTS guidance). When you ship something another agent or future-you needs to know about, add a date-stamped section. See `docs/update-changelog.md` (surfaced by `bin/docs-list`) for the curation checklist when the file falls behind several commits.
 

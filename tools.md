@@ -86,11 +86,11 @@ List docs with front-matter summaries + read_when hints.
 ## browser-tools
 Chrome DevTools helper (navigate, evaluate, screenshot, inspect, etc.).
 
-**Location**: `scripts/browser-tools.ts`
+**Location**: `bin/browser-tools` (resolves to `scripts/browser-tools.ts`)
 
 **Commands**:
 ```bash
-./scripts/browser-tools.ts --help
+./bin/browser-tools --help
 ```
 
 ---
