@@ -9,7 +9,18 @@ read_when:
 
 A running log of meaningful changes to this toolkit — skills, profiles, sync/audit behavior, AGENTS guidance. One section per change, reverse-chronological. Add an entry whenever you ship something another agent or future-you needs to know about. Curate with the `update-changelog` skill.
 
-## 2026-06-15 — Add `bin/browser-tools` shim
+## 2026-06-15 — Delete Playwright skill, archive grill-with-docs, trim macOS ASO bundle
+
+- Deleted the `playwright` skill entirely; `agent-browser` is the sole browser-automation skill.
+- Archived `grill-with-docs` to `archived-skills/` and removed it from all profiles (`web-base`, `swift-app-developer`, `rn-app-developer`, `macos-swift-app-developer`).
+- Removed legacy ASO skills (`app-icon-optimization`, `app-store-optimization`, `app-store-screenshots`) from `macos-swift-app-developer` — direct-download macOS apps don't need them. The consolidated 4-skill ASC bundle (`asc-release`, `asc-metadata`, `asc-pricing`, `asc-version-guard`) remains on iOS/RN profiles only.
+
+## 2026-06-15 — Scope release and Playwright skills to profiles
+
+- Moved `release-ios-app` out of global `skills/` into `profiles/_shared/skills/` and linked it from `swift-app-developer` and `rn-app-developer`.
+- Moved `release-mac-app` out of global `skills/` into `profiles/_shared/skills/` and linked it from `macos-swift-app-developer` (replacing the stale shared copy).
+- Moved `playwright` out of global `skills/` into `web-base`; `agent-browser` remains the global browser-automation skill.
+- Updated release skill command examples to use project-local `./.agents/skills/...` paths.
 
 - Added `bin/browser-tools` bash shim that executes the underlying `scripts/browser-tools.ts` DevTools helper using `tsx`, `bun`, or `npx` automatically.
 - Updated `tools.md` to point to `bin/browser-tools` as the canonical location and entrypoint.

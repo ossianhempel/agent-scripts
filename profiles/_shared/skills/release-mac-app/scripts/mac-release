@@ -1,8 +1,30 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+if [[ -n "${BASH_VERSION:-}" && "${BASH_VERSINFO[0]:-0}" -lt 4 && -x /opt/homebrew/bin/bash ]]; then
+  exec /opt/homebrew/bin/bash "$0" "$@"
+fi
+
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-# shellcheck source=/Users/steipete/Projects/agent-scripts/skills/release-mac-app/scripts/lib/mac_release.sh
+
+# Prefer Apple's system Python for appcast XML parsing. Homebrew Python can be
+# ahead of the macOS libexpat on this machine, which breaks ElementTree imports.
+export PATH="/usr/bin:/bin:/usr/sbin:/sbin:$PATH"
+
+if [[ -n "${MAC_RELEASE_SPARKLE_BIN_DIR:-}" && -d "$MAC_RELEASE_SPARKLE_BIN_DIR" ]]; then
+  export PATH="$MAC_RELEASE_SPARKLE_BIN_DIR:$PATH"
+else
+  for sparkle_bin in \
+    "$PWD/.build/artifacts/sparkle/Sparkle/bin" \
+    "$PWD/.build/index-build/artifacts/sparkle/Sparkle/bin"; do
+    if [[ -x "$sparkle_bin/generate_appcast" ]]; then
+      export PATH="$sparkle_bin:$PATH"
+      break
+    fi
+  done
+fi
+
+# shellcheck source=/Users/ossianhempel/Developer/agent-scripts/profiles/_shared/skills/release-mac-app/scripts/lib/mac_release.sh
 source "$SCRIPT_DIR/lib/mac_release.sh"
 
 cmd=${1:-status}
@@ -41,6 +63,9 @@ case "$cmd" in
   sparkle-key-status)
     mac_release_sparkle_key_status "$@"
     ;;
+  codesign-run)
+    mac_release_codesign_run "$@"
+    ;;
   --public-key)
     mac_release_load
     mac_release_public_key_for_source "${1:-keychain}"
@@ -63,6 +88,7 @@ Commands:
   verify-appcast [version]
   check-assets [tag]
   sparkle-key-status [keychain|/path/to/key]
+  codesign-run [--with-package-secrets] -- <command> [args...]
   release
 EOF
     exit 2

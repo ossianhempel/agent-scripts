@@ -49,7 +49,7 @@ Default web stack: TanStack Start, PGlite/SQLite → PG when needed, single-cont
 - `docs/brainstorms/` — requirements docs shaping the WHAT (the `brainstorm` skill). The upstream a plan traces to.
 - `docs/plans/` — implementation plans (the `plan` skill: `YYYY-MM-DD-NNN-<type>-<slug>-plan.md`). Check for a current plan before starting multi-step work.
 - `docs/solutions/` — solved-problem & learning writeups (the `compound` skill). **Search here before debugging** — surface prior fixes via the learnings-researcher rather than re-discovering them.
-- `CONCEPTS.md` — domain glossary (the `grill-with-docs` skill; multi-context via `CONCEPTS-MAP.md`). Use its exact terms; don't coin synonyms.
+- `CONCEPTS.md` — domain glossary (multi-context via `CONCEPTS-MAP.md`). Use its exact terms; don't coin synonyms.
 - After finishing non-trivial work, `compound` to capture the learning, fence off recurrence, and refresh stale docs.
 
 ## Build/Test

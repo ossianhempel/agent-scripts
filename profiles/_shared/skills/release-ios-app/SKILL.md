@@ -8,7 +8,7 @@ description: "Release iOS (and Expo iOS/Android) apps to TestFlight and the App 
 One release flow for all of Ossian's iOS apps. The shared decision/submission logic lives
 here; each repo owns a `.ios-release.env` manifest with its app-specific values and a
 `references/`-style notes file for genuine repo gotchas. This mirrors `release-mac-app`
-(global skill + repo-owned `.mac-release.env`).
+(profile skill + repo-owned `.mac-release.env`).
 
 ## Rules
 
@@ -73,9 +73,9 @@ App Store submissions must **attach an already-uploaded, `VALID` TestFlight buil
 ## Commands
 
 ```bash
-/Users/ossianhempel/Developer/agent-scripts/skills/release-ios-app/scripts/ios-release status
-/Users/ossianhempel/Developer/agent-scripts/skills/release-ios-app/scripts/ios-release check-version [version]
-/Users/ossianhempel/Developer/agent-scripts/skills/release-ios-app/scripts/ios-release live-version
+./.agents/skills/release-ios-app/scripts/ios-release status
+./.agents/skills/release-ios-app/scripts/ios-release check-version [version]
+./.agents/skills/release-ios-app/scripts/ios-release live-version
 ```
 
 ## Manifest & references

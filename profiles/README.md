@@ -26,7 +26,7 @@ uses:
 
 | Profile | Skills |
 |---|---|
-| `web-base` | shadcn, frontend-app-builder, frontend-testing-debugging, privacy-policy, grill-with-docs (every web repo) |
+| `web-base` | shadcn, frontend-app-builder, frontend-testing-debugging, privacy-policy (every web repo) |
 | `fw-nextjs` | vercel-react-best-practices, vercel-composition-patterns |
 | `fw-tanstack` | tanstack-start-best-practices |
 | `auth-clerk` | clerk, clerk-setup, clerk-custom-ui (+ global `clerk-cli`) |

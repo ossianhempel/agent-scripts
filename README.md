@@ -164,25 +164,27 @@ Run: `pre-commit run --all-files`
 
 ## Contents
 Skills
+- `agent-browser`
 - `agent-transcript`
 - `autoreview`
-- `brainstorm`
-- `compound`
+- `clerk-cli`
+- `convex-cli`
 - `coolify`
 - `copywriter`
-- `frontend-design`
-- `grill-me`
+- `git-cleanup`
 - `handoff`
 - `obsidian`
-- `plan`
-- `playwright`
-- `review-agent-md`
+- `oracle`
+- `peekaboo`
+- `plan-inbox`
+- `readwise-cli`
 - `session-viewer`
 - `setup-pre-commit`
 - `skill-cleaner`
 - `skill-creator`
-- `skimmify`
 - `summarize`
+- `teach`
+- `zoom-out`
 
 Subagents (canonical in `subagents/`, generated per harness — see `docs/subagents.md`)
 - `learnings-researcher`
@@ -208,7 +210,6 @@ Tools
 - `things`
 
 Profile-shared development skills
-- `grill-with-docs`
 - `shadcn`
 - `turborepo`
 

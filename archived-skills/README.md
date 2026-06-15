@@ -12,8 +12,11 @@ whose `ce-` namespaced loop (`ce-brainstorm` / `ce-plan` / `ce-compound` /
 | `brainstorm`     | `ce-brainstorm`  |
 | `review-agent-md`| `ce-doc-review`  |
 
-Kept active because CE has no equivalent: `grill-me`, `grill-with-docs`,
-`plan-inbox`.
+Kept active because CE has no equivalent: `grill-me`, `plan-inbox`.
+
+| Archived skill     | Replaced by                          |
+|--------------------|--------------------------------------|
+| `grill-with-docs`  | `ce-brainstorm` / `ce-compound`      |
 
 These are moved out of `skills/` so `scripts/sync-agent-scripts.sh` no longer
 links them into `~/.claude`, `~/.agents`, or `~/.gemini/antigravity-cli`. To
