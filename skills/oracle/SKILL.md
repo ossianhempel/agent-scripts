@@ -12,7 +12,6 @@ Oracle bundles your prompt + selected files into one “one-shot” request so a
 Default workflow here: `--engine browser` with GPT‑5.5 Pro in ChatGPT. This is the “human in the loop” path: it can take ~10 minutes to ~1 hour; expect a stored session you can reattach to.
 
 Recommended defaults:
-
 - Engine: browser (`--engine browser`)
 - Model: GPT‑5.5 Pro (either `--model gpt-5.5-pro` or a ChatGPT picker label like `--model "5.5 Pro"`)
 - Attachments: directories/globs + excludes; avoid secrets.
@@ -108,8 +107,8 @@ Recommended defaults:
 - Stored under `~/.oracle/sessions` (override with `ORACLE_HOME_DIR`).
 - Browser runs save durable files under `~/.oracle/sessions/<id>/artifacts/`, including `transcript.md`, Deep Research reports, and downloaded ChatGPT-generated images when available.
 - Runs may detach or take a long time (browser/API + GPT‑5.5 Pro often does). If the CLI times out: don’t re-run; reattach.
--   List: `oracle status --hours 72`
--   Attach: `oracle session <id> --render`
+  - List: `oracle status --hours 72`
+  - Attach: `oracle session <id> --render`
 - Use `--slug "<3-5 words>"` to keep session IDs readable.
 - Duplicate prompt guard exists; use `--force` only when you truly want a fresh run.
 - CLI guardrails: root runs without a prompt exit nonzero; `--dry-run` conflicts with `--render` / `--render-markdown`; Ctrl-C exits foreground API runs with code 130 while browser cleanup/reattach still runs.
@@ -117,7 +116,6 @@ Recommended defaults:
 ## Prompt template (high signal)
 
 Oracle starts with **zero** project knowledge. Assume the model cannot infer your stack, build tooling, conventions, or “obvious” paths. Include:
-
 - Project briefing (stack + build/test commands + platform constraints).
 - “Where things live” (key directories, entrypoints, config files, dependency boundaries).
 - Exact question + what you tried + the error text (verbatim).
@@ -127,10 +125,9 @@ Oracle starts with **zero** project knowledge. Assume the model cannot infer you
 ### “Exhaustive prompt” pattern (for later restoration)
 
 When you know this will be a long investigation, write a prompt that can stand alone later:
-
 - Top: 6–30 sentence project briefing + current goal.
 - Middle: concrete repro steps + exact errors + what you already tried.
-- Bottom: attach _all_ context files needed so a fresh model can fully understand (entrypoints, configs, key modules, docs).
+- Bottom: attach *all* context files needed so a fresh model can fully understand (entrypoints, configs, key modules, docs).
 
 If you need to reproduce the same context later, re-run with the same prompt + `--file …` set (Oracle runs are one-shot; the model doesn’t remember prior runs).
 
