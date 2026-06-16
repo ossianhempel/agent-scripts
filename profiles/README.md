@@ -26,19 +26,26 @@ uses:
 
 | Profile | Skills |
 |---|---|
-| `web-base` | shadcn, frontend-app-builder, frontend-testing-debugging, privacy-policy (every web repo) |
+| `web-base` | privacy-policy (every web repo) |
 | `fw-nextjs` | vercel-react-best-practices, vercel-composition-patterns |
 | `fw-tanstack` | tanstack-start-best-practices |
 | `auth-clerk` | clerk, clerk-setup, clerk-custom-ui (+ global `clerk-cli`) |
 | `auth-better-auth` | better-auth-best-practices, better-auth-create-auth, better-auth-organization |
 | `web-monorepo` | hono, turborepo |
-| `payments-stripe` | stripe-best-practices |
 | `web-tooling` | mcp-builder, create-cli |
 | `convex` | the convex-* cluster (CLI ops: global `convex-cli`) |
 
+> **Frontend-design and dev-mechanics skills are retired.** App build/run/debug
+> (iOS/macOS/Expo) and Stripe rely on directly-installed agent plugins
+> (`swift-lsp`, `build-ios-apps`, `expo`, `stripe`) rather than vendored skills.
+> The frontend web-design skills and `payments-stripe` profile were removed; the
+> bodies live in `../archived-skills/`. Profiles now keep only bespoke "meta"
+> skills with no plugin equivalent (asc, RevenueCat, Convex, Clerk, better-auth,
+> ASO/marketing, release orchestration).
+
 ```jsonc
 // profile-assignments.json
-"~/Developer/gainslog-web": ["web-base", "auth-clerk", "fw-nextjs", "payments-stripe"],
+"~/Developer/gainslog-web": ["web-base", "auth-clerk", "fw-nextjs"],
 "~/Developer/mejla":        ["web-base", "auth-better-auth", "fw-tanstack"]
 ```
 

@@ -17,9 +17,9 @@
     "~/Developer/gainslog-ios": "swift-app-developer",
     "~/Developer/top-of-class": "swift-app-developer",
 
-    "~/Developer/recalliq": ["macos-swift-app-developer", "payments-stripe", "auth-clerk", "convex"],
+    "~/Developer/recalliq": ["macos-swift-app-developer", "auth-clerk", "convex"],
     "~/Developer/agent-wispr": "macos-swift-app-developer",
-    "~/Developer/completia": ["macos-swift-app-developer", "payments-stripe"],
+    "~/Developer/completia": "macos-swift-app-developer",
 
     "~/Developer/gainslog": "rn-app-developer",
     "~/Developer/chat-analytics": "rn-app-developer",
@@ -27,18 +27,18 @@
     "~/Developer/ai-kanban": ["web-base", "auth-better-auth", "web-monorepo"],
     "~/Developer/aso-screenshots": ["web-base", "auth-clerk", "fw-tanstack"],
     "~/Developer/company-brain": ["web-base", "web-monorepo"],
-    "~/Developer/gainslog-web": ["web-base", "auth-clerk", "fw-nextjs", "payments-stripe"],
-    "~/Developer/mina-recept.se": ["web-base", "auth-clerk", "fw-nextjs", "payments-stripe"],
+    "~/Developer/gainslog-web": ["web-base", "auth-clerk", "fw-nextjs"],
+    "~/Developer/mina-recept.se": ["web-base", "auth-clerk", "fw-nextjs"],
     "~/Developer/ossianhempel_com": ["web-base", "fw-nextjs"],
-    "~/Developer/post-queue": ["web-base", "auth-clerk", "fw-nextjs", "payments-stripe"],
+    "~/Developer/post-queue": ["web-base", "auth-clerk", "fw-nextjs"],
     "~/Developer/share-app-images": ["web-base"],
     "~/Developer/sl-departure-board": ["web-base"],
-    "~/Developer/St-rkande_tr-ning": ["web-base", "payments-stripe"],
+    "~/Developer/St-rkande_tr-ning": ["web-base"],
     "~/Developer/walkmon-web": ["web-base", "auth-clerk", "web-monorepo"],
     "~/Developer/platesnap-web": ["web-base", "web-monorepo"],
-    "~/Developer/resume-builder": ["web-base", "auth-clerk", "web-monorepo", "payments-stripe"],
+    "~/Developer/resume-builder": ["web-base", "auth-clerk", "web-monorepo"],
     "~/Developer/tiktok-slides": ["web-base"],
     "~/Developer/agent-wispr-cloud": ["web-base"],
-    "~/Developer/mejla": ["web-base", "auth-better-auth", "fw-tanstack", "payments-stripe"]
+    "~/Developer/mejla": ["web-base", "auth-better-auth", "fw-tanstack"]
   }
 }

@@ -9,6 +9,19 @@ read_when:
 
 A running log of meaningful changes to this toolkit — skills, profiles, sync/audit behavior, AGENTS guidance. One section per change, reverse-chronological. Add an entry whenever you ship something another agent or future-you needs to know about. Curate with the `update-changelog` skill.
 
+## 2026-06-16 — Archive dev-mechanics + frontend-design profile skills; rely on official plugins
+
+- Strategic shift: iOS/macOS/Expo build-run-debug and Stripe now rely on **directly-installed agent plugins** (`swift-lsp`, `build-ios-apps`, `expo`, `stripe`) in Claude Code / Codex instead of skills vendored into repos. Profiles keep only bespoke "meta" skills with no plugin equivalent. Global `skills/` untouched.
+- Archived to `archived-skills/` (recoverable, not deleted):
+  - **iOS dev** (`swift-app-developer`): `ios-app-intents`, `ios-ettrace-performance`, `ios-memgraph-leaks`, `ios-simulator-browser`, `swiftui-liquid-glass`, `swiftui-ui-patterns`, `swiftui-view-refactor`.
+  - **macOS dev** (`macos-swift-app-developer` body): `appkit-interop`, `build-run-debug`, `liquid-glass`, `packaging-notarization`, `signing-entitlements`, `swiftpm-macos`, `swiftui-patterns`, `telemetry`, `test-triage`, `view-refactor`, `window-management`.
+  - **Expo/RN dev** (`rn-app-developer`): `building-native-ui`, `codex-expo-run-actions`, `expo-api-routes`, `expo-cicd-workflows`, `expo-deployment`, `expo-dev-client`, `expo-module`, `expo-tailwind-setup`, `expo-ui-jetpack-compose`, `expo-ui-swift-ui`, `native-data-fetching`, `react-native-skills`, `upgrading-expo`, `use-dom`. (`convex-expo-skill` kept — Convex family.)
+  - **Frontend web-design** (`web-base`): `design-taste-frontend`, `frontend-app-builder`, `frontend-testing-debugging`, `gpt-taste`, `high-end-visual-design`, `image-to-code-skill`, `industrial-brutalist-ui`, `minimalist-ui`, `redesign-existing-projects`, `shadcn`.
+  - **Shared iOS/Swift dev** (`_shared`): `swift-concurrency-expert`, `swiftui-performance-audit`, `ios-debugger-agent`.
+  - **Payments** (`payments-stripe`): `stripe-best-practices` — profile emptied and removed; `payments-stripe` stripped from all `profile-assignments.json` entries.
+- Kept (bespoke, no official plugin): `asc-*`, RevenueCat, Convex, Clerk, better-auth, ASO/marketing (`app-store-*`, `app-icon-optimization`, `ios-marketing-capture`, `baguette`, `onboarding-flow`, `create-onboarding-video`, `remotion-best-practices`), `release-ios-app`, `release-mac-app`, `asc-version-guard`, web framework/tooling (`fw-*`, `web-monorepo`, `web-tooling`), `data-analytics` (standalone, unassigned).
+- Profile sync (`--provider profiles`) prunes the archived copies out of the assigned repos on next run.
+
 ## 2026-06-15 — Delete Playwright skill, archive grill-with-docs, trim macOS ASO bundle
 
 - Deleted the `playwright` skill entirely; `agent-browser` is the sole browser-automation skill.
