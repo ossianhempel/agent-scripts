@@ -1,4 +1,0 @@
-interface:
-  display_name: "Baguette"
-  short_description: "Drive iOS 26 simulators headlessly with Baguette."
-  default_prompt: "Use Baguette to boot, view, drive, screenshot, and integration-test iOS simulator apps."
