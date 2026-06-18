@@ -29,9 +29,8 @@ Each link resolves like
 
 This applies to **global** skills only (the home-dir installs above). They live
 in your home directory, are never committed, and have a stable path to
-agent-scripts, so a symlink is pure upside. **Profile** skills install into app
-repos and are **copied** instead — see "Where profile skills land in a project"
-below.
+agent-scripts, so a symlink is pure upside. **Profile** MCP bundles install into app repos and are **copied** for MCP config
+only — see [Profiles](#profiles-project-scoped-mcp-bundles) below.
 
 Consequences (global skills):
 
@@ -75,31 +74,19 @@ Limit providers:
 /path/to/agent-scripts/scripts/sync-agent-scripts.sh --providers agents,claude
 ```
 
-## Profiles (project-scoped skill packages)
+## Profiles (project-scoped MCP bundles)
 
-Global skills (`skills/`) go everywhere. **Profiles** are curated bundles that
-install only into the specific projects that need them, keeping the global set
-small.
+All skills live in `skills/` and sync globally via symlinks. **Profiles** are
+optional project packages that merge MCP server config only — use them when a
+project needs MCPs that should not spin up globally on every Codex launch.
 
 ```
 profiles/
-  _shared/skills/<skill>/          # canonical home for skills used by 2+ profiles
-  swift-app-developer/skills/<skill>/
-  rn-app-developer/skills/<skill>/
-  swift-app-developer/mcp.json     # optional profile MCP servers
+  swift-app-developer/mcp.json
+  rn-app-developer/mcp.json
+  macos-swift-app-developer/mcp.json
 profile-assignments.json           # project path -> profile(s)
 ```
-
-- A skill in **one** profile is a real directory inside that profile's `skills/`.
-- A skill shared by **multiple** profiles (but not global) lives once in
-  `_shared/skills/<skill>/`; each profile that uses it holds a symlink:
-
-  ```sh
-  ln -s ../../_shared/skills/<skill> profiles/<profile>/skills/<skill>
-  ```
-
-  Sync follows the symlink and copies the real contents into the project, so the
-  shared skill keeps a single source of truth.
 
 ### Syncing profiles
 
@@ -130,40 +117,12 @@ or a list of names:
 }
 ```
 
-### Where profile skills land in a project
+### Legacy project skill copies
 
-Profile skills install as **self-contained real-directory copies** — not
-symlinks. App repos must stay portable: a symlink pointing into agent-scripts
-breaks the moment the repo is cloned, run in CI, or opened on another machine,
-and some editors/indexers won't follow it.
-
-```
-<project>/.agents/skills/<skill>/   (real dir, copied from the profile)
-<project>/.claude/skills/<skill>/   (real dir, copied from the profile)
-```
-
-The in-repo `_shared/` model is still the single source of truth — a profile's
-`<skill>` entry may be a symlink to `_shared/skills/<skill>` — but the sync
-**dereferences** it (`cp -RL`) so the project always receives real files, never
-a link. agent-scripts is therefore NOT a runtime dependency of the project;
-each repo carries its own copies.
-
-The sync skips a skill whose project copy is already byte-identical (so it
-produces no git churn), and always replaces a stale symlink left by the old
-symlink-install model. Each dest dir keeps an `.agent-scripts-managed` manifest
-listing the skills the sync owns.
-
-Consequences:
-
-- **Portable** — a cloned repo / CI / another machine sees real skill files,
-  no broken links.
-- **Re-sync after edits** — editing a skill in agent-scripts does NOT update
-  projects until you re-run the profile sync (the deliberate tradeoff vs.
-  global symlinks). `_shared` keeps you editing each shared skill once.
-- **Safe prune** — removing a skill from a profile deletes its stale copy on the
-  next sync; project-authored skills (never in the manifest) are never touched.
-- **Broken-symlink cleanup** — any dangling link left in a dest dir by the old
-  model is removed on sync.
+Older profile syncs copied skills into `<project>/.agents/skills/` and
+`<project>/.claude/skills/`. A profiles run with no `skills/` dir in the
+profile prunes those managed copies (via `.agent-scripts-managed` manifests).
+Project-authored skills outside the manifest are never touched.
 
 ### Where profile MCPs land in a project
 
@@ -214,10 +173,9 @@ empty.)
 
 Two distinct categories matter for pruning:
 
-- **Profile orphans** — a skill installed in a project that *is* managed by the
-  repo's profile system (it lives in some profile or `_shared`) but is *not* in
-  this project's assigned profile(s). These were installed by a different
-  profile assignment and are safe to prune.
+- **Profile orphans** — a skill installed in a project that was managed by a
+  prior profile sync (listed in `.agent-scripts-managed`) but is no longer
+  expected. Safe to prune after moving skills to global.
 - **Project-local skills not in any repo profile** — skills authored inside the
   project that the repo has no copy of (e.g. an app's bespoke
   `gainslog-content` or `react-native-skills`). These are **never** pruned;

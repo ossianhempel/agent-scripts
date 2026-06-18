@@ -16,11 +16,7 @@ Subcommands:
 Repo scopes (authoritative source):
   <repo>/skills/*                  - synced to all global installs
   <repo>/local-skills/*            - kept in this repo only, never synced
-  <repo>/profiles/<name>/skills/*  - project-scoped packages; installed only
-                                     into projects assigned in
-                                     profile-assignments.json. Shared skills
-                                     live in profiles/_shared/skills and are
-                                     symlinked from the profiles that use them.
+  <repo>/profiles/<name>/          - project MCP bundles (mcp.json); no skills
 
 Global scopes (managed — `prune` may delete orphans here):
   ~/.agents/skills/*   ~/.claude/skills/*
@@ -46,8 +42,6 @@ REPO_SKILLS = REPO_ROOT / "skills"
 LOCAL_REPO_SKILLS = REPO_ROOT / "local-skills"
 PROFILES_ROOT = REPO_ROOT / "profiles"
 PROFILES_MANIFEST = REPO_ROOT / "profile-assignments.json"
-# Not a profile — canonical store for skills shared across profiles via symlink.
-SHARED_PROFILE_DIR = "_shared"
 
 # Project scopes a profile installs into, relative to the project root.
 PROFILE_PROJECT_SUFFIXES = [
@@ -114,24 +108,28 @@ def discover_local_scopes() -> list[Path]:
 
 
 def list_profiles() -> list[str]:
-    """Profile names: directories under profiles/ (excluding _shared) that hold a
-    skills/ subdir."""
+    """Profile names: directories under profiles/ that carry MCP or plugin config."""
     if not PROFILES_ROOT.is_dir():
         return []
     return sorted(
         p.name
         for p in PROFILES_ROOT.iterdir()
         if p.is_dir()
-        and p.name != SHARED_PROFILE_DIR
         and not p.name.startswith(".")
-        and (p / "skills").is_dir()
+        and (
+            (p / "mcp.json").is_file()
+            or (p / "plugins.json").is_file()
+            or (p / "skills").is_dir()
+        )
     )
 
 
 def profile_skills(profile: str) -> list[str]:
-    """Skill names in a profile. list_skills follows symlinks, so shared skills
-    (symlinked into _shared) are included."""
-    return list_skills(PROFILES_ROOT / profile / "skills")
+    """Legacy: profile skill dirs are retired; skills live in skills/ globally."""
+    skills_dir = PROFILES_ROOT / profile / "skills"
+    if not skills_dir.is_dir():
+        return []
+    return list_skills(skills_dir)
 
 
 def profile_union_skills(profiles: list[str]) -> set[str]:
@@ -305,9 +303,12 @@ def scan_profiles() -> bool:
         print("  none")
         return False
     for profile in profiles:
-        print(f"  {profile} ({len(profile_skills(profile))} skills)")
+        has_mcp = (PROFILES_ROOT / profile / "mcp.json").is_file()
+        skill_count = len(profile_skills(profile))
+        suffix = "mcp" if has_mcp else "legacy skills"
+        print(f"  {profile} ({suffix}{f', {skill_count} skills' if skill_count else ''})")
 
-    # Name collisions: a profile skill that shares a name with a global skill.
+    # Name collisions: legacy profile skills that share a name with a global skill.
     global_skills = set(list_skills(REPO_SKILLS))
     print()
     print("== Profile/global name collisions ==")
@@ -330,18 +331,18 @@ def scan_profiles() -> bool:
             exists = "" if project.is_dir() else "  (project not found)"
             print(f"  {project} -> {', '.join(names)}{exists}")
 
-    # Drift + orphans per assigned project.
+    # Drift: legacy profile skill copies in projects vs repo skills/.
     print()
     print("== Profile drift (installed project copy differs from repo source) ==")
     drift = False
     for project, names in assignments:
         if not project.is_dir():
             continue
-        # name -> repo source (resolved through _shared symlinks)
         sources = {
-            name: (PROFILES_ROOT / profile / "skills" / name)
+            name: (REPO_SKILLS / name)
             for profile in names
             for name in profile_skills(profile)
+            if (REPO_SKILLS / name).is_dir()
         }
         installed_root = project / ".agents" / "skills"
         for name, source in sources.items():

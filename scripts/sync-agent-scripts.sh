@@ -31,7 +31,7 @@ Cursor, Copilot, Windsurf), ~/.claude/skills (Claude Code only), and
 runtime dependency: move or delete it and the links break.
 Commands/prompts are copied to each tool's native location.
 
-Profiles (profiles/<name>/skills/ plus optional profiles/<name>/mcp.json and
+Profiles (profiles/<name>/mcp.json plus optional profiles/<name>/plugins.json)
 profiles/<name>/plugins.json) are project-scoped packages. They are NOT part of
 the default run — sync them with the 'profiles' provider, which installs into
 each assigned project's .agents/skills, .claude/skills, .mcp.json, and (Claude
@@ -540,7 +540,7 @@ sync_profiles_to_project() {
       log_sub "Skipping: missing profile '$profile' ($src, $mcp_src, or $plugins_src)"
       continue
     fi
-    log_sub "$profile -> $project (self-contained copies)"
+    log_sub "$profile -> $project"
 
     if [[ -d "$src" ]]; then
       shopt -s nullglob
@@ -577,7 +577,11 @@ sync_profiles_to_project() {
     for ((i = 0; i < ${#skill_names[@]}; i++)); do
       copy_skill_dir "${skill_srcs[$i]}" "$d/${skill_names[$i]}" || true
     done
-    prune_managed_skills "$d" "${skill_names[@]}"
+    if ((${#skill_names[@]} > 0)); then
+      prune_managed_skills "$d" "${skill_names[@]}"
+    else
+      prune_managed_skills "$d"
+    fi
   done
 }
 

@@ -102,7 +102,7 @@ For lightweight browser control (navigation, JS evaluation, screenshots, element
 `CHANGELOG.md` at the repo root logs meaningful changes (skills added/removed/renamed, sync/audit behavior, AGENTS guidance). When you ship something another agent or future-you needs to know about, add a date-stamped section. See `docs/update-changelog.md` (surfaced by `bin/docs-list`) for the curation checklist when the file falls behind several commits.
 
 ### Skill Sync & Audit
-- Source of truth: add/edit skills in `skills/` or `profiles/<profile>/skills/`, never directly in runtime caches or project-local generated copies.
+- Source of truth: add/edit skills in `skills/` only; profiles carry MCP config only. Never edit runtime caches or project-local generated copies directly.
 - Read `docs/syncing.md` before changing sync/profile/plugin behavior; read `docs/supported-agents.md` before making tooling work across runtimes.
 - Subagents live in `subagents/`; read `docs/subagents.md` before adding or editing them.
 - Small CLI tools should usually have a companion skill plus a short `tools.md` entry.

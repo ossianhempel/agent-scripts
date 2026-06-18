@@ -11,7 +11,7 @@ Use this when trimming skill prompt budget, finding duplicate skills, auditing e
 
 Scans the repo source of truth and every supported-agent skill root (see `docs/supported-agents.md`):
 
-- **Repo source:** `~/Developer/agent-scripts/skills` (or `~/repos/...`), plus `profiles/<name>/skills` and `profiles/_shared/skills`.
+- **Repo source:** `~/Developer/agent-scripts/skills` (or `~/repos/...`).
 - **Agent installs:** `~/.claude/skills` (Claude Code), `~/.agents/skills` (Codex/Gemini/Cursor/Copilot/Windsurf), `~/.gemini/antigravity-cli/skills` (Antigravity), `~/.codex/skills`, `~/.codex/plugins/cache`.
 - **Project installs:** `<project>/.agents/skills` under each workspace dir.
 
@@ -55,7 +55,7 @@ node --experimental-strip-types skills/skill-cleaner/scripts/skill-cleaner.ts --
 - It reads `~/.codex/models_cache.json` for GPT-5.5 `context_window`; fallback is 272,000 tokens and 2%.
 - It scans the supported-agent skill roots above by default (see Scanned Roots). Extra folders such as Dropbox archives are included only with `--root <path>`.
 - It realpath-dedupes roots and collapses byte-identical sync fan-out, so symlinked roots and managed copies do not create false duplicates.
-- For duplicate names, it reports description/body similarity and suggests deletion candidates only when bodies are near copies. Keep priority: Codex system skills, then the agent-scripts repo source (skills/ and profiles/), then plugin skills, then fanned-out agent copies.
+- For duplicate names, it reports description/body similarity and suggests deletion candidates only when bodies are near copies. Keep priority: Codex system skills, then the agent-scripts repo source (`skills/`), then plugin skills, then fanned-out agent copies.
 - Usage evidence comes from `~/.codex/history.jsonl`, recent `~/.codex/sessions/**/*.jsonl`, and `~/.claude/projects/**/*.jsonl` (Claude Code + Codex are the only transcript-capable supported agents). Add `--deep-logs` for archived sessions and OpenClaw/Clawd folders.
 - Usage evidence is heuristic: `$skill`, `Use $skill`, and paths like `skills/<name>/SKILL.md`.
 

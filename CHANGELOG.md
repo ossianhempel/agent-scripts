@@ -9,7 +9,14 @@ read_when:
 
 A running log of meaningful changes to this toolkit — skills, profiles, sync/audit behavior, AGENTS guidance. One section per change, reverse-chronological. Add an entry whenever you ship something another agent or future-you needs to know about. Curate with the `update-changelog` skill.
 
-## 2026-06-16 — Archive dev-mechanics + frontend-design profile skills; rely on official plugins
+## 2026-06-18 — Collapse profile skills into global skills/
+
+- Moved all profile-scoped skills (`profiles/_shared/`, composable web profiles, profile-only skills) into `skills/` (62 global skills total). Single canonical tree; global symlink install only.
+- Profiles reduced to MCP bundles only (`swift-app-developer`, `rn-app-developer`, `macos-swift-app-developer` retain `mcp.json`). Removed composable web/auth/convex profile dirs and the standalone `asc` profile.
+- Archived unassigned `data-analytics` profile (18 viz skills) to `archived-skills/profiles/data-analytics/`.
+- Trimmed `profile-assignments.json` to MCP-relevant projects only; web repos no longer need profile assignments.
+- Updated `docs/syncing.md`, `profiles/README.md`, `skills-audit.py`, and `skill-cleaner` for the new model. Profile sync now prunes legacy project skill copies on next `--provider profiles` run.
+
 
 - Strategic shift: iOS/macOS/Expo build-run-debug and Stripe now rely on **directly-installed agent plugins** (`swift-lsp`, `build-ios-apps`, `expo`, `stripe`) in Claude Code / Codex instead of skills vendored into repos. Profiles keep only bespoke "meta" skills with no plugin equivalent. Global `skills/` untouched.
 - Archived to `archived-skills/` (recoverable, not deleted):
