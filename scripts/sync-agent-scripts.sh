@@ -1264,6 +1264,8 @@ if want_provider "copilot"; then
   if scope_has "$COPILOT_SCOPE" "workspace"; then
     if [[ -z "$COPILOT_PROMPTS_DIR" ]]; then
       log_sub "Skipping workspace prompts: set COPILOT_PROMPTS_DIR or --copilot-prompts-dir."
+    elif [[ ! -d "$ROOT/slash-commands" ]]; then
+      :
     else
       log_sub "Workspace prompts -> $COPILOT_PROMPTS_DIR"
       while IFS= read -r -d '' file; do
@@ -1284,6 +1286,8 @@ if want_provider "copilot"; then
   if scope_has "$COPILOT_SCOPE" "user"; then
     if [[ -z "$COPILOT_USER_PROMPTS_DIR" ]]; then
       log_sub "Skipping user prompts: set COPILOT_USER_PROMPTS_DIR or --copilot-user-prompts-dir."
+    elif [[ ! -d "$ROOT/slash-commands" ]]; then
+      :
     else
       log_sub "User prompts -> $COPILOT_USER_PROMPTS_DIR"
       while IFS= read -r -d '' file; do
