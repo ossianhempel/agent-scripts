@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-repo="openclaw/openclaw"
+repo=""
 months="12"
 include_global="0"
 
@@ -132,6 +132,8 @@ done
 
 need gh
 need jq
+
+[[ -n "$repo" ]] || die "--repo owner/repo is required"
 
 since_ts=$(date_utc_relative_months "$months")
 now_ts=$(date -u +%Y-%m-%dT%H:00:00Z)

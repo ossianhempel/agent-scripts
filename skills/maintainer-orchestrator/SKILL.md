@@ -7,10 +7,27 @@ description: "Delegated maintainer ops: decision-ready PRs, worker monitoring, q
 
 Coordinate repository work through completion. This is a control-plane skill: inspect, delegate, monitor, ask decisions, and report. Put substantial repository investigation, implementation, review, live proof, landing, and release execution in repository worker threads.
 
+## Worker Backends
+
+The orchestration logic below is the same regardless of backend. Only how the root session launches and how workers are spawned differs.
+
+**Codex (primary, unchanged).** This skill is launched from `agents/openai.yaml` as a Codex agent, and each worker is a separate Codex chat/thread the root session spawns (`<Project>: <task>`), renames, polls (~5 min), and steers. Workers do not subdelegate. This path already works — the rest of this document describes it; do not alter it for the Claude adaptation below.
+
+**Claude Code (adaptation).** When this skill runs inside Claude Code, the main session is the root orchestrator. Map the Codex worker concepts onto native primitives — nothing about the Codex path changes:
+
+| Concept | Codex (as today) | Claude Code equivalent |
+|---|---|---|
+| Spawn a worker | New thread, paste the worker brief | `Agent` tool with `agents/repo-worker.md` as the prompt (`run_in_background: true`; `isolation: "worktree"` when lanes touch files concurrently) |
+| Rename / relabel | Rename thread `<Project>: <task>` | Set the agent `description` per task |
+| Continue a worker | Reuse the same thread | `SendMessage` to the same agent (context persists) — don't respawn |
+| Monitor | ~5-minute poll of thread state | Background-agent completion notifications + a `ScheduleWakeup` heartbeat backstop; avoid tight polling |
+| Subdelegation | Workers must NOT subdelegate | Subagents MAY spawn their own subagents to finish their lane; they still must not manage other lanes or the control plane |
+
+`agents/repo-worker.md` is the self-contained worker brief for the Claude path (a subagent doesn't have this SKILL.md in context, so it packages the contract, permissions, and live-proof gate into one prompt). The Codex path keeps delegating exactly as it does today. Everything below is backend-agnostic unless it names Codex or Claude Code explicitly.
+
 ## Repository Scope
 
-- Own repositories where Peter is the majority commit author, regardless of GitHub owner.
-- Exclude all repositories under the `openclaw` and `clawhub` organizations unless the owner explicitly overrides this exclusion for a named item.
+- Own repositories where Ossian is the majority commit author, regardless of GitHub owner. Ossian has no GitHub orgs by default; treat all repos under `ossianhempel` as in scope unless contribution history says otherwise.
 - Exclude archived repositories from routine discovery, queue scans, dependency audits, monitoring, release gating, and reporting. Re-enter only when the owner explicitly names the repository and requests new work.
 - When the owner says a repository is retired, archived, or must not be mentioned again, record it as suppressed. Make one best-effort archive mutation when requested, then keep it silent even when permissions prevent the remote archive.
 - Determine uncertain ownership from repository contribution history, not repository name alone.
@@ -34,7 +51,7 @@ Do not treat ordinary draft, stale, difficult, or platform-specific items as ign
 
 - Only this root orchestrator session may create, reuse, fork, assign, rename, archive, or steer worker threads.
 - Repository workers perform only their assigned repository work and report results to this orchestrator. They must not create subworkers, delegate work, or manage other chats.
-- Put the no-subdelegation rule in every worker prompt.
+- Put the no-subdelegation rule in every worker prompt. (Claude Code exception: a subagent worker may spawn its own subagents to finish its lane, but still must not manage other lanes or the control plane.)
 - Do not delegate portfolio triage, thread creation, or worker management to another worker.
 - Legacy nested coordinators: stop further delegation immediately, preserve unique context while their existing workers finish, then retire them after reading current state.
 
@@ -93,7 +110,7 @@ Never interrupt, archive, rename, duplicate, or replace a worker without first r
 
 ## Thread Naming
 
-- Rename a worker whenever giving it a new task or materially changing its assignment.
+- Rename/relabel a worker whenever giving it a new task or materially changing its assignment.
 - Format every worker title as `<Project>: <short current task>`.
 - Read the latest state and newest thread-local instructions before renaming.
 - Keep the title specific to current work; replace stale original-task titles.
@@ -113,7 +130,7 @@ An idle or completed repository thread must not remain a polling-only lane. Afte
 1. Assign the next autonomous issue or PR to the same repository thread.
 2. Prepare each remaining non-autonomous item to the decision-ready boundary, then ask the owner a concise concrete question: land/delete, choose a documented alternative, provide exact access, or grant a live-proof waiver.
 3. When the effective issue and PR queues are empty, execute the authorized patch or minor release after all release gates pass.
-4. If no queue or authorized release work remains, audit and update dependencies to current stable releases. Delegate this as normal repository work: inspect upstream changes and package health, honor repository-specific stabilization policies, avoid prerelease-only upgrades unless already adopted, preserve the repository's package manager, add compatibility fixes/tests when needed, run exact built/live proof, autoreview, the Public Model Identifier Gate, and required CI, then prepare or land the update within granted permissions.
+4. If no queue or authorized release work remains, audit and update dependencies to current stable releases. Delegate this as normal repository work: inspect upstream changes and package health, honor repository-specific stabilization policies, avoid prerelease-only upgrades unless already adopted, preserve the repository's package manager, add compatibility fixes/tests when needed, run exact built/live proof, autoreview, and required CI, then prepare or land the update within granted permissions.
 
 Do not keep completed threads merely to satisfy a lane count. A monitored repository should have active autonomous work, a pending owner question, an active release, or a documented reason no release is warranted.
 
@@ -136,15 +153,14 @@ Record the granted permissions in each worker prompt. Without the required permi
 
 ## Credential Access
 
-Assume most maintainer credentials are stored in 1Password. Before reporting a credential blocker:
+Maintainer credentials currently live in `.env` files (per-project) or exported environment variables. Before reporting a credential blocker:
 
-1. Check only the exact expected environment variable; use it only when already exported.
-2. Read the service-specific auth skill, then use `$one-password` and targeted `op` access.
-3. Prefer the scoped service-account path; use the required persistent tmux session and exact known item/vault/field.
-4. Never broadly enumerate secrets or print values. Use `op run` or `op inject` when supported.
-5. Ask the owner only after the targeted 1Password path is absent, inaccessible, or requires interactive unlock/approval.
+1. Check the exact expected environment variable; use it only when already exported.
+2. Look for a project `.env` (or `.env.local`) and read only the exact key needed via the project's normal loader. Never print secret values or dump the whole file.
+3. Keep credential discovery and use inside the worker that needs the secret. Report only presence, access path, and the exact missing item; never send credential values between threads.
+4. Ask the owner only after the expected env var is unset and no project `.env` provides the key.
 
-Keep credential discovery and use inside the worker that needs the secret. Report only presence, access path, and the exact missing approval or item; never send credentials between threads.
+If 1Password (CLI `op` or service accounts) is set up later, prefer it over plaintext `.env`: read the service-specific auth skill, use scoped `op run`/`op inject`, never broadly enumerate or print secrets, and fall back to `.env` only when 1Password access is unavailable.
 
 ## Worker Contract
 
@@ -166,12 +182,15 @@ Every delegated implementation thread, within its explicit authorization, must:
 Prefer repairing the contributor PR. Preserve contributor credit and follow the workspace PR rules.
 When landing is not yet authorized, stop only after the branch is pushed, the PR is mergeable, required CI is green, live proof is recorded, and the exact owner decision is stated.
 
+(Codex workers must not subdelegate; Claude Code subagents may spawn their own subagents to complete this contract.)
+
 ## Live Proof Gate
 
 Live proof is a pre-land requirement, not optional polish.
 
 - Test the exact final candidate commit through the changed user path using the real built/installed artifact and real service, account, device, OS, or external provider as applicable.
 - For external integrations, authenticated live calls are required. Docs, mocks, fixtures, protocol captures, route-existence checks, and CI supplement live proof; they do not replace it.
+- For macOS UI behavior, use the `peekaboo` skill for screenshots / UI proof; for web UI, use the `agent-browser` skill.
 - Redact secrets and private user data while retaining concrete evidence such as command, behavior, response class, artifact hash, or observed state transition.
 - If credentials, account state, hardware, platform access, or a safe live target are unavailable, finish all autonomous code, tests, review, and CI work, then stop before merge/close. Ask for the exact access, an explicit item-specific waiver, or a reject/close decision.
 - Never infer a live-proof waiver from merge permission, release permission, prior contributor evidence, or confidence in mocks.
@@ -179,19 +198,6 @@ Live proof is a pre-land requirement, not optional polish.
 - Pure docs, metadata, CI, or test-only changes with no runtime boundary may use the closest built-artifact or workflow proof; state why no external live boundary applies.
 
 Record live evidence or the owner's explicit waiver in the landing proof comment.
-
-## Public Model Identifier Gate
-
-Before any push, public PR update, merge, or release involving model-bearing code or artifacts:
-
-- Audit the exact candidate diff, tests, fixtures, snapshots, generated metadata, workflows, CI/test logs, packaged artifacts, and public PR/issue proof for model identifiers.
-- Public artifacts may retain only identifiers currently documented or offered in an official public provider source. Record the source URL in the worker's audit report.
-- Never expose internal, employee-only, preview-only, alias-only, inferred, synthetic provider-shaped, or otherwise undisclosed identifiers. Genericize questionable test and fixture values because assertion failures can print them in CI logs.
-- Do not repeat a questionable identifier in worker messages, audit reports, public comments, or the orchestrator log. Describe it generically.
-- Binary/archive scans must classify candidate strings as verified public identifiers, unrelated false positives, or blocking unknowns without echoing blocking unknowns.
-- Return an explicit `PASS` or `BLOCKED` report covering every audited surface. Any new candidate diff, generated artifact, log/proof text, or model-bearing change invalidates the pass and requires re-audit.
-
-No push, public mutation, merge, or release may proceed while this gate is blocked.
 
 ## Release Gate
 
@@ -223,6 +229,7 @@ Use the repository's release docs and matching skill:
 
 - npm packages: use `npm`;
 - macOS apps: use `release-mac-app`;
+- iOS / Expo apps: use `release-ios-app`;
 - other projects: use established repo scripts/workflows.
 
 Before release:
