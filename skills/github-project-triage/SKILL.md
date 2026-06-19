@@ -9,16 +9,35 @@ Always use this skill when the user types `triage`, unless the request explicitl
 
 Output is URL-first: every surfaced issue/PR/repo item must include its GitHub URL in the first line or first sentence for that item. If giving a shortlist, print one URL per item.
 
-Discovery is `gh`-only. For broad queue discovery across all of Ossian's repos, use `gh search` (one sweep for open PRs, one for open issues) rather than hand-rolling `gh repo list` loops. For per-repo detail, use `gh issue`/`gh pr`.
+Use **RepoBar** as the first pass for broad queue discovery across owners. RepoBar is faster and more profile-aware than hand-rolling `gh repo list`/`gh search` loops: it understands repo activity, issue/PR counts, CI, releases, local checkouts, auth, cache, and filters in one tool, and it works for **private repos** (it shares the GitHub auth/cache of the RepoBar app). Drop to `gh` for maintainer-grade per-PR/issue state (diffs, checks, review decision, merge state) and for anything RepoBar does not cover. If RepoBar is unavailable, fall back to `gh search`/`gh issue`/`gh pr`.
 
 ## Setup
 
-Requires `gh` (authenticated) and `jq`. Confirm auth and identity once:
+Requires `gh` (authenticated), `jq`, and **RepoBar** (preferred). Confirm identity once:
 
 ```bash
 gh auth status
 gh api user --jq .login   # expected: ossianhempel
 ```
+
+RepoBar ships a CLI inside its app bundle. Prefer a `repobar` on PATH; otherwise call the bundled binary directly:
+
+```bash
+repobar_cmd() {
+  if command -v repobar >/dev/null 2>&1; then
+    repobar "$@"
+  elif [ -x "/Applications/RepoBar.app/Contents/MacOS/repobarcli" ]; then
+    "/Applications/RepoBar.app/Contents/MacOS/repobarcli" "$@"
+  else
+    printf 'RepoBar not installed. Run: brew install --cask repobar && repobar import-gh-token\n' >&2
+    return 127
+  fi
+}
+
+repobar_cmd status   # expect: Logged in as github.com#ossianhempel
+```
+
+RepoBar auth reuses your `gh` token via `repobar import-gh-token` (re-run after any `gh auth login`/token change). A `repobar` symlink is installed at `~/.local/bin/repobar` → the app's bundled `repobarcli`; it survives Sparkle app updates. If `repobar status` shows `Logged out`, run `repobar import-gh-token`.
 
 Default owner for broad triage: `ossianhempel` (all your repos; no orgs by default). Only broaden to other owners/orgs when the user names them, or when the current repo already lives under that owner.
 
@@ -145,45 +164,58 @@ Judge:
 
 ## Fast Queue Map
 
-Use this only when the scope is broad. Sweep all open work across your repos with two `gh search` calls, then group by repo.
+Use this only when the scope is broad. Start with RepoBar's repo-level map: it finds repos with open issues and/or PRs and gives counts in one call.
 
-Open PRs across all your repos, primary triage order:
+PR queue, primary triage order:
+
+```bash
+repobar_cmd repos --scope all --only-with work --owner ossianhempel --sort prs --json
+```
+
+Issue pressure, second pass when issues matter:
+
+```bash
+repobar_cmd repos --scope all --only-with work --owner ossianhempel --sort issues --json
+```
+
+Useful `jq` summary (fields: `fullName`, `openIssues`, `openPulls`, `activityTitle`, `activityActor`):
+
+```bash
+repobar_cmd repos --scope all --only-with work --owner ossianhempel --sort prs --json |
+  jq -r '.[] | [.fullName, .openIssues, .openPulls, .activityTitle, .activityActor] | @tsv'
+```
+
+For a compact terminal view, use `--plain` instead of `--json`.
+
+Notes:
+- RepoBar covers private repos (shares the app's GitHub auth). Default `--age` is 365 days; pass `--forks`/`--archived` only when the user asks for "all", "everything", or archaeology.
+- Preserve RepoBar's PR-count order when summarizing. Do not include a lower-PR repo while omitting a higher-PR repo from the same scope. Repos with zero issues but open PRs are still triage-relevant.
+
+Fallback if RepoBar is unavailable — sweep with `gh search`, then group by repo:
 
 ```bash
 gh search prs --owner ossianhempel --state open --limit 200 \
   --json repository,number,title,author,createdAt,updatedAt,url |
-  jq -r 'group_by(.repository.nameWithOwner)
-    | sort_by(-length)
+  jq -r 'group_by(.repository.nameWithOwner) | sort_by(-length)
     | .[] | "\(.[0].repository.nameWithOwner): \(length) open PRs"'
-```
-
-Open issues across all your repos, second pass when issues matter:
-
-```bash
 gh search issues --owner ossianhempel --state open --include-prs=false --limit 200 \
   --json repository,number,title,author,createdAt,updatedAt,url |
-  jq -r 'group_by(.repository.nameWithOwner)
-    | sort_by(-length)
+  jq -r 'group_by(.repository.nameWithOwner) | sort_by(-length)
     | .[] | "\(.[0].repository.nameWithOwner): \(length) open issues"'
 ```
 
-Notes:
-- `gh search` skips archived repos by default. To include them, add the repos explicitly or pass `--archived` only when the user asks for "all", "everything", or archaeology.
-- To restrict the sweep to non-fork sources, cross-check against `gh repo list ossianhempel --source --no-archived`.
-- Preserve the PR-count order when summarizing. Do not include a lower-PR repo while omitting a higher-PR repo from the same scope. Repos with zero issues but open PRs are still triage-relevant.
-
 ## Detail Pass
 
-After a broad queue map, inspect only the top repos unless the user explicitly wants exhaustive detail.
+After a broad queue map, inspect only the top repos unless the user explicitly wants exhaustive detail. RepoBar gives fast per-repo issue/PR/CI/activity views:
 
 ```bash
-gh issue list --repo <owner/name> --state open --limit 50 \
-  --json number,title,author,labels,createdAt,updatedAt,url
-gh pr list --repo <owner/name> --state open --limit 50 \
-  --json number,title,author,isDraft,reviewDecision,mergeStateStatus,createdAt,updatedAt,url
+repobar_cmd issues <owner/name> --limit 50 --json
+repobar_cmd pulls <owner/name> --limit 50 --json
+repobar_cmd ci <owner/name> --limit 20 --json
+repobar_cmd activity <owner/name> --limit 20 --json
 ```
 
-For PRs that look mergeable or suspicious, pull maintainer-grade state:
+For PRs that look mergeable or suspicious, switch to `gh` for maintainer-grade state (diff, checks, review decision, merge state):
 
 ```bash
 gh pr view <n> --repo <owner/name> --json number,title,state,author,isDraft,mergeStateStatus,reviewDecision,statusCheckRollup,updatedAt,url
@@ -199,6 +231,17 @@ To find duplicate or related threads before commenting or closing, search across
 gh search issues --owner ossianhempel "<keywords>" --limit 30 --json repository,number,title,state,url
 gh search prs    --owner ossianhempel "<keywords>" --limit 30 --json repository,number,title,state,url
 ```
+
+## Local Cross-Check
+
+Use this when the task mentions local project state, dirty repos, or "what do I own here". RepoBar maps local checkouts and their sync state:
+
+```bash
+repobar_cmd local --root "$HOME/Developer" --depth 1 --limit 200 --plain
+repobar_cmd local --root "$HOME/Developer" --depth 1 --sync --limit 200 --json
+```
+
+Do not run destructive local actions (`local reset`, branch deletes, checkout moves) unless the user explicitly asks.
 
 ## Triage Heuristics
 
@@ -251,7 +294,7 @@ For a broad scan, answer with:
 
 ```text
 Owner scanned: ossianhempel
-Source: gh search prs/issues sweep, plus gh for selected PRs/issues
+Source: RepoBar <command summary>, plus gh for selected PRs/issues
 
 Top queues:
 - owner/repo: X issues, Y PRs; why it matters; next action
