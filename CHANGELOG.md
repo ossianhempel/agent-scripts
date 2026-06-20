@@ -9,6 +9,10 @@ read_when:
 
 A running log of meaningful changes to this toolkit — skills, profiles, sync/audit behavior, AGENTS guidance. One section per change, reverse-chronological. Add an entry whenever you ship something another agent or future-you needs to know about. Curate with the `update-changelog` skill.
 
+## 2026-06-20 — Guard `oracle` skill sync
+
+- Added sync-test assertions that `oracle` appears in the global `.agents`, Claude, Antigravity, and project `.agents` skill outputs, so future trims or reinstall regressions fail visibly.
+
 ## 2026-06-18 — Collapse profile skills into global skills/
 
 - Moved all profile-scoped skills (`profiles/_shared/`, composable web profiles, profile-only skills) into `skills/` (62 global skills total). Single canonical tree; global symlink install only.

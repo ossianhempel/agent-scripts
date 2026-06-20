@@ -44,12 +44,15 @@ assert_not_contains() {
 # Agents provider syncs skills to ~/.agents/skills (as symlinks into the repo)
 assert_contains "Global skills -> $HOME_DIR/.agents/skills"
 assert_contains "- create symlink -> $HOME_DIR/.agents/skills/copywriter -> "
+assert_contains "- create symlink -> $HOME_DIR/.agents/skills/oracle -> "
 
 # Claude provider syncs skills to ~/.claude/skills
 assert_contains "Skills -> $HOME_DIR/.claude/skills"
+assert_contains "- create symlink -> $HOME_DIR/.claude/skills/oracle -> "
 
 # Antigravity provider syncs skills to ~/.gemini/antigravity-cli/skills
 assert_contains "Skills -> $HOME_DIR/.gemini/antigravity-cli/skills"
+assert_contains "- create symlink -> $HOME_DIR/.gemini/antigravity-cli/skills/oracle -> "
 
 # Codex provider syncs prompts (no skills)
 assert_contains "Prompts -> $HOME_DIR/.codex/prompts"
@@ -100,6 +103,7 @@ OUTPUT_FILE="$TMP_DIR/output-project.txt"
 
 assert_contains "Project skills -> $WORKSPACE_DIR/.agents/skills"
 assert_contains "- create symlink -> $WORKSPACE_DIR/.agents/skills/copywriter -> "
+assert_contains "- create symlink -> $WORKSPACE_DIR/.agents/skills/oracle -> "
 
 PROFILE_PROJECT="$TMP_DIR/profile-project"
 mkdir -p "$PROFILE_PROJECT/.codex"
