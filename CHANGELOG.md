@@ -7,6 +7,15 @@ read_when:
 
 # Changelog
 
+## 2026-06-20
+
+- Updated `automation/scheduled-maintainer-run.md` as the git-tracked source for the 15-minute RepoBar pinned maintainer automation prompt, including worker polling, visible proof, review-thread handling, manual issue lifecycle, and no worker-thread pinning.
+- Added an active `notion` skill for Notion API work with the current data-source model.
+- Added `work-migrate`, a dry-run-first migration CLI for Things/Notion items to GitHub Issues, Azure DevOps work items, and Jira tickets.
+- Documented the local work migration system, including launchd scheduling and H&M Jira routing.
+- Refocused `work-migrate` examples and docs on the private Notion/Things -> GitHub flow, with work DevOps/Jira left to a separate future pipeline.
+- Added a `work-migration` skill and made private Things routes append the created GitHub issue link and complete the Things task after successful import.
+
 A running log of meaningful changes to this toolkit — skills, profiles, sync/audit behavior, AGENTS guidance. One section per change, reverse-chronological. Add an entry whenever you ship something another agent or future-you needs to know about. Curate with the `update-changelog` skill.
 
 ## 2026-06-20 — Maintainer Automation And Branch Gate

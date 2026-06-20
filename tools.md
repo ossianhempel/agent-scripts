@@ -266,6 +266,44 @@ Repeating updates write directly to the Things database (Full Disk Access may be
 
 ---
 
+## work-migrate
+Local, idempotent private migration from Things/Notion work items to GitHub Issues.
+
+**Location**: `bin/work-migrate`
+
+**Implementation**: `skills/work-migration/scripts/work-migrate.mjs`
+
+**Docs**: `skills/work-migration/docs/work-migration.md`
+
+**Usage**:
+```bash
+work-migrate list-pipelines
+work-migrate validate-config
+work-migrate prepare things-mejla-to-github --limit 10 --out /tmp/mejla-plan.json
+work-migrate apply-plan /tmp/mejla-plan.json
+work-migrate apply-plan /tmp/mejla-plan.json --apply
+```
+
+Dry-run is the default. Raw `run --apply` is blocked; the LLM/orchestrator must rewrite an issue plan before creation. State is tracked in `~/.local/state/work-migrate/state.json`.
+
+Companion skill: `skills/work-migration`.
+
+---
+
+## notion
+Notion API access for pages, databases, data sources, and blocks.
+
+**Setup**:
+```bash
+mkdir -p ~/.config/notion
+echo "ntn_your_key_here" > ~/.config/notion/api_key
+chmod 600 ~/.config/notion/api_key
+```
+
+Companion skill: `skills/notion`.
+
+---
+
 ## obsidian
 Obsidian vault for notes and knowledge management.
 
