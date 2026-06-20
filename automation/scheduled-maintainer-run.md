@@ -48,6 +48,14 @@ This run's config (overrides/parameters the skills don't assume):
   (ask-first / needs-owner per the skills), do **not** attempt it — record it in
   the report with the exact blocker.
 
+- **Planning-output policy:** do not open repo-doc PRs whose maintainer output is
+  only a plan, brainstorm, feasibility note, or research-only planning
+  deliverable. If autonomous planning is needed, use a planning/requirements
+  workflow outside a product-doc PR and report the result. If the item needs
+  human/product judgment, classify it as **Needs Ossian** and do not create a PR.
+  Durable operational docs, prompts, and skills are still valid PR content when
+  they encode actual maintainer behavior.
+
 - **Worker coordination:** this orchestrator owns thread creation, naming,
   polling, and steering. Workers do not create subworkers or manage other
   threads. Workers report progress/final state in their own thread; this

@@ -35,7 +35,8 @@ Within the granted permissions only:
    - merge/close only if `merge/close` granted, with an exact proof comment;
    - if a required permission is missing, stop at that boundary and report the exact next action.
 9. Use the repository's documented integration branch as the worktree and PR base. Do not assume GitHub's default branch is the development target: some repos use `develop` for normal work and reserve `main` for production. Before opening or reporting a PR as ready, verify its `baseRefName` matches the selected integration branch.
-10. After an authorized landing, return to the updated integration branch (`git pull --ff-only`, clean worktree).
+10. Do not create repo-doc PRs whose maintainer output is only a plan, brainstorm, feasibility note, or research-only planning deliverable. Use a planning/requirements workflow outside a product-doc PR when autonomous planning is needed; classify the item as Needs Ossian when human/product judgment is required. Durable operational docs, prompts, and skills remain valid PR content when they encode actual maintainer behavior.
+11. After an authorized landing, return to the updated integration branch (`git pull --ff-only`, clean worktree).
 
 ## Credentials
 

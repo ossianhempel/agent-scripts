@@ -22,6 +22,7 @@ A running log of meaningful changes to this toolkit — skills, profiles, sync/a
 
 - Added `automation/scheduled-maintainer-run.md` as the git-tracked source for the 15-minute RepoBar pinned maintainer automation prompt, including worker polling, visible proof, review-thread handling, manual issue lifecycle, and no worker-thread pinning.
 - Added an integration-branch gate to the maintainer orchestration and GitHub triage skills so repos with `develop` staging branches open PRs against `develop` instead of defaulting to production `main`.
+- Added a maintainer-output policy that keeps planning, brainstorm, feasibility, and research-only deliverables out of repo-doc PRs while preserving durable operational docs, prompts, and skills as valid PR content.
 
 ## 2026-06-18 — Collapse profile skills into global skills/
 

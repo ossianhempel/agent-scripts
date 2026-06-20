@@ -40,6 +40,7 @@ The orchestration logic below is the same regardless of backend. Only how the ro
    - `Autonomous`: clear fit, reproducible, bounded implementation, and usable verification path.
    - `Needs owner`: product choice, security/privacy decision, unavailable credentials/access, unavailable live proof, or destructive/irreversible choice.
    - `Ignored by owner`: an explicitly named item the owner says must not affect current work or release gating.
+   - `Planning-only`: plans, brainstorms, feasibility notes, and research-only planning deliverables are not maintainer repo-doc PR output. If planning is autonomous, run a planning/requirements workflow outside a product-doc PR and report the result. If product judgment is needed, classify the item as `Needs owner` and do not create a PR.
 3. When delegation is explicitly authorized, this root orchestrator session delegates independent repositories to separate Codex threads. Whenever assigning or materially changing work, rename the worker thread to `<Project>: <short current task>`. Keep work for one repository in its existing thread. Do not set or request a custom model; omit model selection and inherit the platform default.
 4. Keep this coordinator thread lightweight. Do not perform extensive repository work here. Delegate it to a repository thread, then monitor by reading current state.
 5. Monitor workers every fifteen minutes when the owner requests continuous orchestration. Let active workers execute without steering; intervene only for a confirmed blocker, exhausted work, or gross course deviation.
@@ -64,6 +65,13 @@ Do not ask the owner to decide from an unprepared issue or rough contributor bra
 - Product decision: choose a reversible default when technically safe and expose the decision clearly in the PR. Prepare alternatives in the PR description when useful.
 - Access or live-proof blocker: finish code, tests, docs, review, and CI first. Ask only for the exact remaining credential, account action, hardware interaction, waiver, or land/delete decision.
 - Rejection candidate: produce concrete research and proof. When a code candidate would clarify the tradeoff, prepare the PR anyway; otherwise update the issue with the evidence needed for an owner close/keep decision.
+
+Do not turn plans, brainstorms, feasibility notes, or research-only planning
+deliverables into repo-doc PRs as maintainer output. Use a planning/requirements
+workflow outside a product-doc PR when that work is autonomous; if the item needs
+human/product judgment, mark it `Needs owner` and report the exact decision
+required. Durable operational docs, prompts, and skills are still valid PR
+content when they encode actual maintainer behavior.
 
 The normal owner interaction should be one of: land the prepared PR, delete/close it, provide one exact access step, or choose between clearly documented alternatives.
 
