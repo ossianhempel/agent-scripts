@@ -1,0 +1,129 @@
+{
+  "statePath": "~/.local/state/work-migrate/state.json",
+  "defaults": {
+    "limit": 25,
+    "notionVersion": "2026-03-11"
+  },
+  "pipelines": {
+    "notion-gainslog-to-github": {
+      "group": "notion-batch",
+      "source": {
+        "type": "notion",
+        "dataSourceId": "1d340201-44c3-458e-9717-e96b4f9389ce",
+        "titleProperty": "Task name",
+        "filter": {
+          "and": [
+            {
+              "property": "Tags",
+              "multi_select": {
+                "contains": "GainsLog"
+              }
+            },
+            {
+              "property": "Status",
+              "status": {
+                "does_not_equal": "Done"
+              }
+            }
+          ]
+        },
+        "includeProperties": ["Task ID", "Status", "Priority", "Date", "Deadline", "Tags", "URL"]
+      },
+      "destination": {
+        "type": "github",
+        "repo": "ossianhempel/gainslog",
+        "labels": ["from-notion", "gainslog"]
+      }
+    },
+    "things-gainslog-web-to-github": {
+      "group": "things-inbox",
+      "source": {
+        "type": "things",
+        "project": "GainsLog Web 👨🏼‍💻"
+      },
+      "destination": {
+        "type": "github",
+        "repo": "ossianhempel/gainslog-web",
+        "labels": ["from-things"]
+      },
+      "afterCreate": {
+        "things": {
+          "appendNote": true,
+          "complete": true
+        }
+      }
+    },
+    "things-gainslog-to-github": {
+      "group": "things-inbox",
+      "source": {
+        "type": "things",
+        "project": "Android Payments"
+      },
+      "destination": {
+        "type": "github",
+        "repo": "ossianhempel/gainslog",
+        "labels": ["from-things"]
+      },
+      "afterCreate": {
+        "things": {
+          "appendNote": true,
+          "complete": true
+        }
+      }
+    },
+    "things-agent-wispr-to-github": {
+      "group": "things-inbox",
+      "source": {
+        "type": "things",
+        "project": "AgentWispr 🎙️"
+      },
+      "destination": {
+        "type": "github",
+        "repo": "ossianhempel/agent-wispr",
+        "labels": ["from-things"]
+      },
+      "afterCreate": {
+        "things": {
+          "appendNote": true,
+          "complete": true
+        }
+      }
+    },
+    "things-mejla-to-github": {
+      "group": "things-inbox",
+      "source": {
+        "type": "things",
+        "project": "Mejla 📧"
+      },
+      "destination": {
+        "type": "github",
+        "repo": "ossianhempel/mejla",
+        "labels": ["from-things"]
+      },
+      "afterCreate": {
+        "things": {
+          "appendNote": true,
+          "complete": true
+        }
+      }
+    },
+    "things-recalliq-to-github": {
+      "group": "things-inbox",
+      "source": {
+        "type": "things",
+        "project": "RecallIQ 📝"
+      },
+      "destination": {
+        "type": "github",
+        "repo": "ossianhempel/recalliq",
+        "labels": ["from-things"]
+      },
+      "afterCreate": {
+        "things": {
+          "appendNote": true,
+          "complete": true
+        }
+      }
+    }
+  }
+}

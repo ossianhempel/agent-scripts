@@ -1,0 +1,273 @@
+{
+  "statePath": "~/.local/state/work-migrate/state.json",
+  "defaults": {
+    "limit": 25,
+    "notionVersion": "2026-03-11"
+  },
+  "pipelines": {
+    "notion-gainslog-to-github": {
+      "group": "notion-batch",
+      "source": {
+        "type": "notion",
+        "dataSourceId": "1d340201-44c3-458e-9717-e96b4f9389ce",
+        "titleProperty": "Task name",
+        "filter": {
+          "and": [
+            {
+              "property": "Tags",
+              "multi_select": {
+                "contains": "GainsLog"
+              }
+            },
+            {
+              "property": "Status",
+              "status": {
+                "does_not_equal": "Done"
+              }
+            }
+          ]
+        },
+        "includeProperties": ["Task ID", "Status", "Priority", "Date", "Deadline", "Tags", "URL"]
+      },
+      "destination": {
+        "type": "github",
+        "repo": "ossianhempel/gainslog",
+        "labels": ["from-notion", "gainslog"]
+      }
+    },
+    "things-gainslog-to-github": {
+      "group": "things-inbox",
+      "source": {
+        "type": "things",
+        "area": "📱GainsLog"
+      },
+      "destination": {
+        "type": "github",
+        "repo": "ossianhempel/gainslog",
+        "labels": ["from-things"]
+      },
+      "afterCreate": {
+        "things": {
+          "appendNote": true,
+          "complete": true
+        }
+      }
+    },
+    "things-agent-wispr-to-github": {
+      "group": "things-inbox",
+      "source": {
+        "type": "things",
+        "project": "AgentWispr 🎙️"
+      },
+      "destination": {
+        "type": "github",
+        "repo": "ossianhempel/agent-wispr",
+        "labels": ["from-things"]
+      },
+      "afterCreate": {
+        "things": {
+          "appendNote": true,
+          "complete": true
+        }
+      }
+    },
+    "things-mejla-to-github": {
+      "group": "things-inbox",
+      "source": {
+        "type": "things",
+        "project": "Mejla 📧"
+      },
+      "destination": {
+        "type": "github",
+        "repo": "ossianhempel/mejla",
+        "labels": ["from-things"]
+      },
+      "afterCreate": {
+        "things": {
+          "appendNote": true,
+          "complete": true
+        }
+      }
+    },
+    "things-recalliq-to-github": {
+      "group": "things-inbox",
+      "source": {
+        "type": "things",
+        "project": "RecallIQ 📝"
+      },
+      "destination": {
+        "type": "github",
+        "repo": "ossianhempel/recalliq",
+        "labels": ["from-things"]
+      },
+      "afterCreate": {
+        "things": {
+          "appendNote": true,
+          "complete": true
+        }
+      }
+    },
+    "things-company-brain-to-github": {
+      "group": "things-inbox",
+      "source": {
+        "type": "things",
+        "project": "AI-native Company Brain 🧠 "
+      },
+      "destination": {
+        "type": "github",
+        "repo": "ossianhempel/company-brain",
+        "labels": ["from-things"]
+      },
+      "afterCreate": {
+        "things": {
+          "appendNote": true,
+          "complete": true
+        }
+      }
+    },
+    "things-walkmon-to-github": {
+      "group": "things-inbox",
+      "source": {
+        "type": "things",
+        "project": "Walkmon 🦊"
+      },
+      "destination": {
+        "type": "github",
+        "repo": "ossianhempel/walkmon",
+        "labels": ["from-things"]
+      },
+      "afterCreate": {
+        "things": {
+          "appendNote": true,
+          "complete": true
+        }
+      }
+    },
+    "things-top-of-class-to-github": {
+      "group": "things-inbox",
+      "source": {
+        "type": "things",
+        "project": "TopOfClass 👨🏼‍🏫"
+      },
+      "destination": {
+        "type": "github",
+        "repo": "ossianhempel/top-of-class",
+        "labels": ["from-things"]
+      },
+      "afterCreate": {
+        "things": {
+          "appendNote": true,
+          "complete": true
+        }
+      }
+    },
+    "things-things3-cli-to-github": {
+      "group": "things-inbox",
+      "source": {
+        "type": "things",
+        "project": "Things3 but AI-native"
+      },
+      "destination": {
+        "type": "github",
+        "repo": "ossianhempel/things3-cli",
+        "labels": ["from-things"]
+      },
+      "afterCreate": {
+        "things": {
+          "appendNote": true,
+          "complete": true
+        }
+      }
+    },
+    "things-skill-library-to-github": {
+      "group": "things-inbox",
+      "source": {
+        "type": "things",
+        "project": "skill-library 📚"
+      },
+      "destination": {
+        "type": "github",
+        "repo": "ossianhempel/skill-library",
+        "labels": ["from-things"]
+      },
+      "afterCreate": {
+        "things": {
+          "appendNote": true,
+          "complete": true
+        }
+      }
+    },
+    "things-content-machine-to-github": {
+      "group": "things-inbox",
+      "source": {
+        "type": "things",
+        "project": "Content Machine"
+      },
+      "destination": {
+        "type": "github",
+        "repo": "ossianhempel/content-machine",
+        "labels": ["from-things"]
+      },
+      "afterCreate": {
+        "things": {
+          "appendNote": true,
+          "complete": true
+        }
+      }
+    },
+    "things-post-queue-to-github": {
+      "group": "things-inbox",
+      "source": {
+        "type": "things",
+        "project": "Post Queue 📆"
+      },
+      "destination": {
+        "type": "github",
+        "repo": "ossianhempel/post-queue",
+        "labels": ["from-things"]
+      },
+      "afterCreate": {
+        "things": {
+          "appendNote": true,
+          "complete": true
+        }
+      }
+    },
+    "things-agent-scripts-to-github": {
+      "group": "things-inbox",
+      "source": {
+        "type": "things",
+        "area": "agent-scripts"
+      },
+      "destination": {
+        "type": "github",
+        "repo": "ossianhempel/agent-scripts",
+        "labels": ["from-things"]
+      },
+      "afterCreate": {
+        "things": {
+          "appendNote": true,
+          "complete": true
+        }
+      }
+    },
+    "things-ossianhempel-com-to-github": {
+      "group": "things-inbox",
+      "source": {
+        "type": "things",
+        "area": "🖥️ OssianHempel.com"
+      },
+      "destination": {
+        "type": "github",
+        "repo": "ossianhempel/ossianhempel_com",
+        "labels": ["from-things"]
+      },
+      "afterCreate": {
+        "things": {
+          "appendNote": true,
+          "complete": true
+        }
+      }
+    }
+  }
+}
