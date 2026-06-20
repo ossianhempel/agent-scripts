@@ -139,12 +139,6 @@ When the user says `triage`, always scan open issues and open PRs for the curren
 - `Needs Ossian`: items blocked on owner decision, product direction, missing credentials/access, live-provider proof that cannot be obtained, security/privacy judgment, or an authoritative owner comment requesting changes.
 - `Defer/close/supersede`: stale, duplicate, lower-quality, or overlapping items where the likely action is not new code.
 
-Plans, brainstorms, feasibility notes, and research-only planning deliverables are
-not autonomous repo-doc PR output. If an item only asks for planning or needs
-human/product judgment, classify it as `Needs Ossian` with the exact decision or
-planning workflow needed. Durable operational docs, prompts, and skills remain
-valid maintainer PR content when they encode actual repo-maintenance behavior.
-
 For every plausible autonomous candidate, check feasibility before presenting it: use the `oracle` skill or an independent high-reasoning subagent when available. Give the reviewer only task-local evidence and ask whether the item can be completed autonomously, what verification is required, and what could make it unsafe. If no second-model review is available, do the same depth yourself and say so.
 
 ## Autonomous Work Mode
@@ -157,7 +151,6 @@ Never work multiple tickets at once. For each item:
 2. Decide if it is autonomous:
    - Go: performance improvements unless complexity rises too much; bugfixes with repro/root cause and verification path; small UI/UX tweaks; docs fixes; narrow test/internal fixes; low-risk dependency/CI cleanup with green proof.
    - Ask first: new features, product/vision choices, broad behavior changes, risky dependencies, security-sensitive changes without strong proof, live-provider work without usable credentials, anything that cannot be end-to-end tested.
-   - Planning boundary: plans, brainstorms, feasibility notes, and research-only planning deliverables do not become repo-doc PRs. Use a planning/requirements workflow outside a product-doc PR when planning is autonomous; classify as Needs Ossian when product judgment is required.
    - Refactor preference: choose a clean bounded refactor when it is the better fix for an autonomous item; do not use "small patch" as the default if it leaves worse design.
 3. Implement or fix the PR in the best maintainable way. Prefer updating the contributor PR when writable; otherwise recreate locally with credit.
 4. Verify locally and live end-to-end when possible. For macOS UI behavior, use the `peekaboo` skill for screenshots / UI proof; for web UI, use the `agent-browser` skill. For API/provider behavior, use a real usable key/account through the expected secret workflow when available. If access is missing, stop before pretending the item is done and ask Ossian for help.

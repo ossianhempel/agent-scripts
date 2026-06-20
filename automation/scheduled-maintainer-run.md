@@ -48,12 +48,12 @@ This run's config (overrides/parameters the skills don't assume):
   (ask-first / needs-owner per the skills), do **not** attempt it — record it in
   the report with the exact blocker.
 
-- **Planning-output policy:** do not open repo-doc PRs whose maintainer output is
-  only a plan, brainstorm, feasibility note, or research-only planning
-  deliverable. If autonomous planning is needed, use a planning/requirements
-  workflow outside a product-doc PR and report the result. If the item needs
-  human/product judgment, classify it as **Needs Ossian** and do not create a PR.
-  Durable operational docs, prompts, and skills are still valid PR content when
+- **Planning/research policy:** do not turn plans, brainstorms, feasibility
+  notes, or research-only decision writeups into repo docs PRs. If autonomous
+  planning is useful, use the appropriate planning/requirements workflow (for
+  example `ce-plan` / requirements) outside a product-doc PR. If the item needs
+  product or owner judgment, classify it as **Needs Ossian** and do not create a
+  PR. Durable operational docs/prompts/skills are still valid PR content when
   they encode actual maintainer behavior.
 
 - **Worker coordination:** this orchestrator owns thread creation, naming,
@@ -90,9 +90,16 @@ This run's config (overrides/parameters the skills don't assume):
 - **Proof:** every PR must carry proof in its body per the skills' live-proof gate
   — visual proof (peekaboo / simulator / agent-browser screenshots) for UI
   changes, command/test output for non-UI. Visual proof must be visible from the
-  GitHub PR itself, not merely referenced as a local file path. Never fabricate
-  proof; if the environment lacks a GUI/simulator or upload path, skip the item
-  needing visual proof or report the exact proof blocker.
+  GitHub PR itself, not merely referenced as a local file path. For screenshots,
+  GIFs, or reels, use the CE demo/evidence upload flow when available:
+  non-interactive runs should upload non-sensitive artifacts to permanent public
+  hosting (R2 when configured, otherwise Catbox). Litterbox is acceptable only as
+  a temporary preview step because its links expire; do not use a Litterbox-only
+  URL as final PR proof. Do not use branch-bound `raw.githubusercontent.com`
+  image URLs as final proof; they break when branches/files disappear and are
+  unreliable for private repositories. Never fabricate proof; if the environment
+  lacks a GUI/simulator or permanent upload path, skip the item needing visual
+  proof or report the exact proof blocker.
 
 - **PR review feedback:** a follow-up commit by itself is not enough. If a PR has
   valid review feedback, fix it, push, reply on the exact review thread, resolve
