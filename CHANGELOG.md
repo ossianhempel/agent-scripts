@@ -9,6 +9,7 @@ read_when:
 
 ## 2026-06-20
 
+- Added a migration plan for consolidating iOS and Expo release-flow guidance under `release-ios-app` while keeping ASC, metadata, pricing, version-guard, screenshot, and privacy subdomains separately routed.
 - Updated `automation/scheduled-maintainer-run.md` as the git-tracked source for the 15-minute RepoBar pinned maintainer automation prompt, including worker polling, visible proof, review-thread handling, manual issue lifecycle, and no worker-thread pinning.
 - Added an active `notion` skill for Notion API work with the current data-source model.
 - Added `work-migrate`, a dry-run-first migration CLI for Things/Notion items to GitHub Issues, Azure DevOps work items, and Jira tickets.
