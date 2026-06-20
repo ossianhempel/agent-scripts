@@ -125,6 +125,23 @@ Hand prompts + files to other AIs (GPT-5 Pro, etc.).
 
 ---
 
+## mcp-as-cli
+Run MCP tools on demand through MCPorter without adding persistent MCP server
+config to Codex, Claude, Cursor, or project profiles.
+
+**Location**: `bin/mcp-as-cli`
+
+**Docs**: `docs/mcp-as-cli.md`
+
+**Commands**:
+```bash
+bin/mcp-as-cli list https://mcp.example.com/mcp --schema
+bin/mcp-as-cli call 'https://mcp.example.com/mcp.tool_name' key=value
+bin/mcp-as-cli auth https://mcp.example.com/mcp
+```
+
+---
+
 ## summarize
 Summarize or extract content from URLs, articles, PDFs, local files, YouTube/videos, podcasts, transcripts, and stdin text.
 

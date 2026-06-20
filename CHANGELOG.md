@@ -9,6 +9,11 @@ read_when:
 
 A running log of meaningful changes to this toolkit — skills, profiles, sync/audit behavior, AGENTS guidance. One section per change, reverse-chronological. Add an entry whenever you ship something another agent or future-you needs to know about. Curate with the `update-changelog` skill.
 
+## 2026-06-20 — Document MCP-as-CLI workflow
+
+- Added guarded `bin/mcp-as-cli` wrapper around MCPorter for one-off MCP `list`, `call`, and `auth` workflows without persistent MCP server installs.
+- Added `docs/mcp-as-cli.md` and RevenueCat notes covering RevenueCat and Vercel hosted MCP tradeoffs, auth behavior, and when to prefer direct CLIs/API helpers.
+
 ## 2026-06-18 — Collapse profile skills into global skills/
 
 - Moved all profile-scoped skills (`profiles/_shared/`, composable web profiles, profile-only skills) into `skills/` (62 global skills total). Single canonical tree; global symlink install only.

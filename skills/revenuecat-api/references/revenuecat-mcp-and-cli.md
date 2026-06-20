@@ -23,6 +23,27 @@ type = "stdio"
 startup_timeout_ms = 20_000
 ```
 
+## On-demand MCP-as-CLI path
+
+If you want RevenueCat MCP tool coverage without installing a persistent MCP
+server into Codex, Claude, Cursor, or project config, use the repo wrapper:
+
+```bash
+export RC_API_KEY="..."
+bin/mcp-as-cli list \
+  --http-url https://mcp.revenuecat.ai/mcp \
+  --name revenuecat \
+  --header 'Authorization=Bearer $env:RC_API_KEY' \
+  --schema
+```
+
+Then call a discovered tool with the same ad-hoc endpoint. Keep using the
+`$env:RC_API_KEY` header form so the secret value is not written into shell
+history.
+
+See `docs/mcp-as-cli.md` for the general pattern, Vercel notes, and security
+tradeoffs.
+
 ## RevenueCat MCP behavior
 
 - OAuth is supported for some clients such as VS Code and Cursor.
@@ -63,5 +84,7 @@ Notes:
 ## When to prefer which path
 
 - Prefer **MCP** for agent-native workflows and resource-specific tool semantics.
+- Prefer **`bin/mcp-as-cli`** when you need a one-off MCP tool call without
+  installing a persistent MCP server.
 - Prefer **`rc` CLI** when a terminal wrapper is already installed and authenticated.
 - Prefer **`scripts/revenuecat_request.py`** when you need a portable fallback with no external dependency beyond Python.

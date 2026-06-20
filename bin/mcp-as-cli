@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  cat <<'USAGE'
+mcp-as-cli - run MCP tools on demand through mcporter without installing servers.
+
+Usage:
+  bin/mcp-as-cli list https://mcp.example.com/mcp --schema
+  bin/mcp-as-cli call 'https://mcp.example.com/mcp.tool_name' key=value
+  bin/mcp-as-cli auth https://mcp.example.com/mcp
+
+This wrapper intentionally blocks persistent MCP server configuration and
+daemon/bridge modes. It is for one-off list/call/auth workflows. Set
+MCP_AS_CLI_ALLOW_PERSIST=1 only when you explicitly want raw mcporter behavior.
+USAGE
+}
+
+die() {
+  printf 'mcp-as-cli: %s\n' "$*" >&2
+  exit 2
+}
+
+if (($# == 0)); then
+  usage
+  exit 0
+fi
+
+case "${1:-}" in
+  -h|--help|help)
+    usage
+    exit 0
+    ;;
+  --)
+    shift
+    ;;
+esac
+
+allow_persist="${MCP_AS_CLI_ALLOW_PERSIST:-0}"
+
+if [[ "$allow_persist" != "1" ]]; then
+  case "${1:-}" in
+    config|daemon|serve)
+      die "refusing persistent mcporter '$1' mode; set MCP_AS_CLI_ALLOW_PERSIST=1 to bypass"
+      ;;
+  esac
+
+  for arg in "$@"; do
+    case "$arg" in
+      --persist|--persist=*)
+        die "refusing persistent mcporter config writes; set MCP_AS_CLI_ALLOW_PERSIST=1 to bypass"
+        ;;
+    esac
+  done
+fi
+
+if ! command -v npx >/dev/null 2>&1; then
+  die "npx is required to run mcporter"
+fi
+
+exec npx -y mcporter "$@"
