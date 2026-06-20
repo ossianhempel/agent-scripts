@@ -29,7 +29,14 @@ If you want RevenueCat MCP tool coverage without installing a persistent MCP
 server into Codex, Claude, Cursor, or project config, use the repo wrapper:
 
 ```bash
-export RC_API_KEY="..."
+# If RC_API_KEY is not already set by a secret manager:
+stty -echo
+printf 'RevenueCat API key: ' >&2
+IFS= read -r RC_API_KEY
+stty echo
+printf '\n' >&2
+export RC_API_KEY
+
 bin/mcp-as-cli list \
   --http-url https://mcp.revenuecat.ai/mcp \
   --name revenuecat \
@@ -38,8 +45,9 @@ bin/mcp-as-cli list \
 ```
 
 Then call a discovered tool with the same ad-hoc endpoint. Keep using the
-`$env:RC_API_KEY` header form so the secret value is not written into shell
-history.
+`$env:RC_API_KEY` header form so MCPorter reads the key from the environment
+instead of the command line. Do not type the secret into an `export
+RC_API_KEY=...` command because many shells save that command in history.
 
 See `docs/mcp-as-cli.md` for the general pattern, Vercel notes, and security
 tradeoffs.

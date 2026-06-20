@@ -82,11 +82,19 @@ deterministic and does not depend on an MCP client implementation:
 python skills/revenuecat-api/scripts/revenuecat_request.py GET "/projects/{project_id}/products" --all-pages
 ```
 
-For MCP-only tool coverage or parity checks, use an API v2 secret key through an
-environment reference rather than writing the token into shell history:
+For MCP-only tool coverage or parity checks, use an API v2 secret key that is
+already present in the environment from a secret manager, or read it with a
+non-echoing prompt before calling MCPorter:
 
 ```bash
-export RC_API_KEY="..."
+# If RC_API_KEY is not already set by a secret manager:
+stty -echo
+printf 'RevenueCat API key: ' >&2
+IFS= read -r RC_API_KEY
+stty echo
+printf '\n' >&2
+export RC_API_KEY
+
 bin/mcp-as-cli list \
   --http-url https://mcp.revenuecat.ai/mcp \
   --name revenuecat \
