@@ -9,6 +9,9 @@ read_when:
 
 ## 2026-06-20
 
+- Added an integration-branch gate to the maintainer orchestration and GitHub triage skills so repos with `develop` staging branches open PRs against `develop` instead of defaulting to production `main`.
+- Added a maintainer policy guard that prevents plans, brainstorms, feasibility notes, and research-only writeups from becoming repo docs PRs; those now route to planning/requirements workflows or **Needs Ossian** unless they are durable operational docs/prompts/skills.
+- Clarified maintainer visual-proof uploads: Litterbox is only a temporary preview step, branch-bound raw GitHub image URLs are not final proof, and final PR screenshots/GIFs should use permanent public hosting such as R2 or Catbox.
 - Updated `automation/scheduled-maintainer-run.md` as the git-tracked source for the 15-minute RepoBar pinned maintainer automation prompt, including worker polling, visible proof, review-thread handling, manual issue lifecycle, and no worker-thread pinning.
 - Added an active `notion` skill for Notion API work with the current data-source model.
 - Added `work-migrate`, a dry-run-first migration CLI for Things/Notion items to GitHub Issues, Azure DevOps work items, and Jira tickets.
