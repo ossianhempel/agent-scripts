@@ -100,6 +100,8 @@ Use Things as the recurring inbox. Create one Things project per route and map t
 
 Then schedule a Codex/agent task that runs `prepare`, rewrites the issue plan, and runs `apply-plan --apply`. Do not schedule raw `run-all --apply`; that would skip the issue-shaping step that makes the GitHub backlog usable. The command only migrates items that are not already in the state ledger.
 
+Things tasks with a start/assigned date or a due/deadline date are excluded before issue plans are written. Scheduled Things work should stay in Things; this recurring inbox only migrates unscheduled backlog items.
+
 ## Launchd Schedule
 
 Create `~/Library/LaunchAgents/com.ossian.work-migrate.dev-inbox.plist`:

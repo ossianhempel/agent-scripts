@@ -9,6 +9,7 @@ read_when:
 
 ## 2026-06-20
 
+- Updated `work-migrate` Things ingestion to exclude tasks with start/assigned dates or due/deadline dates before issue plans are written, keeping scheduled personal work out of GitHub issue migrations.
 - Added an integration-branch gate to the maintainer orchestration and GitHub triage skills so repos with `develop` staging branches open PRs against `develop` instead of defaulting to production `main`.
 - Added a maintainer policy guard that prevents plans, brainstorms, feasibility notes, and research-only writeups from becoming repo docs PRs; those now route to planning/requirements workflows or **Needs Ossian** unless they are durable operational docs/prompts/skills.
 - Clarified maintainer visual-proof uploads: Litterbox is only a temporary preview step, branch-bound raw GitHub image URLs are not final proof, and final PR screenshots/GIFs should use permanent public hosting such as R2 or Catbox.

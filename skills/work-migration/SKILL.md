@@ -24,6 +24,7 @@ These three rules are non-negotiable for every migration run:
 2. **Evaluate suitability, skip if not a good issue.** The test is *"does it have a clear next action and definition of done?"* — not "is it a question?".
    - **Suitable:** concrete, actionable engineering work (bug, well-scoped feature, refactor, tech-debt, infra) **and** focused research/decision questions with a clear investigative deliverable (e.g. "investigate X, suggest 2–3 approaches"). Tag research/decision/spike items with a `research` label so they read differently from implementation work.
    - **Skip:** vague or unactionable musings (e.g. "dumb down the app", "remove decision fatigue"), marketing/social/strategy notes, personal reminders, pure content/data entry, and anything too underspecified to act on.
+   - **Never migrate Things tasks with a start/assigned date or a due/deadline date.** Those are already scheduled personal work, not inbox backlog. The CLI filters them out before plans are written; if one appears in a plan, drop it.
    When a candidate is unsuitable, **drop it from the plan and move to the next candidate** until you reach 5 suitable issues or exhaust the batch. Skipped items are left **untouched** in Things (not completed, not noted) so they stay in the queue.
 3. **Migrated means done in Things — never live in both places.** Every item that becomes a GitHub issue must be **completed** in Things in the same run (`afterCreate.things.complete: true`). An item must never remain open in Things after its issue exists. Conversely, only items that actually became issues get completed; skipped items stay open.
 
@@ -123,6 +124,7 @@ Workers do not subdelegate and do not apply. The worker brief is self-contained 
 > Curate one work-migration route into a GitHub issue plan. **Do not create issues or touch GitHub/Things — output only.**
 > 1. Run `~/Developer/agent-scripts/bin/work-migrate prepare <PIPELINE> --out <PLAN_PATH>`.
 > 2. For each candidate, judge suitability: keep concrete actionable work (bug, well-scoped feature, refactor, tech-debt, infra) and focused research/decision questions with a clear deliverable (label those `research`); skip vague musings, marketing/social/strategy, personal reminders, pure content/data entry, and underspecified items. Remove skipped entries from the plan JSON so they stay untouched in Things.
+>    Also skip any Things task with a start/assigned date or due/deadline date if it somehow appears in the plan.
 > 3. Rewrite each kept entry into a real issue (concise title, useful body, labels). Stop at **5** kept issues for this repo; remove the rest.
 > 4. Save the plan to `<PLAN_PATH>` and report: pipeline, kept count, skipped count, plan path. Make no other changes. Ask nobody anything.
 

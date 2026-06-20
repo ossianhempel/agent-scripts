@@ -146,37 +146,30 @@ function ensureGitHubLabels(destination) {
   }
 }
 
-function thingsItems(source, limit) {
-  if (Array.isArray(source.ids) && source.ids.length) {
-    return source.ids.slice(0, limit || source.ids.length).map((id) => {
-      const raw = run('things', ['show', '--id', id, '--json']);
-      const task = JSON.parse(raw);
-      return {
-        title: task.title,
-        notes: normalizeText(task.notes),
-        checklist: Array.isArray(task.checklist)
-          ? task.checklist.map((entry) => ({ title: entry.title, completed: Boolean(entry.completed) }))
-          : [],
-        source: {
-          type: 'things',
-          id: task.uuid || task.id,
-          url: task.url || null,
-          raw: task,
-        },
-      };
-    }).filter((item) => item.title && item.source.id);
-  }
+function hasThingsDateValue(task, keys) {
+  return keys.some((key) => {
+    const value = task[key];
+    if (value === null || value === undefined || value === false) return false;
+    if (typeof value === 'string') return value.trim().length > 0;
+    if (Array.isArray(value)) return value.length > 0;
+    return true;
+  });
+}
 
-  const args = ['tasks', '--format', 'json'];
-  if (source.project) args.push('--project', source.project);
-  if (source.area) args.push('--area', source.area);
-  if (source.tag) args.push('--tag', source.tag);
-  if (source.query) args.push('--query', source.query);
-  if (limit) args.push('--limit', String(limit));
+function isThingsIssueCandidate(task) {
+  return !hasThingsDateValue(task, [
+    'start_date',
+    'when',
+    'due_date',
+    'deadline_date',
+    'due',
+    'deadline',
+    'deadline_at',
+  ]);
+}
 
-  const raw = run('things', args);
-  const parsed = JSON.parse(raw || '[]');
-  return parsed.map((task) => ({
+function thingsTaskToItem(task) {
+  return {
     title: task.title,
     notes: normalizeText(task.notes),
     checklist: Array.isArray(task.checklist)
@@ -188,7 +181,32 @@ function thingsItems(source, limit) {
       url: task.url || null,
       raw: task,
     },
-  })).filter((item) => item.title && item.source.id);
+  };
+}
+
+function thingsItems(source, limit) {
+  if (Array.isArray(source.ids) && source.ids.length) {
+    return source.ids.map((id) => {
+      const raw = run('things', ['show', '--id', id, '--json']);
+      const task = JSON.parse(raw);
+      return isThingsIssueCandidate(task) ? thingsTaskToItem(task) : null;
+    }).filter((item) => item?.title && item.source.id).slice(0, limit || source.ids.length);
+  }
+
+  const args = ['tasks', '--format', 'json'];
+  if (source.project) args.push('--project', source.project);
+  if (source.area) args.push('--area', source.area);
+  if (source.tag) args.push('--tag', source.tag);
+  if (source.query) args.push('--query', source.query);
+  if (limit) args.push('--limit', String(Math.max(limit * 5, 25)));
+
+  const raw = run('things', args);
+  const parsed = JSON.parse(raw || '[]');
+  return parsed
+    .filter(isThingsIssueCandidate)
+    .map(thingsTaskToItem)
+    .filter((item) => item.title && item.source.id)
+    .slice(0, limit || parsed.length);
 }
 
 function richTextToPlain(value) {
