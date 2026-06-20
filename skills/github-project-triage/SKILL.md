@@ -63,20 +63,28 @@ Common examples:
 - PlateSnap: TestFlight/development work targets `develop`; App Store/production
   releases target `main`.
 
-Then verify the checkout is ready on that base branch:
+Then verify the checkout is already on that base branch and clean before any
+pull:
 
 ```bash
 git status --short --branch
 git branch --show-current
+```
+
+Proceed only when the branch is the selected integration branch and
+`git status --short` shows no changes. If the branch is wrong or the worktree is
+dirty, stop and ask Ossian what to do unless the task explicitly authorizes an
+isolated worktree/clone. In isolated work, create the worktree from the selected
+integration branch, not blindly from `main`.
+
+Only after those checks pass, update that selected branch:
+
+```bash
 git pull --ff-only
 git status --short --branch
 ```
 
-Proceed only when the branch is the selected integration branch, the pull
-succeeds, and the worktree is clean. If the branch is wrong, the pull fails, or
-`git status --short` shows changes, stop and ask Ossian what to do unless the
-task explicitly authorizes an isolated worktree/clone. In isolated work, create
-the worktree from the selected integration branch, not blindly from `main`.
+If the pull fails or leaves changes, stop and report the blocker.
 
 Open PRs against the same selected integration branch. Before reporting a PR as
 ready, verify `baseRefName` matches that branch; retarget or report the mismatch

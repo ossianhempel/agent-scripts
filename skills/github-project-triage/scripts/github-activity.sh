@@ -52,8 +52,15 @@ rough_age() {
 thread_kinds() {
   local login="$1"
   local since_ts="$2"
-  gh api --paginate "repos/${repo}/issues?state=all&creator=${login}&since=${since_ts}&per_page=100" \
-    --jq ".[] | select(.created_at >= \"${since_ts}\") | if has(\"pull_request\") then \"pr\" else \"issue\" end"
+  local since_date="${since_ts%%T*}"
+  gh api --paginate -X GET search/issues \
+    -f q="repo:${repo} author:${login} type:pr created:>=${since_date}" \
+    -f per_page=100 \
+    --jq '.items[] | "pr"'
+  gh api --paginate -X GET search/issues \
+    -f q="repo:${repo} author:${login} type:issue created:>=${since_date}" \
+    -f per_page=100 \
+    --jq '.items[] | "issue"'
 }
 
 count_kind_lines() {
