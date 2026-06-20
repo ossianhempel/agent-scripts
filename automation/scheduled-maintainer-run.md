@@ -17,8 +17,8 @@ Use the **`maintainer-orchestrator`** skill as the driver (it uses
 **`github-project-triage`** for discovery). Follow those skills exactly for the
 queue mapping, autonomous-vs-needs-owner classification, local repo gate,
 per-item implementation, live/visual proof, `autoreview`, CI, PR creation,
-worker monitoring, and return-to-clean-`main`. Do not re-derive that workflow —
-apply it.
+worker monitoring, and return-to-clean selected integration branch. Do not
+re-derive that workflow — apply it.
 
 This run's config (overrides/parameters the skills don't assume):
 
@@ -33,11 +33,28 @@ This run's config (overrides/parameters the skills don't assume):
   open PRs, and rerun/fix CI **for your own changes only**. **Not granted:** merge,
   close, push to `main`, force-push, or release. Stop at the open-PR boundary.
 
+- **Branch/base policy:** before starting work in any repo, read the repo
+  instructions/docs and select the repository's development integration branch.
+  Do **not** assume GitHub's default branch is the correct PR base. If a repo
+  documents `develop` as staging/development and `main` as production, create
+  worktrees from `develop`, open PRs against `develop`, and return to clean
+  `develop`. Before reporting a PR as ready, verify `baseRefName` matches the
+  selected integration branch; retarget or report any accidental `main` base as a
+  blocker unless production targeting is explicitly intended.
+
 - **Unattended adaptation:** there is no interactive owner this run. Do not block
   waiting on a land/delete or product decision. Take any autonomous item to a
   reviewable PR and leave it open. For anything that needs my judgment
   (ask-first / needs-owner per the skills), do **not** attempt it — record it in
   the report with the exact blocker.
+
+- **Planning/research policy:** do not turn plans, brainstorms, feasibility
+  notes, or research-only decision writeups into repo docs PRs. If autonomous
+  planning is useful, use the appropriate planning/requirements workflow (for
+  example `ce-plan` / requirements) outside a product-doc PR. If the item needs
+  product or owner judgment, classify it as **Needs Ossian** and do not create a
+  PR. Durable operational docs/prompts/skills are still valid PR content when
+  they encode actual maintainer behavior.
 
 - **Worker coordination:** this orchestrator owns thread creation, naming,
   polling, and steering. Workers do not create subworkers or manage other
@@ -73,9 +90,16 @@ This run's config (overrides/parameters the skills don't assume):
 - **Proof:** every PR must carry proof in its body per the skills' live-proof gate
   — visual proof (peekaboo / simulator / agent-browser screenshots) for UI
   changes, command/test output for non-UI. Visual proof must be visible from the
-  GitHub PR itself, not merely referenced as a local file path. Never fabricate
-  proof; if the environment lacks a GUI/simulator or upload path, skip the item
-  needing visual proof or report the exact proof blocker.
+  GitHub PR itself, not merely referenced as a local file path. For screenshots,
+  GIFs, or reels, use the CE demo/evidence upload flow when available:
+  non-interactive runs should upload non-sensitive artifacts to permanent public
+  hosting (R2 when configured, otherwise Catbox). Litterbox is acceptable only as
+  a temporary preview step because its links expire; do not use a Litterbox-only
+  URL as final PR proof. Do not use branch-bound `raw.githubusercontent.com`
+  image URLs as final proof; they break when branches/files disappear and are
+  unreliable for private repositories. Never fabricate proof; if the environment
+  lacks a GUI/simulator or permanent upload path, skip the item needing visual
+  proof or report the exact proof blocker.
 
 - **PR review feedback:** a follow-up commit by itself is not enough. If a PR has
   valid review feedback, fix it, push, reply on the exact review thread, resolve

@@ -34,7 +34,8 @@ Within the granted permissions only:
    - rerun/repair CI only if `ci-rerun`/`ci-fix` granted — a push alone does not authorize repair commits or workflow edits;
    - merge/close only if `merge/close` granted, with an exact proof comment;
    - if a required permission is missing, stop at that boundary and report the exact next action.
-9. After an authorized landing, return to updated, clean `main` (`git pull --ff-only`, clean worktree).
+9. Use the repository's documented integration branch as the worktree and PR base. Do not assume GitHub's default branch is the development target: some repos use `develop` for normal work and reserve `main` for production. Before opening or reporting a PR as ready, verify its `baseRefName` matches the selected integration branch.
+10. After an authorized landing, return to the updated integration branch (`git pull --ff-only`, clean worktree).
 
 ## Credentials
 
@@ -50,4 +51,4 @@ End with a compact status the orchestrator can act on:
 - `Blocker / decision needed`: exact missing permission, credential, access step, or land/delete/alternatives choice — never a bare URL plus "needs review"
 - `Branch/worktree`: current branch and clean/dirty state
 
-If landing is not yet authorized, stop only after: branch pushed, PR mergeable, required CI green, live proof recorded, and the exact owner decision stated.
+If landing is not yet authorized, stop only after: branch pushed, PR targets the selected integration branch, PR mergeable, required CI green, live proof recorded, and the exact owner decision stated.

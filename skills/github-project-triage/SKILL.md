@@ -41,9 +41,29 @@ RepoBar auth reuses your `gh` token via `repobar import-gh-token` (re-run after 
 
 Default owner for broad triage: `ossianhempel` (all your repos; no orgs by default). Only broaden to other owners/orgs when the user names them, or when the current repo already lives under that owner.
 
-## Local Repo Gate
+## Integration Branch Gate
 
-Before starting work inside any local project, verify the checkout is ready:
+Before starting work inside any local project, determine the repository's
+development integration branch. Do **not** assume GitHub's default branch is the
+correct PR base: several repos keep `main` as production while normal
+development targets `develop`.
+
+Determine the base branch in this order:
+
+1. Repo instructions (`AGENTS.md`, `CLAUDE.md`, release docs, CI docs) that name
+   a branch flow, for example "feature branches -> develop -> main".
+2. Existing active local checkout when it is already clean and on a documented
+   development branch.
+3. GitHub default branch only when no repo instructions or local convention say
+   otherwise.
+
+Common examples:
+
+- GainsLog: feature branches target `develop`; `main` is production.
+- PlateSnap: TestFlight/development work targets `develop`; App Store/production
+  releases target `main`.
+
+Then verify the checkout is ready on that base branch:
 
 ```bash
 git status --short --branch
@@ -52,7 +72,15 @@ git pull --ff-only
 git status --short --branch
 ```
 
-Proceed only when the branch is `main`, the pull succeeds, and the worktree is clean. If the branch is not `main`, the pull fails, or `git status --short` shows changes, stop and ask Ossian what to do. Do not switch branches, stash, commit, reset, restore, or clean without explicit direction.
+Proceed only when the branch is the selected integration branch, the pull
+succeeds, and the worktree is clean. If the branch is wrong, the pull fails, or
+`git status --short` shows changes, stop and ask Ossian what to do unless the
+task explicitly authorizes an isolated worktree/clone. In isolated work, create
+the worktree from the selected integration branch, not blindly from `main`.
+
+Open PRs against the same selected integration branch. Before reporting a PR as
+ready, verify `baseRefName` matches that branch; retarget or report the mismatch
+instead of leaving a development PR aimed at production `main`.
 
 ## Scope Rule
 
@@ -119,7 +147,7 @@ Never work multiple tickets at once. For each item:
 3. Implement or fix the PR in the best maintainable way. Prefer updating the contributor PR when writable; otherwise recreate locally with credit.
 4. Verify locally and live end-to-end when possible. For macOS UI behavior, use the `peekaboo` skill for screenshots / UI proof; for web UI, use the `agent-browser` skill. For API/provider behavior, use a real usable key/account through the expected secret workflow when available. If access is missing, stop before pretending the item is done and ask Ossian for help.
 5. Run Codex Auto Review (`codex`) before commit/land unless trivial/docs-only or explicitly skipped; address accepted/actionable findings.
-6. Ensure CI is green, PR description/changelog are good, land/close/comment with evidence, then return to `main`, pull `--ff-only`, and verify a clean worktree before selecting the next autonomous item.
+6. Ensure CI is green, PR description/changelog are good, land/close/comment with evidence, then return to the selected integration branch, pull `--ff-only`, and verify a clean worktree before selecting the next autonomous item.
 7. After every landed PR, post a PR comment with exactly how it was tested: local commands, live/UI/API proof, CI run/check state, landed commit, and any caveats. If verification images apply, attach them to the comment; if you cannot attach images, say so and include the screenshot path instead of silently omitting them.
 
 Do not end autonomous mode with dirty files or an unpushed local fix unless blocked. If blocked, state the exact blocker, current branch/status, proof already gathered, and the next decision needed.

@@ -40,6 +40,7 @@ The orchestration logic below is the same regardless of backend. Only how the ro
    - `Autonomous`: clear fit, reproducible, bounded implementation, and usable verification path.
    - `Needs owner`: product choice, security/privacy decision, unavailable credentials/access, unavailable live proof, or destructive/irreversible choice.
    - `Ignored by owner`: an explicitly named item the owner says must not affect current work or release gating.
+   - Plans, brainstorms, feasibility notes, and research-only decision writeups are not autonomous repo-doc PRs. If autonomous planning is useful, use an explicit planning/requirements workflow outside a product-doc PR. If the item needs owner/product judgment, classify it as `Needs owner` and do not create a PR. Durable operational docs/prompts/skills remain valid PR content when they encode actual maintainer behavior.
 3. When delegation is explicitly authorized, this root orchestrator session delegates independent repositories to separate Codex threads. Whenever assigning or materially changing work, rename the worker thread to `<Project>: <short current task>`. Keep work for one repository in its existing thread. Do not set or request a custom model; omit model selection and inherit the platform default.
 4. Keep this coordinator thread lightweight. Do not perform extensive repository work here. Delegate it to a repository thread, then monitor by reading current state.
 5. Monitor workers every fifteen minutes when the owner requests continuous orchestration. Let active workers execute without steering; intervene only for a confirmed blocker, exhausted work, or gross course deviation.
@@ -63,7 +64,7 @@ Do not ask the owner to decide from an unprepared issue or rough contributor bra
 - Issue without PR: investigate root cause and product constraints, implement the best bounded candidate on a branch, create a PR, and drive it to the same mergeable proof state.
 - Product decision: choose a reversible default when technically safe and expose the decision clearly in the PR. Prepare alternatives in the PR description when useful.
 - Access or live-proof blocker: finish code, tests, docs, review, and CI first. Ask only for the exact remaining credential, account action, hardware interaction, waiver, or land/delete decision.
-- Rejection candidate: produce concrete research and proof. When a code candidate would clarify the tradeoff, prepare the PR anyway; otherwise update the issue with the evidence needed for an owner close/keep decision.
+- Rejection candidate: produce concrete research and proof in the orchestrator report or planning workflow, not as a repo docs PR. When a code candidate would clarify the tradeoff, prepare the code PR; otherwise keep the issue as `Needs owner` with the evidence needed for an owner close/keep decision.
 
 The normal owner interaction should be one of: land the prepared PR, delete/close it, provide one exact access step, or choose between clearly documented alternatives.
 
@@ -182,10 +183,18 @@ Every delegated implementation thread, within its explicit authorization, must:
 - when CI rerun/fix is authorized, rerun required checks and repair failures until green;
 - when CI rerun/fix is not authorized and checks fail, stop with the exact failure and requested permission;
 - when merge/close is authorized, merge or close the queue item with an exact proof comment;
-- after authorized landing, return to updated, clean `main`.
+- after authorized landing, return to the repository's selected integration branch, pull `--ff-only`, and verify a clean worktree.
 
 Prefer repairing the contributor PR. Preserve contributor credit and follow the workspace PR rules.
-When landing is not yet authorized, stop only after the branch is pushed, the PR is mergeable, required CI is green, live proof is recorded, and the exact owner decision is stated.
+When landing is not yet authorized, stop only after the branch is pushed, the PR targets the repository's selected integration branch, the PR is mergeable, required CI is green, live proof is recorded, and the exact owner decision is stated.
+
+Before creating or judging any PR, apply `github-project-triage`'s Integration
+Branch Gate. Do not assume `main` is the right base merely because it is the
+GitHub default branch. Repositories may use `develop` as the staging/development
+branch and reserve `main` for production releases; in those repos, workers must
+create worktrees from `develop`, open PRs against `develop`, return to clean
+`develop`, and report any PR that accidentally targets `main` as a readiness
+blocker until it is retargeted or intentionally approved.
 
 (Codex workers must not subdelegate; Claude Code subagents may spawn their own subagents to complete this contract.)
 
@@ -196,6 +205,8 @@ Live proof is a pre-land requirement, not optional polish.
 - Test the exact final candidate commit through the changed user path using the real built/installed artifact and real service, account, device, OS, or external provider as applicable.
 - For external integrations, authenticated live calls are required. Docs, mocks, fixtures, protocol captures, route-existence checks, and CI supplement live proof; they do not replace it.
 - For macOS UI behavior, use the `peekaboo` skill for screenshots / UI proof; for web UI, use the `agent-browser` skill.
+- For screenshot/GIF/reel artifacts, prefer the `ce-demo-reel` upload pattern when available: temporary Litterbox preview is fine for human review, but final PR proof must use permanent public hosting such as configured R2 or Catbox (`files.catbox.moe`) so the image renders from the GitHub PR after the run.
+- Do not use branch-bound `raw.githubusercontent.com` image URLs as final PR proof. They can 404 after branch/file cleanup and are not reliable for private repositories; upload the artifact to permanent public hosting or report the upload blocker instead.
 - Redact secrets and private user data while retaining concrete evidence such as command, behavior, response class, artifact hash, or observed state transition.
 - If credentials, account state, hardware, platform access, or a safe live target are unavailable, finish all autonomous code, tests, review, and CI work, then stop before merge/close. Ask for the exact access, an explicit item-specific waiver, or a reject/close decision.
 - Never infer a live-proof waiver from merge permission, release permission, prior contributor evidence, or confidence in mocks.
@@ -253,7 +264,7 @@ After publishing, verify the actual release:
 - npm packages show version, dist-tag, tarball, integrity, and publish time;
 - release body links registry/artifact/integrity and CI proof when applicable.
 
-Then open the next patch `Unreleased` section. Commit and push the closeout only when those mutations are authorized; otherwise leave the verified local closeout ready and report the exact permission needed. After an authorized push, pull `--ff-only` and finish on clean `main`.
+Then open the next patch `Unreleased` section. Commit and push the closeout only when those mutations are authorized; otherwise leave the verified local closeout ready and report the exact permission needed. After an authorized push, pull `--ff-only` and finish on the selected release branch with a clean worktree.
 
 ## Reporting
 
