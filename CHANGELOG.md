@@ -9,9 +9,10 @@ read_when:
 
 A running log of meaningful changes to this toolkit — skills, profiles, sync/audit behavior, AGENTS guidance. One section per change, reverse-chronological. Add an entry whenever you ship something another agent or future-you needs to know about. Curate with the `update-changelog` skill.
 
-## 2026-06-20 — Preserve Maintainer Automation Prompt
+## 2026-06-20 — Maintainer Automation And Branch Gate
 
 - Added `automation/scheduled-maintainer-run.md` as the git-tracked source for the 15-minute RepoBar pinned maintainer automation prompt, including worker polling, visible proof, review-thread handling, manual issue lifecycle, and no worker-thread pinning.
+- Added an integration-branch gate to the maintainer orchestration and GitHub triage skills so repos with `develop` staging branches open PRs against `develop` instead of defaulting to production `main`.
 
 ## 2026-06-18 — Collapse profile skills into global skills/
 

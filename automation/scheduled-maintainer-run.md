@@ -17,8 +17,8 @@ Use the **`maintainer-orchestrator`** skill as the driver (it uses
 **`github-project-triage`** for discovery). Follow those skills exactly for the
 queue mapping, autonomous-vs-needs-owner classification, local repo gate,
 per-item implementation, live/visual proof, `autoreview`, CI, PR creation,
-worker monitoring, and return-to-clean-`main`. Do not re-derive that workflow —
-apply it.
+worker monitoring, and return-to-clean selected integration branch. Do not
+re-derive that workflow — apply it.
 
 This run's config (overrides/parameters the skills don't assume):
 
@@ -32,6 +32,15 @@ This run's config (overrides/parameters the skills don't assume):
 - **Permissions granted this run:** implement locally, push feature branches,
   open PRs, and rerun/fix CI **for your own changes only**. **Not granted:** merge,
   close, push to `main`, force-push, or release. Stop at the open-PR boundary.
+
+- **Branch/base policy:** before starting work in any repo, read the repo
+  instructions/docs and select the repository's development integration branch.
+  Do **not** assume GitHub's default branch is the correct PR base. If a repo
+  documents `develop` as staging/development and `main` as production, create
+  worktrees from `develop`, open PRs against `develop`, and return to clean
+  `develop`. Before reporting a PR as ready, verify `baseRefName` matches the
+  selected integration branch; retarget or report any accidental `main` base as a
+  blocker unless production targeting is explicitly intended.
 
 - **Unattended adaptation:** there is no interactive owner this run. Do not block
   waiting on a land/delete or product decision. Take any autonomous item to a
