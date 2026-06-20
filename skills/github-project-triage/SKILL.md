@@ -9,7 +9,7 @@ Always use this skill when the user types `triage`, unless the request explicitl
 
 Output is URL-first: every surfaced issue/PR/repo item must include its GitHub URL in the first line or first sentence for that item. If giving a shortlist, print one URL per item.
 
-Use **RepoBar** as the first pass for broad queue discovery across owners. RepoBar is faster and more profile-aware than hand-rolling `gh repo list`/`gh search` loops: it understands repo activity, issue/PR counts, CI, releases, local checkouts, auth, cache, and filters in one tool, and it works for **private repos** (it shares the GitHub auth/cache of the RepoBar app). Drop to `gh` for maintainer-grade per-PR/issue state (diffs, checks, review decision, merge state) and for anything RepoBar does not cover. If RepoBar is unavailable, fall back to `gh search`/`gh issue`/`gh pr`.
+Use **RepoBar** as the default discovery and queue-map path for triage, not merely a future or broad-scan backup. RepoBar is faster and more profile-aware than hand-rolling `gh repo list`/`gh search` loops: it understands repo activity, issue/PR counts, CI, releases, local checkouts, auth, cache, pinned scope, and filters in one tool, and it works for **private repos** (it shares the GitHub auth/cache of the RepoBar app). Drop to `gh` only for maintainer-grade item detail, cross-checks, and mutations: full issue/PR bodies and comments, diffs, review decisions, unresolved review threads, exact mergeability, workflow logs, reruns, comments, PR edits, closes, and merges. If RepoBar is unavailable or cannot answer the requested scope, report that and use `gh` only as the explicit fallback.
 
 ## Setup
 
@@ -75,15 +75,15 @@ printf '%s\n' "$repo"
 Current-project triage starts with:
 
 ```bash
-gh issue list --repo "$repo" --state open --limit 50 \
-  --json number,title,author,labels,createdAt,updatedAt,url
-gh pr list --repo "$repo" --state open --limit 50 \
-  --json number,title,author,isDraft,reviewDecision,mergeStateStatus,createdAt,updatedAt,url
+repobar_cmd issues "$repo" --limit 50 --json
+repobar_cmd pulls "$repo" --limit 50 --json
+repobar_cmd ci "$repo" --limit 20 --json
+repobar_cmd activity "$repo" --limit 20 --json
 ```
 
 Before acting on any issue or PR, read all comments and treat Ossian/owner comments as authoritative routing instructions. If Ossian says it looks good, needs changes, is superseded, is product-approved, or is not wanted, that overrides bot labels and ordinary triage judgment. If there is no owner comment, use maintainer judgment and say that the call is yours.
 
-Then inspect enough detail to explain every surfaced item. For small queues (about 10 open items or fewer), inspect all items. For larger queues, inspect the top priority slice and say what was not expanded.
+Then inspect enough detail to explain every surfaced item. For small queues (about 10 open items or fewer), inspect all items. For larger queues, inspect the top priority slice and say what was not expanded. Use `gh` here for the cross-check/details RepoBar does not expose deeply enough:
 
 ```bash
 gh issue view <n> --repo "$repo" \
@@ -164,7 +164,7 @@ Judge:
 
 ## Fast Queue Map
 
-Use this only when the scope is broad. Start with RepoBar's repo-level map: it finds repos with open issues and/or PRs and gives counts in one call.
+Use this when mapping more than one repository, including orchestrator runs. Start with RepoBar's repo-level map: it finds repos with open issues and/or PRs and gives counts in one call.
 
 PR queue, primary triage order:
 
@@ -191,7 +191,7 @@ Notes:
 - RepoBar covers private repos (shares the app's GitHub auth). Default `--age` is 365 days; pass `--forks`/`--archived` only when the user asks for "all", "everything", or archaeology.
 - Preserve RepoBar's PR-count order when summarizing. Do not include a lower-PR repo while omitting a higher-PR repo from the same scope. Repos with zero issues but open PRs are still triage-relevant.
 
-Fallback if RepoBar is unavailable — sweep with `gh search`, then group by repo:
+Fallback if RepoBar is unavailable or unreadable — report that fact, then sweep with `gh search` only if the user's scope permits a fallback:
 
 ```bash
 gh search prs --owner ossianhempel --state open --limit 200 \
@@ -206,7 +206,7 @@ gh search issues --owner ossianhempel --state open --include-prs=false --limit 2
 
 ## Detail Pass
 
-After a broad queue map, inspect only the top repos unless the user explicitly wants exhaustive detail. RepoBar gives fast per-repo issue/PR/CI/activity views:
+After the RepoBar queue map, inspect only the top repos unless the user explicitly wants exhaustive detail. RepoBar gives fast per-repo issue/PR/CI/activity views:
 
 ```bash
 repobar_cmd issues <owner/name> --limit 50 --json
@@ -215,7 +215,7 @@ repobar_cmd ci <owner/name> --limit 20 --json
 repobar_cmd activity <owner/name> --limit 20 --json
 ```
 
-For PRs that look mergeable or suspicious, switch to `gh` for maintainer-grade state (diff, checks, review decision, merge state):
+For PRs that look mergeable, suspicious, or worker-owned, switch to `gh` for maintainer-grade cross-check state (diff, checks, review decision, exact merge state, review threads):
 
 ```bash
 gh pr view <n> --repo <owner/name> --json number,title,state,author,isDraft,mergeStateStatus,reviewDecision,statusCheckRollup,updatedAt,url
@@ -269,7 +269,7 @@ For current-project triage, answer with:
 
 ```text
 Repo: owner/name
-Source: gh list/view/diff/checks, local source/tests where inspected
+Source: RepoBar issue/PR/CI/activity map, plus gh detail/diff/check cross-checks and local source/tests where inspected
 
 Immediate:
 - #123 PR: title

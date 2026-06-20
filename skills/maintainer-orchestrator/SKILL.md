@@ -35,14 +35,14 @@ The orchestration logic below is the same regardless of backend. Only how the ro
 
 ## Operating Model
 
-1. Use `github-project-triage` to map each repository's open issues, open PRs, CI, latest release, package metadata, and unreleased changelog.
+1. Use `github-project-triage` with RepoBar as the default discovery and queue-map path. Start from RepoBar for repository scope, open issue/PR counts, CI/activity/release/local-checkout signals, and pinned/suppressed filtering. Use `gh` only as the authoritative detail/mutation fallback for selected items: full issue/PR bodies and comments, diffs, review decisions, unresolved review threads, mergeability, workflow logs, reruns, comments, PR edits, closes, and merges.
 2. Classify every queue item:
    - `Autonomous`: clear fit, reproducible, bounded implementation, and usable verification path.
    - `Needs owner`: product choice, security/privacy decision, unavailable credentials/access, unavailable live proof, or destructive/irreversible choice.
    - `Ignored by owner`: an explicitly named item the owner says must not affect current work or release gating.
 3. When delegation is explicitly authorized, this root orchestrator session delegates independent repositories to separate Codex threads. Whenever assigning or materially changing work, rename the worker thread to `<Project>: <short current task>`. Keep work for one repository in its existing thread. Do not set or request a custom model; omit model selection and inherit the platform default.
 4. Keep this coordinator thread lightweight. Do not perform extensive repository work here. Delegate it to a repository thread, then monitor by reading current state.
-5. Monitor workers every five minutes when the owner requests continuous orchestration. Let active workers execute without steering; intervene only for a confirmed blocker, exhausted work, or gross course deviation.
+5. Monitor workers every fifteen minutes when the owner requests continuous orchestration. Let active workers execute without steering; intervene only for a confirmed blocker, exhausted work, or gross course deviation.
 6. Continue until each autonomous item is merged/closed with proof, each decision item has a mergeable PR ready for owner land/delete choice, an empty effective queue is released, or an otherwise idle repository has current dependencies.
 
 Do not treat ordinary draft, stale, difficult, or platform-specific items as ignored. Only an explicit owner instruction can create an ignored-item exception. Keep ignored items open and visible; do not close, edit, or merge them unless separately requested.
@@ -93,13 +93,15 @@ Before sending any worker message:
 
 1. Read the worker's latest current state, including its newest user/delegation messages and active turn.
 2. Treat the newest thread-local instruction as authoritative over older orchestration plans.
-3. Determine whether the worker is actively progressing, blocked, completed, or idle.
-4. Send nothing when an active worker has a coherent plan and is making progress.
+3. Refresh the repository/item state through RepoBar first when it can answer the question quickly: queue counts, recent activity, CI summaries, open issues/PRs, and local checkout status. For every PR the worker owns or recently opened, then refresh GitHub's authoritative state including checks, mergeability, top-level comments, submitted reviews, and unresolved inline review threads. Do not rely on `gh pr view` alone for review comments; query review threads explicitly through GraphQL or the GitHub API.
+4. Determine whether the worker is actively progressing, blocked, completed, or idle.
+5. Send nothing when an active worker has a coherent plan and is making progress.
 
 Intervene only when evidence shows one of:
 
 - the worker explicitly requests coordination or reports a blocker;
 - the worker has completed or run out of autonomous work and needs a next queue item;
+- a PR has new requested changes, unresolved inline review comments, or owner review feedback the worker has not acknowledged;
 - repeated failures show no progress and a concrete correction is available;
 - wrong repository/item, unauthorized mutation, destructive action, security risk, release-gate violation, or direct conflict with the owner's latest instruction;
 - implementation has grossly diverged from the accepted task, not merely chosen a different reasonable design.
@@ -167,6 +169,9 @@ If 1Password (CLI `op` or service accounts) is set up later, prefer it over plai
 Every delegated implementation thread, within its explicit authorization, must:
 
 - read the full issue/PR discussion, repo instructions, docs, and relevant code;
+- before treating any PR as ready, inspect top-level comments, submitted reviews, and unresolved inline review threads;
+- when review feedback is valid, fix it, push the fix, reply on the exact review thread with what changed, resolve the thread through GitHub, and verify the unresolved-thread list is empty. A follow-up commit by itself is not enough.
+- when review feedback is invalid or intentionally not addressed, reply on the exact thread with concrete evidence or the decision, resolve only if no owner decision is needed, and leave `needs-human` threads open with the exact decision required.
 - when an issue has no PR, create one after implementing the best bounded candidate;
 - reproduce or establish root cause before accepting an existing patch;
 - rewrite when a cleaner bounded design is available;

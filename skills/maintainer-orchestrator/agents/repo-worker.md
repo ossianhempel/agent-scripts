@@ -26,14 +26,15 @@ Within the granted permissions only:
 2. Reproduce or establish root cause before accepting any existing patch. When an issue has no PR, implement the best bounded candidate, then create the PR.
 3. Rewrite when a cleaner bounded design is available. Prefer repairing the contributor PR and preserving contributor credit.
 4. Add regression coverage when appropriate. Run focused tests, then the full suite.
-5. **Live proof** (pre-land, not optional): exercise the exact final candidate commit through the changed user path on the real built/installed artifact and real service/account/device/OS/provider. Authenticated live calls are required for external integrations; mocks/fixtures/CI supplement but do not replace it. For macOS UI use the `peekaboo` skill; for web UI use the `agent-browser` skill. Redact secrets; keep concrete evidence (command, behavior, response class, artifact hash, observed state). Re-run after any fix that changes the runtime path.
-6. Run `autoreview` until no accepted/actionable findings remain.
-7. Apply permissions exactly:
+5. Before treating any PR as ready, inspect and resolve or explicitly answer top-level comments, submitted reviews, and unresolved inline review threads.
+6. **Live proof** (pre-land, not optional): exercise the exact final candidate commit through the changed user path on the real built/installed artifact and real service/account/device/OS/provider. Authenticated live calls are required for external integrations; mocks/fixtures/CI supplement but do not replace it. For macOS UI use the `peekaboo` skill; for web UI use the `agent-browser` skill. Redact secrets; keep concrete evidence (command, behavior, response class, artifact hash, observed state). Re-run after any fix that changes the runtime path.
+7. Run `autoreview` until no accepted/actionable findings remain.
+8. Apply permissions exactly:
    - push only if `push` granted;
    - rerun/repair CI only if `ci-rerun`/`ci-fix` granted — a push alone does not authorize repair commits or workflow edits;
    - merge/close only if `merge/close` granted, with an exact proof comment;
    - if a required permission is missing, stop at that boundary and report the exact next action.
-8. After an authorized landing, return to updated, clean `main` (`git pull --ff-only`, clean worktree).
+9. After an authorized landing, return to updated, clean `main` (`git pull --ff-only`, clean worktree).
 
 ## Credentials
 
