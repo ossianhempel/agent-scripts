@@ -7,6 +7,11 @@ read_when:
 
 # Changelog
 
+## 2026-06-21 — Consolidate iOS Release Guidance
+
+- Updated `release-ios-app` with a shorter trigger description and a migration reference for retiring older repo-local iOS release-flow skills into the shared global flow.
+- Documented the consolidation boundary between `release-ios-app`, `.ios-release.env`, `asc-release`, `asc-metadata`, and `asc-version-guard`.
+
 ## 2026-06-20
 
 - Updated `work-migrate` Things ingestion to exclude tasks with start/assigned dates or due/deadline dates before issue plans are written, keeping scheduled personal work out of GitHub issue migrations.

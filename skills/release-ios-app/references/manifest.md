@@ -2,7 +2,7 @@
 
 Each iOS app repo owns a `.ios-release.env` at its root. It is a `KEY=value` shell file
 (sourced, not executed) and **must contain no secrets** — only paths, IDs, commands, and
-flags. The profile `release-ios-app` skill and `scripts/ios-release` read it.
+flags. The global `release-ios-app` skill and `scripts/ios-release` read it.
 
 ## Keys
 
