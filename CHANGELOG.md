@@ -7,6 +7,11 @@ read_when:
 
 # Changelog
 
+## 2026-06-22 — Refill Maintainer Workers From Issues
+
+- Tightened maintainer orchestration so an idle scheduled poll must inspect open issues in the current RepoBar scope and start at least one autonomous worker when eligible, instead of repeatedly reporting no active workers while issue queues remain.
+- Updated the pinned maintainer automation prompt to require exact issue URLs and blockers whenever no worker is created despite open pinned issues.
+
 ## 2026-06-21 — Render PR Visual Proof Inline
 
 - Tightened maintainer and triage proof rules so screenshot/GIF/reel evidence must render inline in GitHub PR bodies or proof comments; screenshots/GIFs use durable hosted Markdown images, while video reels may use GitHub-hosted uploaded attachments when they render inline. Bare artifact URLs no longer count as complete visual proof.

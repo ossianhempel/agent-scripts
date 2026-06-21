@@ -48,6 +48,15 @@ This run's config (overrides/parameters the skills don't assume):
   (ask-first / needs-owner per the skills), do **not** attempt it — record it in
   the report with the exact blocker.
 
+- **Queue refill policy:** after the mandatory worker/PR polling gate, if there
+  are no active workers, queued workers, or worker-owned PRs needing repair, do
+  not stop at a status-only report while pinned repos still have open issues.
+  Refresh the RepoBar pinned map, inspect issue detail for repos with open
+  issues in RepoBar order, classify items, and create at least one worker for
+  the highest-confidence autonomous issue within the run's worker budget. If no
+  worker is created despite open issues, report the exact inspected issue URLs
+  and why each is **Needs Ossian** or otherwise not autonomous.
+
 - **Planning/research policy:** do not turn plans, brainstorms, feasibility
   notes, or research-only decision writeups into repo docs PRs. If autonomous
   planning is useful, use the appropriate planning/requirements workflow (for
