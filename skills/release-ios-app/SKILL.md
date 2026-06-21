@@ -1,6 +1,6 @@
 ---
 name: release-ios-app
-description: "Release iOS (and Expo iOS/Android) apps to TestFlight and the App Store — version-bump policy, develop→main promotion PR, build via Xcode Cloud or EAS, the version-must-exceed-live gate, promote-the-validated-build golden rule, backend deploy safeguard, and App Store submission via the asc flow. Use whenever a user mentions an iOS/Expo release, cutting a build, bumping MARKETING_VERSION or expo.version, shipping to TestFlight, submitting to App Store review, or troubleshooting the release flow for PlateSnap, Shotly, Walkmon, GainsLog, or any app with a .ios-release.env manifest."
+description: "Release iOS and Expo apps to TestFlight and the App Store. Triggers: iOS release, Expo release, version bump, TestFlight, App Store review, Xcode Cloud, EAS, .ios-release.env."
 ---
 
 # iOS App Release
@@ -18,6 +18,8 @@ here; each repo owns a `.ios-release.env` manifest with its app-specific values 
 - Branch the build mechanics on `IOS_RELEASE_BUILD_SYSTEM`:
   - `xcodegen-xcodecloud` → [`references/native-xcodecloud.md`](references/native-xcodecloud.md)
   - `eas` → [`references/expo-eas.md`](references/expo-eas.md)
+- When retiring older repo-local release-flow skills or one-off release docs, use
+  [`references/migration.md`](references/migration.md) as the consolidation map.
 - Keep app-specific build/sign/upload behavior in repo scripts / the relevant CLI (`xcodebuild`, `xcodegen`, `eas`, `asc`). This skill orchestrates; it does not re-implement them.
 - **Never auto-merge the `develop` → `main` release PR.** Open it, then stop and wait for Ossian to merge.
 - Never print secrets or key material.
@@ -83,6 +85,7 @@ App Store submissions must **attach an already-uploaded, `VALID` TestFlight buil
 - `.ios-release.env` schema and an annotated example: [`references/manifest.md`](references/manifest.md).
 - Native (XcodeGen + Xcode Cloud) build/promote mechanics: [`references/native-xcodecloud.md`](references/native-xcodecloud.md).
 - Expo / EAS build/submit + Android: [`references/expo-eas.md`](references/expo-eas.md).
+- Consolidation and compatibility guidance for retiring older release-flow skills: [`references/migration.md`](references/migration.md).
 
 ## Done
 

@@ -166,25 +166,42 @@ Run: `pre-commit run --all-files`
 Skills
 - `agent-browser`
 - `agent-transcript`
+- `app-icon-optimization`
+- `app-store-optimization`
+- `app-store-screenshots`
+- `asc-metadata`
+- `asc-pricing`
+- `asc-release`
+- `asc-version-guard`
 - `autoreview`
 - `clerk-cli`
 - `convex-cli`
 - `coolify`
 - `copywriter`
+- `create-cli`
 - `git-cleanup`
+- `github-project-triage`
 - `handoff`
+- `ios-marketing-capture`
+- `maintainer-orchestrator`
+- `notion`
 - `obsidian`
+- `onboarding-flow`
 - `oracle`
 - `peekaboo`
 - `plan-inbox`
+- `privacy-policy`
 - `readwise-cli`
-- `session-viewer`
-- `setup-pre-commit`
+- `release-ios-app`
+- `release-mac-app`
+- `revenuecat-api`
 - `skill-cleaner`
 - `skill-creator`
 - `summarize`
+- `tanstack-start-best-practices`
 - `teach`
-- `zoom-out`
+- `things`
+- `work-migration`
 
 Subagents (canonical in `subagents/`, generated per harness — see `docs/subagents.md`)
 - `learnings-researcher`
