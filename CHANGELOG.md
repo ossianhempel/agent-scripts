@@ -7,6 +7,10 @@ read_when:
 
 # Changelog
 
+## 2026-06-21 — Render PR Visual Proof Inline
+
+- Tightened maintainer and triage proof rules so screenshot/GIF/reel evidence must be embedded directly in GitHub PR bodies or proof comments with Markdown image/video syntax; bare Catbox/R2 URLs no longer count as complete visual proof.
+
 ## 2026-06-21 — Consolidate iOS Release Guidance
 
 - Updated `release-ios-app` with a shorter trigger description and a migration reference for retiring older repo-local iOS release-flow skills into the shared global flow.

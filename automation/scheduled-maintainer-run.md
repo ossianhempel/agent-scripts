@@ -89,17 +89,18 @@ This run's config (overrides/parameters the skills don't assume):
 
 - **Proof:** every PR must carry proof in its body per the skills' live-proof gate
   — visual proof (peekaboo / simulator / agent-browser screenshots) for UI
-  changes, command/test output for non-UI. Visual proof must be visible from the
-  GitHub PR itself, not merely referenced as a local file path. For screenshots,
-  GIFs, or reels, use the CE demo/evidence upload flow when available:
+  changes, command/test output for non-UI. Visual proof must render inline in the
+  GitHub PR body/comment itself, not merely appear as a bare URL or local file path.
+  For screenshots, GIFs, or reels, use the CE demo/evidence upload flow when available:
   non-interactive runs should upload non-sensitive artifacts to permanent public
-  hosting (R2 when configured, otherwise Catbox). Litterbox is acceptable only as
-  a temporary preview step because its links expire; do not use a Litterbox-only
-  URL as final PR proof. Do not use branch-bound `raw.githubusercontent.com`
-  image URLs as final proof; they break when branches/files disappear and are
-  unreliable for private repositories. Never fabricate proof; if the environment
-  lacks a GUI/simulator or permanent upload path, skip the item needing visual
-  proof or report the exact proof blocker.
+  hosting (R2 when configured, otherwise Catbox), then embed the hosted artifact with
+  Markdown image/video syntax and verify GitHub renders it inline before reporting the
+  PR ready. Litterbox is acceptable only as a temporary preview step because its links
+  expire; do not use a Litterbox-only URL as final PR proof. Do not use branch-bound
+  `raw.githubusercontent.com` image URLs as final proof; they break when branches/files
+  disappear and are unreliable for private repositories. Never fabricate proof; if the
+  environment lacks a GUI/simulator, permanent upload path, or inline rendering path,
+  skip the item needing visual proof or report the exact proof blocker.
 
 - **PR review feedback:** a follow-up commit by itself is not enough. If a PR has
   valid review feedback, fix it, push, reply on the exact review thread, resolve
