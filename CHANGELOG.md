@@ -9,7 +9,7 @@ read_when:
 
 ## 2026-06-21 — Render PR Visual Proof Inline
 
-- Tightened maintainer and triage proof rules so screenshot/GIF/reel evidence must be embedded directly in GitHub PR bodies or proof comments with Markdown image/video syntax; bare Catbox/R2 URLs no longer count as complete visual proof.
+- Tightened maintainer and triage proof rules so screenshot/GIF/reel evidence must render inline in GitHub PR bodies or proof comments; screenshots/GIFs use durable hosted Markdown images, while video reels may use GitHub-hosted uploaded attachments when they render inline. Bare artifact URLs no longer count as complete visual proof.
 
 ## 2026-06-21 — Consolidate iOS Release Guidance
 
