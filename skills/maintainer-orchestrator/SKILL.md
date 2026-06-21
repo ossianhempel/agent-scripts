@@ -139,6 +139,33 @@ Do not keep completed threads merely to satisfy a lane count. A monitored reposi
 
 Dependency freshness is a backstop, not higher priority than real queue or release work.
 
+## Empty-Worker Queue Refill
+
+When a scheduled orchestration poll finds no active workers, queued workers, or
+unresolved worker-owned PR repair, it must immediately refill from the current
+RepoBar queue instead of reporting a polling-only idle state.
+
+Required sequence:
+
+1. Refresh the current repository map with RepoBar using the active run scope.
+2. Prioritize repos with open PRs that still need repair, proof, CI, or owner
+   decision briefs.
+3. If no repairable PR work remains, inspect issue detail for repos with open
+   issues, in RepoBar order. Do not rely on repo-level issue counts alone.
+4. Classify inspected issues as `Autonomous`, `Needs owner`, or ignored only by
+   explicit owner instruction.
+5. Start at least one worker for the highest-confidence autonomous issue, within
+   the run's worker and permission limits. If parallel workers are authorized,
+   start one worker per independent repo lane until the configured worker budget
+   is full.
+6. If no worker is started despite open issues, report the exact inspected issue
+   URLs and blocker for each. Do not summarize this as merely "no active
+   workers".
+
+Existing clean/green PRs that are waiting for owner merge do not block starting
+new issue workers unless they need repair, missing proof, failing CI, unresolved
+review feedback, or a decision brief.
+
 ## Authorization
 
 Treat triage, monitoring, implementation, public mutation, and release as separate permissions.
