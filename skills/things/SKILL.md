@@ -25,6 +25,8 @@ Write (URL scheme)
 - `things add-project "Project title" --area "Area Name"`
 - `things update --id <uuid> --notes "Updated notes"`
 - Clear notes by passing an explicit empty notes value: `things update --id <uuid> --notes ""`
+- Source builds after https://github.com/ossianhempel/things3-cli/pull/34 support clearing a deadline, scheduled date, or all tags the same way: `things update --id <uuid> --deadline=""`, `--when=""`, or `--tags=""` (also works for `update-project`). Homebrew `v0.3.0` does not include this yet.
+- Source builds after https://github.com/ossianhempel/things3-cli/pull/34 support natural scheduling dates: `--when`/`--deadline` accept explicit dates plus `today`, `tomorrow`, `next <weekday>`, `next week/month/year`, and `in N day/week/month/year`; dry-run shows the normalized `YYYY-MM-DD` value. Homebrew `v0.3.0` does not include this yet.
 - Checklist status by exact title: `things update --id <uuid> --complete-checklist-item "Step 1"` or `things update --id <uuid> --incomplete-checklist-item "Step 1"`
 - Bulk update (preview then apply): `things update --query 'tag:work' --dry-run` then `things update --query 'tag:work' --yes --tags "Work"`
 - `things update-project --id <uuid> "New project title"`

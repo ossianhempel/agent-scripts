@@ -7,6 +7,10 @@ read_when:
 
 # Changelog
 
+## 2026-06-22 — Document Things Natural Dates
+
+- Updated the `things` skill with the new natural-date forms for `--when` and `--deadline`, plus the explicit empty-value syntax for clearing dates and tags.
+
 ## 2026-06-21 — Render PR Visual Proof Inline
 
 - Tightened maintainer and triage proof rules so screenshot/GIF/reel evidence must render inline in GitHub PR bodies or proof comments; screenshots/GIFs use durable hosted Markdown images, while video reels may use GitHub-hosted uploaded attachments when they render inline. Bare artifact URLs no longer count as complete visual proof.
