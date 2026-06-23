@@ -59,6 +59,7 @@ Default web stack: TanStack Start, PGlite/SQLite → PG when needed, single-cont
 
 ## Runtime Safety
 - Secrets: never run `env`, `set`, `export -p`, or broad secret searches. Query exact names only; redact values.
+- Need an API key, token, password, or `.env` value? Use the `one-password` skill (`op` CLI) to fetch it — `op read "op://Development/Item/field"` or `op run --env-file=.env -- <cmd>`. A service-account token (`~/.zshenv`) makes this non-interactive, scoped to the `Development` vault; reach other vaults with `env -u OP_SERVICE_ACCOUNT_TOKEN op …` (Touch ID). Don't hardcode, print, or ask the user to paste secrets.
 - Public GitHub bodies: use temp files plus `--body-file`; avoid inline shell strings with backticks, `$`, env names, or user text.
 - PR/issue body edits: fetch with REST + `jq -r`, inspect locally, then write with `--body-file`.
 - zsh: don't use `status` as a variable; use arrays for multi-item loops.
