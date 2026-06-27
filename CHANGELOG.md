@@ -7,6 +7,10 @@ read_when:
 
 # Changelog
 
+## 2026-06-26 — Add PostQ Bridge Skill
+
+- Added `postq-bridge` for moving approved Content Machine Walkmon videos into Post Queue drafts and TikTok inbox-draft scheduling.
+
 ## 2026-06-21 — Render PR Visual Proof Inline
 
 - Tightened maintainer and triage proof rules so screenshot/GIF/reel evidence must render inline in GitHub PR bodies or proof comments; screenshots/GIFs use durable hosted Markdown images, while video reels may use GitHub-hosted uploaded attachments when they render inline. Bare artifact URLs no longer count as complete visual proof.
