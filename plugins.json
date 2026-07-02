@@ -3,11 +3,13 @@
   "claude": {
     "marketplaces": {
       "compound-engineering-plugin": { "source": "github", "repo": "EveryInc/compound-engineering-plugin" },
-      "last30days-skill": { "source": "github", "repo": "mvanhorn/last30days-skill" }
+      "last30days-skill": { "source": "github", "repo": "mvanhorn/last30days-skill" },
+      "frontend-slides": { "source": "github", "repo": "zarazhangrui/frontend-slides" }
     },
     "enabled": [
       "compound-engineering@compound-engineering-plugin",
-      "last30days@last30days-skill"
+      "last30days@last30days-skill",
+      "frontend-slides@frontend-slides"
     ]
   },
   "codex": {

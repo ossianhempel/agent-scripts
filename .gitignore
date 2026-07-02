@@ -8,3 +8,6 @@
 # Python
 __pycache__/
 *.pyc
+
+# Local sync artifact: CLAUDE.md is a symlink to AGENTS.md created by sync-agent-scripts.sh
+/CLAUDE.md

@@ -96,14 +96,24 @@ asc_marketing_version_from_yml() {
 }
 
 # asc_live_app_store_version <apple_id> <country>
-# Prints the live App Store version, or empty if the app isn't live yet.
-# Exits nonzero only on a hard tooling failure (handled by callers).
+# Prints the live App Store version. Empty output with exit 0 means the app is
+# genuinely not live yet (a successful lookup that returned zero results).
+# Returns 2 on a hard lookup failure — network/HTTP error or an unparsable
+# response — so strict callers can fail closed instead of mistaking an outage
+# for "no live version yet".
 asc_live_app_store_version() {
   asc_require_tool curl
   asc_require_tool plutil
   _url="https://itunes.apple.com/lookup?id=${1}&country=${2}"
-  _json="$(curl -fsSL "$_url" 2>/dev/null || true)"
-  _count="$(printf '%s' "$_json" | plutil -extract resultCount raw -o - - 2>/dev/null || echo 0)"
-  [ "${_count:-0}" = "0" ] && return 0   # not live yet -> empty, not an error
-  printf '%s' "$_json" | plutil -extract results.0.version raw -o - - 2>/dev/null || true
+  # Separate curl failure (network/HTTP) from a successful empty result.
+  if ! _json="$(curl -fsSL "$_url" 2>/dev/null)"; then
+    return 2
+  fi
+  _count="$(printf '%s' "$_json" | plutil -extract resultCount raw -o - - 2>/dev/null)" || _count=""
+  case "$_count" in
+    "0") return 0 ;;            # successful lookup, app not live yet -> empty
+    *[!0-9]* | "") return 2 ;;  # unparsable resultCount -> treat as failure
+    *) : ;;                     # positive integer -> a live version exists
+  esac
+  printf '%s' "$_json" | plutil -extract results.0.version raw -o - - 2>/dev/null || return 2
 }

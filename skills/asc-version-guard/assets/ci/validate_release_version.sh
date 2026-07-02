@@ -54,12 +54,20 @@ target_version="$(sed -n 's/.*MARKETING_VERSION = \([^;]*\);/\1/p' "$PROJECT_FIL
 [ -n "$target_version" ] || asc_fail "Could not parse MARKETING_VERSION from $PROJECT_FILE"
 asc_validate_shape "$target_version"
 
-live_version="$(asc_live_app_store_version "$APP_APPLE_ID" "$LOOKUP_COUNTRY")"
-if [ -z "$live_version" ]; then
-  printf 'MARKETING_VERSION %s (no live App Store version yet — OK)\n' "$target_version"
-  exit 0
+if live_version="$(asc_live_app_store_version "$APP_APPLE_ID" "$LOOKUP_COUNTRY")"; then
+  if [ -z "$live_version" ]; then
+    printf 'MARKETING_VERSION %s (no live App Store version yet — OK)\n' "$target_version"
+    exit 0
+  fi
+  asc_validate_shape "$live_version"
+else
+  cat >&2 <<EOF
+error: Could not determine the live App Store version (lookup failed: network/HTTP error or unparsable response).
+Refusing to validate a protected-branch release against an unverified version — failing closed.
+Re-run once the App Store lookup is reachable, or set $skip_var=1 for a one-off override.
+EOF
+  exit 1
 fi
-asc_validate_shape "$live_version"
 
 if [ "$(asc_compare "$target_version" "$live_version")" = "1" ]; then
   printf 'MARKETING_VERSION %s > live App Store %s (OK)\n' "$target_version" "$live_version"
