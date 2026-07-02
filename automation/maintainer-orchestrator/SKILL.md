@@ -185,6 +185,12 @@ Every delegated implementation thread, within its explicit authorization, must:
 - when merge/close is authorized, merge or close the queue item with an exact proof comment;
 - after authorized landing, return to the repository's selected integration branch, pull `--ff-only`, and verify a clean worktree.
 
+Worker completion reports should be terse when the PR is clean. Use one or two
+lines with the PR URL, proof type, green checks, review-thread state, and any
+blocker. Do not paste full command lists, branch/worktree details, or long proof
+descriptions unless something failed, is blocked, or needs owner action; the
+orchestrator can inspect GitHub and logs for details.
+
 Prefer repairing the contributor PR. Preserve contributor credit and follow the workspace PR rules.
 When landing is not yet authorized, stop only after the branch is pushed, the PR targets the repository's selected integration branch, the PR is mergeable, required CI is green, live proof is recorded, and the exact owner decision is stated.
 
@@ -276,6 +282,13 @@ Keep one compact cross-repo ledger:
 - `Ignored`: exact item and owner-granted exception.
 - `Released`: version, tag/registry verification, closeout commit.
 - `Ready next`: effective queue empty, CI green, recommended patch/minor version and rationale.
+
+For recurring heartbeat reports, prefer delta-only output. Mention only newly opened
+or newly readied PRs, newly started/closed workers, new blockers, and changed
+Needs owner state. Do not repeat unchanged clean PRs, unchanged proof details, or
+routine poll results unless they are needed to explain an action. A ready PR can
+be one line: `<repo>: <PR URL> ready; proof <type>; checks green; threads clear.`
+An active worker can be one line: `<repo>: <issue URL> active in <phase>.`
 
 Omit archived and owner-suppressed repositories entirely. Do not list them as ignored, blocked, stale, or available work.
 
