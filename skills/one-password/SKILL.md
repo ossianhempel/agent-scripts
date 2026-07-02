@@ -15,13 +15,18 @@ credentials without hardcoding them, printing them, or asking the user to paste.
 exported as `OP_SERVICE_ACCOUNT_TOKEN` in `~/.zshenv`, so every shell (including
 non-interactive agent shells) can run `op` with **no Touch ID prompt**. The token
 is scoped to the **`Development` vault only** — that is the blast radius if it leaks.
+It currently has `read_items` and `write_items` so agents can both retrieve and
+maintain repo/app secrets without a manual 1Password handoff.
 
 - Default account: `my.1password.com`.
-- The service account can **only read the `Development` vault**. Secrets an agent
+- The service account can **read and write items in the `Development` vault**. Secrets an agent
   needs non-interactively must live there. It cannot see `Personal`, `H&M`, or
   `Rebtech`.
 - Service-account reads need an explicit vault: the vault is in the `op://` ref for
   `op read`; for `op item get`/`op item list` pass `--vault Development`.
+- Service-account writes should stay vault-scoped and intentional: use existing app/repo
+  items when possible, add clear repo tags/sections, and inspect the target item
+  structure before broad rewrites.
 
 **Fallback — Touch ID (interactive).** To reach a vault outside the service
 account's scope (`Personal`, `H&M`, `Rebtech`), unset the token for that one
@@ -84,15 +89,23 @@ op read --out-file ./key.pem "op://Development/server/ssh/key.pem"    # write to
 
 ## Adding a new secret for agents to use
 
-Put it in the `Development` vault. The service account is **read-only**, so create
-the item with Touch ID (or the desktop app):
+Put it in the `Development` vault. Prefer the service account for agent-managed
+items and use repo-specific item names, tags, and sections so secrets do not get
+mixed across projects:
 
 ```bash
-env -u OP_SERVICE_ACCOUNT_TOKEN op item create --vault Development \
-  --category "API Credential" --title "Some Service" "api_key[password]=…"
+op item create --vault Development \
+  --category "API Credential" --title "Some Service" \
+  --tags "repo:some-repo,project:some-project" \
+  "api_key[password]=…"
 ```
 
 Then agents read it non-interactively via `op read "op://Development/Some Service/api_key"`.
+
+For sensitive values, prefer JSON templates or `op run`/`op inject` over command-line
+assignment statements so secrets do not appear in process arguments. If you need a
+human-owned vault outside `Development`, unset the service account token and use the
+Touch ID fallback.
 
 ## Finding the right reference
 
@@ -124,11 +137,20 @@ Do not enumerate other vaults by default. Search only when the user asks.
 ## Operations
 
 - Token lives in `~/.zshenv` (`OP_SERVICE_ACCOUNT_TOKEN`). It is scoped to
-  `Development` with `read_items` only.
+  `Development` with `read_items` and `write_items`.
 - Rate limits: `op service-account ratelimit` shows usage if reads start failing.
 - Rotate/replace: create a new one with
-  `op service-account create <name> --vault Development:read_items --raw`, update
+  `op service-account create <name> --vault Development:read_items,write_items --raw`, update
   `~/.zshenv`. The old token keeps working until deleted in the 1Password web UI.
+
+## Service Account Credential
+
+The service-account token itself is stored in
+`op://Development/1Password Service Account — mac-mini-agents/credential`. That
+item should be tagged `tool:1password`, `service-account`, `mac-mini-agents`,
+`vault:development`, and `permission:read-write`. If the token is rotated, update
+both that 1Password item and `~/.zshenv`, then verify `op item edit` works without
+unsetting `OP_SERVICE_ACCOUNT_TOKEN`.
 
 ## Service-specific credentials
 

@@ -23,6 +23,7 @@ Default web stack: TanStack Start, PGlite/SQLite → PG when needed, single-cont
 - Use existing theme/design tokens; don't hardcode styles when a token exists.
 - Avoid polyfills unless explicitly required by the target environment.
 - Use the repo package manager/runtime; no swaps without approval.
+- For social publishing, prefer platform draft/manual-post delivery over direct API publish when supported; direct API posting can reduce engagement.
 - Commits: Conventional Commits (feat|fix|refactor|build|ci|chore|docs|style|perf|test).
 - Prefer end-to-end verify; if blocked, say what's missing.
 - New deps: quick health check (recent releases/commits, adoption).
